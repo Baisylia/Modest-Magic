@@ -79,17 +79,17 @@ public class EnchantingBlockEntity extends PedestalBlockEntity {
                             worldPosition.getX() + 0.5,
                             worldPosition.getY() + 1.0,
                             worldPosition.getZ() + 0.5,
-                            30,
+                            40,
                             0.5, 0.5, 0.5,
                             0.01
                     );
                     serverLevel.sendParticles(
-                            ParticleTypes.POOF,
+                            ParticleTypes.SOUL_FIRE_FLAME,
                             worldPosition.getX() + 0.5,
                             worldPosition.getY() + 1.0,
                             worldPosition.getZ() + 0.5,
                             10,
-                            0.0, 0.0, 0.0,
+                            0.1, 0.1, 0.1,
                             0.01
                     );
 
@@ -101,17 +101,17 @@ public class EnchantingBlockEntity extends PedestalBlockEntity {
                                 pPos.getX() + 0.5,
                                 pPos.getY() + 1.0,
                                 pPos.getZ() + 0.5,
-                                15,
+                                20,
                                 0.3, 0.3, 0.3,
                                 0.1
                         );
                         serverLevel.sendParticles(
-                                ParticleTypes.POOF,
+                                ParticleTypes.SOUL_FIRE_FLAME,
                                 pPos.getX() + 0.5,
                                 pPos.getY() + 1.0,
                                 pPos.getZ() + 0.5,
                                 10,
-                                0.0, 0.0, 0.0,
+                                0.1, 0.1, 0.1,
                                 0.01
                         );
                     }
