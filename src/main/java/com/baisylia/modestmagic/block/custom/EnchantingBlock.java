@@ -29,10 +29,6 @@ public class EnchantingBlock extends PedestalBlock {
         return new EnchantingBlockEntity(pos, state);
     }
 
-    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
-        return Block.box(0.0D, 0.0D, 0.0D, 16.0D, 12.0D, 16.0D);
-    }
-
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if(level.isClientSide) return InteractionResult.SUCCESS;

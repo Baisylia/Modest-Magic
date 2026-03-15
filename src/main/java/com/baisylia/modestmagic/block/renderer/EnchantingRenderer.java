@@ -21,11 +21,11 @@ public class EnchantingRenderer implements BlockEntityRenderer<EnchantingBlockEn
 
         poseStack.pushPose();
 
-        poseStack.translate(0.5, 1.0, 0.5);
+        poseStack.translate(0.5, 1.3, 0.5);
 
         float rotation = (enchantingTable.getLevel().getGameTime() + partialTick) * 2;
         poseStack.mulPose(Vector3f.YP.rotationDegrees(rotation));
-        poseStack.scale(1.0f,1.0f,1.0f);
+        poseStack.scale(1.5f,1.5f,1.5f);
 
         Minecraft.getInstance().getItemRenderer().renderStatic(
                 stack,

@@ -1,5 +1,5 @@
 {
   "variants": {
-    "": { "model": "minecraft:block/enchanting_table" }
+    "": { "model": "modestmagic:block/enchanting_table" }
   }
 }

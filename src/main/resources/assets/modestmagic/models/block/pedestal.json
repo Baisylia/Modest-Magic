@@ -5,7 +5,7 @@
 	"textures": {
 		"10": "block/chiseled_stone_bricks",
 		"11": "block/stone_bricks",
-		"particle": "block/lectern_sides"
+		"particle": "block/chiseled_stone_bricks"
 	},
 	"elements": [
 		{
