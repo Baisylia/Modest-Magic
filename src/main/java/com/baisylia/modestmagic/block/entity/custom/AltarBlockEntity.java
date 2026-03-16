@@ -107,26 +107,35 @@ public class AltarBlockEntity extends PedestalBlockEntity {
                 BlockPos pPos = pedestal.getBlockPos();
                 makeParticles(serverLevel, pPos, particle);
             }
+            serverLevel.sendParticles(
+                    ParticleTypes.WITCH,
+                    worldPosition.getX() + 0.5,
+                    worldPosition.getY() + 1.0,
+                    worldPosition.getZ() + 0.5,
+                    20,
+                    0.0,0.0,0.0,
+                    0.05
+            );
+            serverLevel.sendParticles(
+                    ParticleTypes.ENCHANT,
+                    worldPosition.getX() + 0.5,
+                    worldPosition.getY() + 2,
+                    worldPosition.getZ() + 0.5,
+                    35,
+                    0.0,0.0,0.0,
+                    3.0
+            );
         }
     }
     public <T extends ParticleOptions> void makeParticles(ServerLevel serverLevel, BlockPos pos, T particle) {
         serverLevel.sendParticles(
-                ParticleTypes.ENCHANT,
-                pos.getX() + 0.5,
-                pos.getY() + 1,
-                pos.getZ() + 0.5,
-                40,
-                0.5,0.5,0.5,
-                0.01
-        );
-        serverLevel.sendParticles(
                 particle,
                 pos.getX() + 0.5,
-                pos.getY() + 1.0,
+                pos.getY() + 1.5,
                 pos.getZ() + 0.5,
                 10,
-                0.1, 0.1, 0.1,
-                0.01
+                0.0, 0.0, 0.0,
+                0.05
         );
     }
 }
