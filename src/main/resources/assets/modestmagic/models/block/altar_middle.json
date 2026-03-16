@@ -3,8 +3,8 @@
 	"credit": "Made with Blockbench",
 	"parent": "block/block",
 	"textures": {
-		"2": "modestmagic:block/enchanting_table_misc",
-		"particle": "modestmagic:block/enchanting_table_bottom"
+		"2": "modestmagic:block/altar_misc",
+		"particle": "modestmagic:block/altar_bottom"
 	},
 	"elements": [
 		{

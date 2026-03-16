@@ -7,7 +7,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "modestmagic:enchanting_table"
+          "name": "modestmagic:altar"
         }
       ],
       "conditions": [

@@ -1,6 +1,6 @@
 package com.baisylia.modestmagic.block.renderer;
 
-import com.baisylia.modestmagic.block.entity.custom.EnchantingBlockEntity;
+import com.baisylia.modestmagic.block.entity.custom.AltarBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;
@@ -10,12 +10,12 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.item.ItemStack;
 
-public class EnchantingRenderer implements BlockEntityRenderer<EnchantingBlockEntity> {
+public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
 
-    public EnchantingRenderer(BlockEntityRendererProvider.Context context) {}
+    public AltarRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
-    public void render(EnchantingBlockEntity enchantingTable, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int light, int overlay) {
+    public void render(AltarBlockEntity enchantingTable, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int light, int overlay) {
         ItemStack stack = enchantingTable.getItem();
         if(stack.isEmpty()) return;
 

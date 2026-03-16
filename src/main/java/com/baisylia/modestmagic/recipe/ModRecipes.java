@@ -17,10 +17,18 @@ public class ModRecipes {
             DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, ModestMagic.MOD_ID);
 
 
+
+    public static final RegistryObject<RecipeType<InfusingRecipe>> INFUSING_TYPE =
+            TYPES.register("infusing", () -> new RecipeType<>() {});
+    public static final RegistryObject<RecipeSerializer<InfusingRecipe>> INFUSING_SERIALIZER =
+            SERIALIZERS.register("infusing", () -> InfusingRecipe.Serializer.INSTANCE);
+
     public static final RegistryObject<RecipeType<EnchantingRecipe>> ENCHANTING_TYPE =
             TYPES.register("enchanting", () -> new RecipeType<>() {});
+
     public static final RegistryObject<RecipeSerializer<EnchantingRecipe>> ENCHANTING_SERIALIZER =
-            SERIALIZERS.register("enchanting", () -> EnchantingRecipe.Serializer.INSTANCE);
+            SERIALIZERS.register("enchanting", EnchantingRecipe.Serializer::new);
+
 
 
     public static void register(IEventBus eventBus) {

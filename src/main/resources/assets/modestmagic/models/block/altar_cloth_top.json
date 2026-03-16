@@ -3,33 +3,21 @@
 	"credit": "Made with Blockbench",
 	"parent": "block/block",
 	"textures": {
-		"2": "modestmagic:block/enchanting_table_misc",
-		"3": "modestmagic:block/enchanting_table_bottom",
-		"5": "modestmagic:block/enchanting_table_top",
-		"particle": "modestmagic:block/enchanting_table_top"
+		"2": "modestmagic:block/altar_misc",
+		"3": "modestmagic:block/altar_bottom",
+		"5": "modestmagic:block/altar_top",
+		"particle": "modestmagic:block/altar_top"
 	},
 	"elements": [
 		{
-			"from": [0, 0, 0],
-			"to": [16, 3, 16],
-			"faces": {
-				"north": {"uv": [0, 13, 16, 16], "texture": "#3", "cullface": "north"},
-				"east": {"uv": [0, 13, 16, 16], "texture": "#3", "cullface": "east"},
-				"south": {"uv": [0, 13, 16, 16], "texture": "#3", "cullface": "south"},
-				"west": {"uv": [0, 13, 16, 16], "texture": "#3", "cullface": "west"},
-				"up": {"uv": [0, 0, 16, 16], "rotation": 180, "texture": "#3"},
-				"down": {"uv": [0, 0, 16, 16], "texture": "#3", "cullface": "down"}
-			}
-		},
-		{
-			"from": [3, 3, 3],
+			"from": [3, 0, 3],
 			"to": [13, 13, 13],
 			"rotation": {"angle": 0, "axis": "y", "origin": [0, 1, 0]},
 			"faces": {
-				"north": {"uv": [0, 11, 5, 16], "texture": "#2"},
-				"east": {"uv": [5, 11, 0, 16], "texture": "#2"},
-				"south": {"uv": [0, 11, 5, 16], "texture": "#2"},
-				"west": {"uv": [0, 11, 5, 16], "texture": "#2"}
+				"north": {"uv": [5, 0, 10, 6.5], "texture": "#2"},
+				"east": {"uv": [10, 0, 5, 6.5], "texture": "#2"},
+				"south": {"uv": [5, 0, 10, 6.5], "texture": "#2"},
+				"west": {"uv": [5, 0, 10, 6.5], "texture": "#2"}
 			}
 		},
 		{

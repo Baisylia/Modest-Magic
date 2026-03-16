@@ -60,7 +60,7 @@ public class ModestMagic
         public static void onClientSetup(FMLClientSetupEvent event)
         {
             ItemBlockRenderTypes.setRenderLayer(ModBlocks.PEDESTAL.get(), RenderType.cutoutMipped());
-            ItemBlockRenderTypes.setRenderLayer(ModBlocks.ENCHANTING_TABLE.get(), RenderType.cutoutMipped());
+            ItemBlockRenderTypes.setRenderLayer(ModBlocks.ALTAR.get(), RenderType.cutoutMipped());
         }
     }
 }

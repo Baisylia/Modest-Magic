@@ -1,7 +1,7 @@
 package com.baisylia.modestmagic.block;
 
 import com.baisylia.modestmagic.ModestMagic;
-import com.baisylia.modestmagic.block.custom.EnchantingBlock;
+import com.baisylia.modestmagic.block.custom.AltarBlock;
 import com.baisylia.modestmagic.block.custom.PedestalBlock;
 import com.baisylia.modestmagic.item.ModItems;
 import net.minecraft.world.item.BlockItem;
@@ -11,8 +11,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.material.MaterialColor;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -25,8 +23,8 @@ public class ModBlocks {
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, ModestMagic.MOD_ID);
 
 
-    public static final RegistryObject<Block> ENCHANTING_TABLE = registerBlock("enchanting_table",
-            () -> new EnchantingBlock(BlockBehaviour.Properties.copy(Blocks.OBSIDIAN).noOcclusion()), CreativeModeTab.TAB_DECORATIONS, false, 0);
+    public static final RegistryObject<Block> ALTAR = registerBlock("altar",
+            () -> new AltarBlock(BlockBehaviour.Properties.copy(Blocks.OBSIDIAN).noOcclusion()), CreativeModeTab.TAB_DECORATIONS, false, 0);
 
     public static final RegistryObject<Block> PEDESTAL = registerBlock("pedestal",
             () -> new PedestalBlock(BlockBehaviour.Properties.copy(Blocks.STONE_BRICKS).noOcclusion()), CreativeModeTab.TAB_DECORATIONS, false, 0);

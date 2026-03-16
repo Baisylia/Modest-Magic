@@ -2,7 +2,7 @@ package com.baisylia.modestmagic.event;
 
 import com.baisylia.modestmagic.ModestMagic;
 import com.baisylia.modestmagic.block.entity.ModBlockEntities;
-import com.baisylia.modestmagic.block.renderer.EnchantingRenderer;
+import com.baisylia.modestmagic.block.renderer.AltarRenderer;
 import com.baisylia.modestmagic.block.renderer.PedestalRenderer;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -20,8 +20,8 @@ public class ModEvents {
         );
 
         event.registerBlockEntityRenderer(
-                ModBlockEntities.ENCHANTING_BLOCK_ENTITY.get(),
-                EnchantingRenderer::new
+                ModBlockEntities.ALTAR_BLOCK_ENTITY.get(),
+                AltarRenderer::new
         );
     }
 }

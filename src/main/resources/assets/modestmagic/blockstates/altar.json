@@ -2,53 +2,53 @@
   "variants": {
 
     "axis=y,top=true,bottom=true": {
-      "model": "modestmagic:block/enchanting_table_cloth"
+      "model": "modestmagic:block/altar_cloth"
     },
     "axis=y,top=true,bottom=false": {
-      "model": "modestmagic:block/enchanting_table_cloth_top"
+      "model": "modestmagic:block/altar_cloth_top"
     },
     "axis=y,top=false,bottom=true": {
-      "model": "modestmagic:block/enchanting_table_bottom"
+      "model": "modestmagic:block/altar_bottom"
     },
     "axis=y,top=false,bottom=false": {
-      "model": "modestmagic:block/enchanting_table_middle"
+      "model": "modestmagic:block/altar_middle"
     },
 
     "axis=x,top=true,bottom=true": {
-      "model": "modestmagic:block/enchanting_table_full",
+      "model": "modestmagic:block/altar_full",
       "x": 90,
       "y": 90
     },
     "axis=x,top=true,bottom=false": {
-      "model": "modestmagic:block/enchanting_table_top",
+      "model": "modestmagic:block/altar_top",
       "x": 90,
       "y": 90
     },
     "axis=x,top=false,bottom=true": {
-      "model": "modestmagic:block/enchanting_table_bottom",
+      "model": "modestmagic:block/altar_bottom",
       "x": 90,
       "y": 90
     },
     "axis=x,top=false,bottom=false": {
-      "model": "modestmagic:block/enchanting_table_middle",
+      "model": "modestmagic:block/altar_middle",
       "x": 90,
       "y": 90
     },
 
     "axis=z,top=true,bottom=true": {
-      "model": "modestmagic:block/enchanting_table_full",
+      "model": "modestmagic:block/altar_full",
       "x": 90
     },
     "axis=z,top=true,bottom=false": {
-      "model": "modestmagic:block/enchanting_table_bottom",
+      "model": "modestmagic:block/altar_bottom",
       "x": 90
     },
     "axis=z,top=false,bottom=true": {
-      "model": "modestmagic:block/enchanting_table_top",
+      "model": "modestmagic:block/altar_top",
       "x": 90
     },
     "axis=z,top=false,bottom=false": {
-      "model": "modestmagic:block/enchanting_table_middle",
+      "model": "modestmagic:block/altar_middle",
       "x": 90
     }
 

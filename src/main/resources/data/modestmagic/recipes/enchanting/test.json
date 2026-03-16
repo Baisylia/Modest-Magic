@@ -1,20 +1,11 @@
 {
   "type": "modestmagic:enchanting",
-
-  "base": { "item": "minecraft:stick" },
-
   "ingredients": [
-    { "item": "minecraft:diamond" },
-    { "item": "minecraft:diamond" },
-    { "item": "minecraft:diamond" },
-    { "item": "minecraft:diamond" },
-    { "item": "minecraft:diamond" },
-    { "item": "minecraft:diamond" },
-    { "item": "minecraft:diamond" },
-    { "item": "minecraft:diamond" }
+    { "item": "minecraft:emerald" },
+    { "item": "minecraft:emerald" }
   ],
-
-  "result": {
-    "item": "minecraft:nether_star"
-  }
+  "enchantments": [
+    "minecraft:sharpness",
+    "minecraft:fire_aspect"
+  ]
 }

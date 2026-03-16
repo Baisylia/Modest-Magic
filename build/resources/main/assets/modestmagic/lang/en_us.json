@@ -1,10 +1,12 @@
 {
-  "block.modestmagic.enchanting_table": "Altar",
+  "item.modestmagic.enchantment_tablet": "Enchantment Tablet",
+  "item.modestmagic.enchantment_tablet_aquatic": "Aquatic Enchantment Tablet",
+
+  "block.modestmagic.altar": "Altar",
   "block.modestmagic.pedestal": "Pedestal",
 
-  "recipe.modestmagic.forging": "Enchanting",
-  "emi.category.modestmagic.forging": "Enchanting",
-
-  "modestmagic.subtitles.forge.crackle": "Forge crackles",
-  "gui.recipe_book.toggle_recipes.forgeable": "Toggle Forgeable"
+  "recipe.modestmagic.infusing": "Infusing",
+  "emi.category.modestmagic.infusing": "Infusing",
+  "recipe.modestmagic.enhancing": "Enhancing",
+  "emi.category.modestmagic.enhancing": "Enhancing"
 }

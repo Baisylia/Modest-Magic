@@ -3,21 +3,19 @@
   "category": "misc",
   "key": {
     "O": {
-      "item": "minecraft:obsidian"
-    },
-    "A": {
       "item": "minecraft:amethyst_shard"
     },
-    "L": {
-      "item": "minecraft:leather"
+    "#": {
+      "item": "minecraft:gold_block"
     }
   },
   "pattern": [
-    "ALA",
-    " O ",
+    "OOO",
+    "O#O",
     "OOO"
   ],
   "result": {
-    "item": "modestmagic:enchanting_table"
+    "item": "modestmagic:enchantment_tablet",
+    "count": 1
   }
 }

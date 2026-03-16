@@ -1,0 +1,10 @@
+{
+  "type": "modestmagic:tablet",
+  "base": {
+    "tag": "forge:tools/swords"
+  },
+  "tablet": {
+    "item": "modestmagic:sharpness_tablet"
+  },
+  "enchantment": "minecraft:sharpness"
+}

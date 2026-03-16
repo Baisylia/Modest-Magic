@@ -1,6 +1,6 @@
 package com.baisylia.modestmagic.block.custom;
 
-import com.baisylia.modestmagic.block.entity.custom.EnchantingBlockEntity;
+import com.baisylia.modestmagic.block.entity.custom.AltarBlockEntity;
 import com.baisylia.modestmagic.block.entity.custom.PedestalBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -8,26 +8,22 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-public class EnchantingBlock extends PedestalBlock {
+public class AltarBlock extends PedestalBlock {
 
-    public EnchantingBlock(Properties properties) {
+    public AltarBlock(Properties properties) {
         super(properties);
     }
 
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new EnchantingBlockEntity(pos, state);
+        return new AltarBlockEntity(pos, state);
     }
 
     @Override
@@ -35,7 +31,7 @@ public class EnchantingBlock extends PedestalBlock {
         if(level.isClientSide) return InteractionResult.SUCCESS;
 
         BlockEntity be = level.getBlockEntity(pos);
-        if(!(be instanceof EnchantingBlockEntity table))
+        if(!(be instanceof AltarBlockEntity table))
             return InteractionResult.PASS;
 
         if(state.getValue(AXIS) != Direction.Axis.Y)
