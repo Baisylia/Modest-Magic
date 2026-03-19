@@ -1,5 +1,6 @@
 package com.baisylia.modestmagic;
 
+import com.baisylia.modestmagic.client.ModSounds;
 import com.mojang.logging.LogUtils;
 import com.baisylia.modestmagic.block.ModBlocks;
 import com.baisylia.modestmagic.block.entity.ModBlockEntities;
@@ -35,6 +36,7 @@ public class ModestMagic
         ModBlocks.register(eventBus);
         ModBlockEntities.register(eventBus);
         ModRecipes.register(eventBus);
+        ModSounds.register(eventBus);
 
         MinecraftForge.EVENT_BUS.register(this);
     }

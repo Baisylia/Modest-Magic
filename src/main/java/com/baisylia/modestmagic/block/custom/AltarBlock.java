@@ -2,6 +2,7 @@ package com.baisylia.modestmagic.block.custom;
 
 import com.baisylia.modestmagic.block.entity.custom.AltarBlockEntity;
 import com.baisylia.modestmagic.block.entity.custom.PedestalBlockEntity;
+import com.baisylia.modestmagic.client.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -39,6 +40,6 @@ public class AltarBlock extends PedestalBlock {
         }
 
         // Pedestal
-        return pedestalUse(level, pos, player, hand, state);
+        return pedestalUse(level, pos, player, hand, state, ModSounds.ADD_ITEM_ALTAR.get());
     }
 }

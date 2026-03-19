@@ -2,8 +2,10 @@ package com.baisylia.modestmagic.block.custom;
 
 import com.baisylia.modestmagic.block.entity.ModBlockEntities;
 import com.baisylia.modestmagic.block.entity.custom.PedestalBlockEntity;
+import com.baisylia.modestmagic.client.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -28,6 +30,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class PedestalBlock extends BaseEntityBlock implements SimpleWaterloggedBlock {
@@ -165,10 +168,10 @@ public class PedestalBlock extends BaseEntityBlock implements SimpleWaterloggedB
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        return pedestalUse(level, pos, player, hand, state);
+        return pedestalUse(level, pos, player, hand, state, ModSounds.ADD_ITEM_PEDESTAL.get());
     }
 
-    protected InteractionResult pedestalUse(Level level, BlockPos pos, Player player, InteractionHand hand, BlockState state) {
+    protected InteractionResult pedestalUse(Level level, BlockPos pos, Player player, InteractionHand hand, BlockState state, @NotNull SoundEvent soundEvent) {
         if(state.getValue(AXIS) != Direction.Axis.Y) return InteractionResult.PASS;
         if(!state.getValue(TOP)) return InteractionResult.PASS;
 
@@ -184,12 +187,17 @@ public class PedestalBlock extends BaseEntityBlock implements SimpleWaterloggedB
             if(!level.isClientSide) {
                 pedestal.setItem(held.split(1));
             }
+
+            level.playSound(null, pos, soundEvent,
+                    net.minecraft.sounds.SoundSource.BLOCKS, 1.0f, 1.0f);
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
         else {
             if(!level.isClientSide) {
                 ItemStack stack = pedestal.getItem();
                 pedestal.clear();
+                level.playSound(null, pos, ModSounds.REMOVE_ITEM_PEDESTAL.get(),
+                        net.minecraft.sounds.SoundSource.BLOCKS, 1.0f, 1.0f);
 
                 if(!player.addItem(stack)) {
                     player.drop(stack, false);
