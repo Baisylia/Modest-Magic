@@ -8,5 +8,6 @@
     { "item": "minecraft:ghast_tear" },
     { "item": "minecraft:ghast_tear" }
   ],
+  "consume_base": true,
   "result_entity": "minecraft:ghast"
 }

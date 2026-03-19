@@ -25,3 +25,6 @@ run
 forge*changelog.txt
 /.gradle
 /.gradle
+*.lock
+.gradle/7.5.1/checksums/checksums.lock
+/.gradle/7.5.1

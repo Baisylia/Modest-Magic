@@ -26,12 +26,18 @@ public class SummoningRecipe implements Recipe<SimpleContainer> {
     private final NonNullList<Ingredient> ingredients;
     private final Ingredient base;
     private final EntityType<?> resultEntity;
+    private final boolean consumeBase;
 
-    public SummoningRecipe(ResourceLocation id, Ingredient base, NonNullList<Ingredient> ingredients, EntityType<?> resultEntity) {
+    public SummoningRecipe(ResourceLocation id, Ingredient base, NonNullList<Ingredient> ingredients, EntityType<?> resultEntity, boolean consumeBase) {
         this.id = id;
         this.base = base;
         this.ingredients = ingredients;
         this.resultEntity = resultEntity;
+        this.consumeBase = consumeBase;
+    }
+
+    public boolean shouldConsumeBase() {
+        return consumeBase;
     }
 
     public boolean matches(ItemStack centerItem, List<ItemStack> pedestalItems) {
@@ -101,12 +107,12 @@ public class SummoningRecipe implements Recipe<SimpleContainer> {
             for (int i = 0; i < ingredientsJson.size(); i++) {
                 ingredients.add(Ingredient.fromJson(ingredientsJson.get(i)));
             }
-
+            boolean consumeBase = GsonHelper.getAsBoolean(json, "consume_base", true);
             EntityType<?> entity = ForgeRegistries.ENTITY_TYPES.getValue(
                     new ResourceLocation(GsonHelper.getAsString(json, "result_entity"))
             );
 
-            return new SummoningRecipe(id, base, ingredients, entity);
+            return new SummoningRecipe(id, base, ingredients, entity, consumeBase);
         }
 
         @Override
@@ -114,18 +120,18 @@ public class SummoningRecipe implements Recipe<SimpleContainer> {
             int size = buf.readVarInt();
             NonNullList<Ingredient> ingredients = NonNullList.withSize(size, Ingredient.EMPTY);
             for (int i = 0; i < size; i++) ingredients.set(i, Ingredient.fromNetwork(buf));
-
+            boolean consumeBase = buf.readBoolean();
             Ingredient base = Ingredient.fromNetwork(buf);
             EntityType<?> entity = ForgeRegistries.ENTITY_TYPES.getValue(buf.readResourceLocation());
 
-            return new SummoningRecipe(id, base, ingredients, entity);
+            return new SummoningRecipe(id, base, ingredients, entity, consumeBase);
         }
 
         @Override
         public void toNetwork(FriendlyByteBuf buf, SummoningRecipe recipe) {
             buf.writeVarInt(recipe.ingredients.size());
             for (Ingredient ing : recipe.ingredients) ing.toNetwork(buf);
-
+            buf.writeBoolean(recipe.consumeBase);
             recipe.base.toNetwork(buf);
             buf.writeResourceLocation(ForgeRegistries.ENTITY_TYPES.getKey(recipe.resultEntity));
         }
