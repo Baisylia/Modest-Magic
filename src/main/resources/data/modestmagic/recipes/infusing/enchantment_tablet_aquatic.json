@@ -1,15 +1,22 @@
 {
   "type": "modestmagic:infusing",
-
-  "base": { "item": "modestmagic:enchantment_tablet" },
-
+  "base": { 
+    "item": "modestmagic:enchantment_tablet" 
+  },
   "ingredients": [
-    { "item": "minecraft:prismarine_crystals" },
-    { "item": "minecraft:prismarine_crystals" },
-    { "item": "minecraft:prismarine_crystals" },
-    { "item": "minecraft:prismarine_crystals" }
+    {
+	  "item": "minecraft:prismarine_crystals"
+	},
+    {
+	  "item": "minecraft:prismarine_crystals"
+	},
+    {
+	  "item": "minecraft:prismarine_crystals"
+	},
+    {
+	  "item": "minecraft:prismarine_crystals"
+	}
   ],
-
   "result": {
     "item": "modestmagic:enchantment_tablet_aquatic"
   }

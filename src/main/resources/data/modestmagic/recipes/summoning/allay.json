@@ -4,9 +4,15 @@
     "item": "minecraft:diamond"
   },
   "ingredients": [
-    { "item": "minecraft:prismarine_crystals" },
-    { "item": "minecraft:prismarine_crystals" },
-    { "item": "minecraft:prismarine_crystals" }
+    {
+	  "item": "minecraft:prismarine_crystals"
+	},
+    {
+	  "item": "minecraft:prismarine_crystals"
+	},
+    {
+	  "item": "minecraft:prismarine_crystals"
+	}
   ],
   "consume_base": false,
   "result_entity": "minecraft:allay"

@@ -1,8 +1,12 @@
 {
   "type": "modestmagic:enchanting",
   "ingredients": [
-    { "item": "minecraft:emerald" },
-    { "item": "minecraft:emerald" }
+    { 
+	  "item": "minecraft:redstone" 
+	},
+    { 
+	  "item": "minecraft:redstone" 
+	}
   ],
   "enchantments": [
     "minecraft:sharpness",

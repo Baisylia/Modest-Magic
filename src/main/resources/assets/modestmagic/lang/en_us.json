@@ -10,9 +10,9 @@
   "recipe.modestmagic.enhancing": "Enhancing",
   "emi.category.modestmagic.enhancing": "Enhancing",
 
-  "modestmagic.subtitles.pedestal.add_item": "Item removed from pedestal",
-  "modestmagic.subtitles.pedestal.remove_item": "Item placed on pedestal",
-  "modestmagic.subtitles.altar.add_item": "Item placed on altar",
-  "modestmagic.subtitles.altar.enchant": "Item enchanted on altar",
-  "modestmagic.subtitles.altar.summon": "Mob summoned on altar"
+  "subtitles.modestmagic.block.pedestal.add_item": "Pedestal fills",
+  "subtitles.modestmagic.block.pedestal.remove_item": "Pedestal empties",
+  "subtitles.modestmagic.block.altar.add_item": "Altar fills",
+  "subtitles.modestmagic.block.altar.enchant": "Altar enchants",
+  "subtitles.modestmagic.block.altar.summon": "Altar summons"
 }
