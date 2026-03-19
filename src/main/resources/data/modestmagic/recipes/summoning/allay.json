@@ -1,7 +1,7 @@
 {
   "type": "modestmagic:summoning",
   "base": {
-    "item": "minecraft:diamond"
+    "item": "minecraft:diamond_sword"
   },
   "ingredients": [
     {
@@ -15,5 +15,6 @@
 	}
   ],
   "consume_base": false,
+  "durability_taken": 40,
   "result_entity": "minecraft:allay"
 }

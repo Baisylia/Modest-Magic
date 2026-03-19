@@ -101,8 +101,22 @@ public class AltarBlockEntity extends PedestalBlockEntity {
                     recipe.getResultEntity().spawn(server, null, null, worldPosition.above(),
                             MobSpawnType.MOB_SUMMONED, true, true);
                 }
+
+                ItemStack stack = this.getItem();
                 if (recipe.shouldConsumeBase()) {
                     this.clearContent();
+                }
+                else {
+                    int damage = recipe.getDurabilityCost();
+                    if (damage > 0 && stack.isDamageableItem()) {
+                        stack.hurt(damage, level.random, null);
+
+                        if (stack.hurt(damage, level.random, null)) {
+                            this.clearContent();
+                        } else {
+                            this.setItem(stack);
+                        }
+                    }
                 }
 
                 enchantEffects(pedestals, ParticleTypes.AMBIENT_ENTITY_EFFECT, ModSounds.ALTAR_SUMMON.get());

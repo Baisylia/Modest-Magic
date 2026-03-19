@@ -38,10 +38,12 @@ public class PedestalBlockEntity extends BlockEntity implements WorldlyContainer
         protected void onContentsChanged(int slot) {
             setChanged();
 
-            if (level != null) {
+            if (level != null && !level.isClientSide) {
                 BlockState state = getBlockState();
-                level.setBlockAndUpdate(worldPosition,
-                        state.setValue(PedestalBlock.HAS_ITEM, !getStackInSlot(0).isEmpty()));
+
+                level.setBlock(worldPosition, state.setValue(PedestalBlock.HAS_ITEM, !getStackInSlot(0).isEmpty()), 3);
+
+                level.sendBlockUpdated(worldPosition, state, state, 3);
             }
         }
 

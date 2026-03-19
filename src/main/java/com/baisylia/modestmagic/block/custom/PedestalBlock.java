@@ -5,7 +5,9 @@ import com.baisylia.modestmagic.block.entity.custom.PedestalBlockEntity;
 import com.baisylia.modestmagic.client.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -104,20 +106,42 @@ public class PedestalBlock extends BaseEntityBlock implements SimpleWaterloggedB
                 .setValue(TOP, newTop)
                 .setValue(BOTTOM, newBottom);
 
-        // Drop Item
-        if(state.getValue(TOP) && !newTop && level instanceof Level realLevel) {
-            BlockEntity be = realLevel.getBlockEntity(pos);
-            if(be instanceof PedestalBlockEntity pedestal) {
-                ItemStack stack = pedestal.getItem();
+        if (level instanceof Level realLevel) {
+            validateItem(realLevel, pos, newState);
+        }
 
-                if(!stack.isEmpty()) {
-                    Containers.dropItemStack(realLevel, pos.getX(), pos.getY() + 1, pos.getZ(), stack);
-                    pedestal.clear();
-                    newState = newState.setValue(HAS_ITEM, false);
-                }
+        return newState;
+    }
+
+    private void validateItem(Level level, BlockPos pos, BlockState state) {
+        if (level.isClientSide) return;
+        BlockEntity be = level.getBlockEntity(pos);
+        if (!(be instanceof PedestalBlockEntity pedestal)) return;
+
+        boolean invalid = state.getValue(AXIS) != Direction.Axis.Y || !state.getValue(TOP);
+
+        if (invalid && !pedestal.getItem().isEmpty()) {
+            ItemStack stack = pedestal.getItem();
+            Containers.dropItemStack(level, pos.getX(), pos.getY() + 1, pos.getZ(), stack);
+
+            BlockState newState = state.setValue(HAS_ITEM, false);
+            pedestal.clear();
+            pedestal.setChanged();
+            level.sendBlockUpdated(pos, state, newState, 3);
+            level.setBlock(pos, newState, 3);
+            if (level instanceof ServerLevel server) {
+                server.getChunkSource().blockChanged(pos);
             }
         }
-        return newState;
+    }
+
+    @Override
+    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean moved) {
+        super.onPlace(state, level, pos, oldState, moved);
+
+        if (oldState.getBlock() == state.getBlock()) {
+            validateItem(level, pos, state);
+        }
     }
 
     @Nullable
@@ -188,16 +212,14 @@ public class PedestalBlock extends BaseEntityBlock implements SimpleWaterloggedB
                 pedestal.setItem(held.split(1));
             }
 
-            level.playSound(null, pos, soundEvent,
-                    net.minecraft.sounds.SoundSource.BLOCKS, 1.0f, 1.0f);
+            level.playSound(null, pos, soundEvent, SoundSource.BLOCKS, 1.0f, 1.0f);
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
         else {
             if(!level.isClientSide) {
                 ItemStack stack = pedestal.getItem();
                 pedestal.clear();
-                level.playSound(null, pos, ModSounds.REMOVE_ITEM_PEDESTAL.get(),
-                        net.minecraft.sounds.SoundSource.BLOCKS, 1.0f, 1.0f);
+                level.playSound(null, pos, ModSounds.REMOVE_ITEM_PEDESTAL.get(), SoundSource.BLOCKS, 1.0f, 1.0f);
 
                 if(!player.addItem(stack)) {
                     player.drop(stack, false);
