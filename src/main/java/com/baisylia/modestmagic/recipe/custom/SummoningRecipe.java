@@ -4,6 +4,8 @@ import com.baisylia.modestmagic.recipe.ModRecipes;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.TagParser;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -28,14 +30,20 @@ public class SummoningRecipe implements Recipe<SimpleContainer> {
     private final EntityType<?> resultEntity;
     private final boolean consumeBase;
     private final int durabilityCost;
+    private final CompoundTag entityNbt;
 
-    public SummoningRecipe(ResourceLocation id, Ingredient base, NonNullList<Ingredient> ingredients, EntityType<?> resultEntity, boolean consumeBase, int durabilityCost) {
+    public SummoningRecipe(ResourceLocation id, Ingredient base, NonNullList<Ingredient> ingredients, EntityType<?> resultEntity, boolean consumeBase, int durabilityCost, CompoundTag entityNbt) {
         this.id = id;
         this.base = base;
         this.ingredients = ingredients;
         this.resultEntity = resultEntity;
         this.consumeBase = consumeBase;
         this.durabilityCost = durabilityCost;
+        this.entityNbt = entityNbt;
+    }
+
+    public CompoundTag getEntityNbt() {
+        return entityNbt;
     }
 
     public int getDurabilityCost() {
@@ -119,7 +127,17 @@ public class SummoningRecipe implements Recipe<SimpleContainer> {
                     new ResourceLocation(GsonHelper.getAsString(json, "result_entity"))
             );
 
-            return new SummoningRecipe(id, base, ingredients, entity, consumeBase, durability);
+            CompoundTag nbt = new CompoundTag();
+
+            if (json.has("entity_nbt")) {
+                try {
+                    nbt = TagParser.parseTag(json.get("entity_nbt").toString());
+                } catch (Exception e) {
+                    throw new RuntimeException("Invalid entity_nbt in recipe " + id, e);
+                }
+            }
+
+            return new SummoningRecipe(id, base, ingredients, entity, consumeBase, durability, nbt);
         }
 
         @Override
@@ -131,8 +149,9 @@ public class SummoningRecipe implements Recipe<SimpleContainer> {
             int durability = buf.readVarInt();
             Ingredient base = Ingredient.fromNetwork(buf);
             EntityType<?> entity = ForgeRegistries.ENTITY_TYPES.getValue(buf.readResourceLocation());
+            CompoundTag nbt = buf.readNbt();
 
-            return new SummoningRecipe(id, base, ingredients, entity, consumeBase, durability);
+            return new SummoningRecipe(id, base, ingredients, entity, consumeBase, durability, nbt);
         }
 
         @Override
@@ -143,6 +162,7 @@ public class SummoningRecipe implements Recipe<SimpleContainer> {
             buf.writeVarInt(recipe.durabilityCost);
             recipe.base.toNetwork(buf);
             buf.writeResourceLocation(ForgeRegistries.ENTITY_TYPES.getKey(recipe.resultEntity));
+            buf.writeNbt(recipe.entityNbt);
         }
     }
 }

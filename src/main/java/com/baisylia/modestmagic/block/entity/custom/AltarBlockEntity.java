@@ -9,6 +9,7 @@ import com.baisylia.modestmagic.recipe.custom.SummoningRecipe;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.MobSpawnType;
@@ -55,6 +56,7 @@ public class AltarBlockEntity extends PedestalBlockEntity {
         if (items.isEmpty())
             return false;
 
+        // Infusing Recipe
         for (InfusingRecipe recipe : level.getRecipeManager().getAllRecipesFor(ModRecipes.INFUSING_TYPE.get())) {
             if (recipe.matches(this.getItem(), items)) {
                 // Do Thingy
@@ -64,6 +66,8 @@ public class AltarBlockEntity extends PedestalBlockEntity {
                 return true;
             }
         }
+
+        // Enchanting Recipe
         for (EnchantingRecipe recipe : level.getRecipeManager().getAllRecipesFor(ModRecipes.ENCHANTING_TYPE.get())) {
             if (recipe.matches(items)) {
 
@@ -94,12 +98,24 @@ public class AltarBlockEntity extends PedestalBlockEntity {
                 return true;
             }
         }
+
+        // Summoning Recipe
         for (SummoningRecipe recipe : level.getRecipeManager().getAllRecipesFor(ModRecipes.SUMMONING_TYPE.get())) {
             if (recipe.matches(this.getItem(), items)) {
                 // Do Thingy
                 if (level instanceof ServerLevel server) {
-                    recipe.getResultEntity().spawn(server, null, null, worldPosition.above(),
-                            MobSpawnType.MOB_SUMMONED, true, true);
+                    var entity = recipe.getResultEntity().create(server);
+                    if (entity != null) {
+                        if (!recipe.getEntityNbt().isEmpty()) {
+                            CompoundTag nbt = recipe.getEntityNbt().copy();
+                            nbt.remove("Pos");
+                            nbt.remove("Motion");
+                            nbt.remove("Rotation");
+                            entity.load(nbt);
+                        }
+                        entity.moveTo(worldPosition.getX() + 0.5, worldPosition.getY() + 1, worldPosition.getZ() + 0.5, server.random.nextFloat() * 360F, 0);
+                        server.addFreshEntity(entity);
+                    }
                 }
 
                 ItemStack stack = this.getItem();
@@ -109,8 +125,6 @@ public class AltarBlockEntity extends PedestalBlockEntity {
                 else {
                     int damage = recipe.getDurabilityCost();
                     if (damage > 0 && stack.isDamageableItem()) {
-                        stack.hurt(damage, level.random, null);
-
                         if (stack.hurt(damage, level.random, null)) {
                             this.clearContent();
                         } else {

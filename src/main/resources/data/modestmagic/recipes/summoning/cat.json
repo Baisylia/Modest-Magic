@@ -1,0 +1,20 @@
+{
+  "type": "modestmagic:summoning",
+  "base": {
+    "item": "minecraft:diamond"
+  },
+  "ingredients": [
+    {
+      "item": "minecraft:salmon"
+    },
+    {
+      "item": "minecraft:salmon"
+    }
+  ],
+  "consume_base": true,
+  "result_entity": "minecraft:cat",
+  "entity_nbt": {
+    "Age": -24000,
+    "variant":"minecraft:calico"
+  }
+}
