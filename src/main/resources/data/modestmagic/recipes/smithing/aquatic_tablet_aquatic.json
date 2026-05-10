@@ -1,0 +1,11 @@
+{
+  "type": "modestmagic:tablet_smithing",
+  "addition": {
+    "item": "modestmagic:enchantment_tablet_aquatic"
+  },
+  "enchantments": [
+    "minecraft:aqua_affinity",
+    "minecraft:depth_strider",
+    "minecraft:impaling"
+  ]
+}

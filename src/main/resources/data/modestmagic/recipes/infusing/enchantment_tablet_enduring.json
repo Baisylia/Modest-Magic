@@ -1,0 +1,29 @@
+{
+  "type": "modestmagic:infusing",
+  "base": { 
+    "item": "modestmagic:enchantment_tablet" 
+  },
+  "ingredients": [
+    {
+	  "item": "modestmagic:stardust"
+	},
+    {
+	  "item": "modestmagic:stardust"
+	},
+    {
+	  "item": "minecraft:diamond"
+	},
+    {
+	  "item": "minecraft:diamond"
+	},
+    {
+      "item": "minecraft:diamond"
+    },
+    {
+      "item": "minecraft:diamond"
+    }
+  ],
+  "result": {
+    "item": "modestmagic:enchantment_tablet_enduring"
+  }
+}

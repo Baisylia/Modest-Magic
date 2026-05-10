@@ -1,0 +1,11 @@
+{
+  "type": "modestmagic:tablet_smithing",
+  "addition": {
+    "item": "modestmagic:enchantment_tablet_fiery"
+  },
+  "enchantments": [
+    "minecraft:fire_aspect",
+    "minecraft:flame",
+    "minecraft:fire_protection"
+  ]
+}

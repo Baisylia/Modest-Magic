@@ -1,0 +1,11 @@
+{
+  "type": "modestmagic:tablet_smithing",
+  "addition": {
+    "item": "modestmagic:enchantment_tablet_recollection"
+  },
+  "enchantments": [
+    "minecraft:infinity",
+    "minecraft:multishot",
+    "minecraft:loyalty"
+  ]
+}

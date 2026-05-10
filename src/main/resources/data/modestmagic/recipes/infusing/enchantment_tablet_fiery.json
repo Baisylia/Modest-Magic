@@ -1,0 +1,29 @@
+{
+  "type": "modestmagic:infusing",
+  "base": { 
+    "item": "modestmagic:enchantment_tablet" 
+  },
+  "ingredients": [
+    {
+	  "item": "minecraft:blaze_powder"
+	},
+    {
+	  "item": "minecraft:blaze_powder"
+	},
+    {
+	  "item": "minecraft:magma_cream"
+	},
+    {
+	  "item": "minecraft:magma_cream"
+	},
+    {
+      "item": "minecraft:glowstone_dust"
+    },
+    {
+      "item": "minecraft:glowstone_dust"
+    }
+  ],
+  "result": {
+    "item": "modestmagic:enchantment_tablet_fiery"
+  }
+}

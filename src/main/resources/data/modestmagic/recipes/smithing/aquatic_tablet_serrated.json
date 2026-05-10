@@ -1,0 +1,10 @@
+{
+  "type": "modestmagic:tablet_smithing",
+  "addition": {
+    "item": "modestmagic:enchantment_tablet_serrated"
+  },
+  "enchantments": [
+    "minecraft:sharpness",
+    "minecraft:thorns"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "type": "modestmagic:tablet_smithing",
+  "addition": {
+    "item": "modestmagic:enchantment_tablet_secure"
+  },
+  "enchantments": [
+    "minecraft:protection",
+    "minecraft:binding_curse"
+  ]
+}

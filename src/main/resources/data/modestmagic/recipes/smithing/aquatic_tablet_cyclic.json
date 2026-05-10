@@ -1,0 +1,10 @@
+{
+  "type": "modestmagic:tablet_smithing",
+  "addition": {
+    "item": "modestmagic:enchantment_tablet_cyclic"
+  },
+  "enchantments": [
+    "minecraft:sweeping",
+    "minecraft:riptide"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "type": "modestmagic:tablet_smithing",
+  "addition": {
+    "item": "modestmagic:enchantment_tablet_everlasting"
+  },
+  "enchantments": [
+    "minecraft:unbreaking"
+  ]
+}

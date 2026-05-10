@@ -1,0 +1,11 @@
+{
+  "type": "modestmagic:tablet_smithing",
+  "addition": {
+    "item": "modestmagic:enchantment_tablet_puncturing"
+  },
+  "enchantments": [
+    "minecraft:power",
+    "minecraft:piercing",
+    "minecraft:projectile_protection"
+  ]
+}

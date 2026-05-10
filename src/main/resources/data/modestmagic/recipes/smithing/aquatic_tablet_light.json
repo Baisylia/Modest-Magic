@@ -1,0 +1,10 @@
+{
+  "type": "modestmagic:tablet_smithing",
+  "addition": {
+    "item": "modestmagic:enchantment_tablet_light"
+  },
+  "enchantments": [
+    "minecraft:silk_touch",
+    "minecraft:feather_falling"
+  ]
+}

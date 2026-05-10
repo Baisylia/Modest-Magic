@@ -1,0 +1,11 @@
+{
+  "type": "modestmagic:tablet_smithing",
+  "addition": {
+    "item": "modestmagic:enchantment_tablet_swift"
+  },
+  "enchantments": [
+    "minecraft:efficiency",
+    "minecraft:quick_charge",
+    "minecraft:lure"
+  ]
+}
