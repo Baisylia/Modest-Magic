@@ -73,7 +73,7 @@ public class SummoningEmiRecipe implements EmiRecipe {
 
     @Override
     public int getDisplayHeight() {
-        return inputs.size() > 6 ? 100 : 80;
+        return 80;
     }
 
     @Override
@@ -82,11 +82,18 @@ public class SummoningEmiRecipe implements EmiRecipe {
 
         int cx = 35;
         int cy = getDisplayHeight() / 2;
-        int radius = inputs.size() > 6 ? 32 : 24;
+        int radius = 24;
 
-        // Rotating Pedestal items
         List<EmiIngredient> pedestalItems = inputs.subList(1, inputs.size());
-        RotationState state = new RotationState(cx, cy, radius, pedestalItems.size());
+        List<EmiIngredient> circleItems;
+
+        if (pedestalItems.size() > 6) {
+            circleItems = ModestMagicEmiPlugin.consolidateItems(pedestalItems);
+        } else {
+            circleItems = pedestalItems;
+        }
+
+        RotationState state = new RotationState(cx, cy, radius, circleItems.size());
 
         widgets.add(new RotatingLettersWidget(
                 new ResourceLocation("modestmagic", "textures/gui/enchanted_letters.png"),
@@ -95,8 +102,8 @@ public class SummoningEmiRecipe implements EmiRecipe {
 
         widgets.add(new HoveringSlotWidget(base, cx - 9, cy - 9, 0));
 
-        for (int i = 0; i < pedestalItems.size(); i++) {
-            widgets.add(new RotatingSlotWidget(state, pedestalItems.get(i), i + 1));
+        for (int i = 0; i < circleItems.size(); i++) {
+            widgets.add(new RotatingSlotWidget(state, circleItems.get(i), i + 1));
         }
 
         // Pedestal Count slot
@@ -116,13 +123,12 @@ public class SummoningEmiRecipe implements EmiRecipe {
                 if (currentEntity instanceof LivingEntity living) {
                     double width = living.getBbWidth();
                     double height = living.getBbHeight();
-                    double len = (width + width + height) / 3.0;
 
-                    if (len > 1.05) len = (len + Math.sqrt(len)) / 2.0;
-                    float scale = (float) (1.05 / len * 14.0);
+                    float maxDim = (float) Math.max(width, height);
+                    float scale = 16.0f / Math.max(maxDim, 0.5f);
 
                     int entityX = slotX + 9;
-                    int entityY = slotY + 17;
+                    int entityY = (int) (slotY + 9 + (height * scale) / 2.0f);
 
                     PoseStack modelViewStack = RenderSystem.getModelViewStack();
                     modelViewStack.pushPose();
@@ -140,5 +146,7 @@ public class SummoningEmiRecipe implements EmiRecipe {
                 }
             }
         });
+
+        widgets.add(new WheelListTooltipWidget(cx, cy, radius, circleItems));
     }
 }
