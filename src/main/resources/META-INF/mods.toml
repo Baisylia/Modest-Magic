@@ -29,7 +29,7 @@ displayName="Modest Magic" #mandatory
 # A file name (in the root of the mod JAR) containing a logo for display
 logoFile="icon.png" #optional
 # A text field displayed in the mod UI
-credits="Owner: Baisylia" #optional
+credits="Owner: Baisylia, Contributors: Raspmary, evanbones" #optional
 # A text field displayed in the mod UI
 authors="Baisylia" #optional
 # Display Test controls the display for your mod in the server connection screen
