@@ -5,7 +5,7 @@ import net.minecraftforge.common.ForgeConfigSpec;
 public class ModestMagicConfig {
     public static final ForgeConfigSpec SPEC;
     public static final ForgeConfigSpec.BooleanValue THROW_ITEMS_ON_PEDESTALS;
-    public static final ForgeConfigSpec.BooleanValue REDUCED_EMI_MOTION; // Add this line
+    public static final ForgeConfigSpec.BooleanValue REDUCED_EMI_MOTION;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();

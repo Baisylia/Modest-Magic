@@ -120,7 +120,7 @@ dependencies {
     // modRuntimeOnly("mezz.jei:jei-${mc_version}:${jei_version}") // Adds the full JEI mod as a runtime dependency
     // implementation("com.tterrag.registrate:Registrate:MC${mc_version}-${registrate_version}") // Adds registrate as a dependency
 
-    modRuntimeOnly("curse.maven:appleskin-248787:3872808")
+    modRuntimeOnly("maven.modrinth:appleskin:2.5.1+mc1.19.2")
 
     // compile against the JEI API but do not include it at runtime
     modCompileOnly("mezz.jei:jei-1.19.2-common-api:11.5.0.297")
