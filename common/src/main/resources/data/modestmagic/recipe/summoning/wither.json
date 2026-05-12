@@ -1,0 +1,32 @@
+{
+  "type": "modestmagic:summoning",
+  "base": {
+    "item": "minecraft:wither_skeleton_skull"
+  },
+  "ingredients": [
+    {
+	  "item": "minecraft:wither_skeleton_skull"
+	},
+    {
+	  "item": "minecraft:wither_skeleton_skull"
+	},
+    {
+      "item": "minecraft:soul_sand"
+    },
+    {
+      "item": "minecraft:soul_sand"
+    },
+    {
+      "item": "minecraft:soul_sand"
+    },
+    {
+      "item": "minecraft:soul_sand"
+    }
+  ],
+  "consume_base": true,
+  "outcomes": [
+  {
+    "result_entity": "minecraft:wither"
+  }
+]
+}

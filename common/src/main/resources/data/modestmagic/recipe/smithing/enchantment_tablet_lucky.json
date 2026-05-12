@@ -1,0 +1,14 @@
+{
+  "type": "modestmagic:tablet_smithing",
+  "template": {
+    "item": "modestmagic:enchantment_tablet_lucky"
+  },
+  "base": {
+    "tag": "minecraft:enchantable/durability"
+  },
+  "enchantments": [
+    "minecraft:fortune",
+    "minecraft:looting",
+    "minecraft:luck_of_the_sea"
+  ]
+}

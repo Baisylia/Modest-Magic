@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "minecraft:nether_star"
-  },
-  "result": "modestmagic:stardust",
-  "count": 8
-}

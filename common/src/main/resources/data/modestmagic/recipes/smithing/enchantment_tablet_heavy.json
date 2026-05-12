@@ -1,9 +1,0 @@
-{
-  "type": "modestmagic:tablet_smithing",
-  "addition": {
-    "item": "modestmagic:enchantment_tablet_heavy"
-  },
-  "enchantments": [
-    "minecraft:blast_protection"
-  ]
-}

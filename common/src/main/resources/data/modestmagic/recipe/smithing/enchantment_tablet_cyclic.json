@@ -1,0 +1,13 @@
+{
+  "type": "modestmagic:tablet_smithing",
+  "template": {
+    "item": "modestmagic:enchantment_tablet_cyclic"
+  },
+  "base": {
+    "tag": "minecraft:enchantable/durability"
+  },
+  "enchantments": [
+    "minecraft:sweeping",
+    "minecraft:riptide"
+  ]
+}

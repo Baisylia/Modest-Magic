@@ -1,0 +1,28 @@
+{
+  "type": "modestmagic:infusing",
+  "base": { 
+    "item": "modestmagic:enchantment_tablet" 
+  },
+  "ingredients": [
+    {
+	  "item": "minecraft:turtle_scute"
+	},
+    {
+	  "item": "minecraft:blue_ice"
+	},
+    {
+	  "item": "minecraft:blue_ice"
+	},
+    {
+	  "item": "minecraft:blue_ice"
+	},
+    {
+      "item": "minecraft:blue_ice"
+    }
+  ],
+  "results": [
+  {
+    "id": "modestmagic:enchantment_tablet_glacial"
+  }
+]
+}

@@ -1,31 +1,27 @@
 package com.baisylia.modestmagic.recipe.custom;
 
 import com.baisylia.modestmagic.recipe.ModRecipes;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
-import net.minecraft.world.SimpleContainer;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class InfusingRecipe implements Recipe<SimpleContainer> {
+public class InfusingRecipe implements Recipe<RecipeInput> {
 
-    private final ResourceLocation id;
-    private final NonNullList<Ingredient> ingredients;
     private final Ingredient base;
+    private final NonNullList<Ingredient> ingredients;
     private final List<ItemStack> results;
 
-    public InfusingRecipe(ResourceLocation id, Ingredient base, NonNullList<Ingredient> ingredients, List<ItemStack> results) {
-        this.id = id;
+    public InfusingRecipe(Ingredient base, NonNullList<Ingredient> ingredients, List<ItemStack> results) {
         this.base = base;
         this.ingredients = ingredients;
         this.results = results;
@@ -34,9 +30,7 @@ public class InfusingRecipe implements Recipe<SimpleContainer> {
     public boolean matches(ItemStack centerItem, List<ItemStack> pedestalItems) {
         if (!base.test(centerItem))
             return false;
-
         if (pedestalItems.size() != ingredients.size()) return false;
-
         return matchIngredients(pedestalItems, ingredients, new boolean[pedestalItems.size()], 0);
     }
 
@@ -58,13 +52,13 @@ public class InfusingRecipe implements Recipe<SimpleContainer> {
     }
 
     @Override
-    public boolean matches(@NotNull SimpleContainer container, @NotNull Level level) {
+    public boolean matches(@NotNull RecipeInput input, @NotNull Level level) {
         return false;
     }
 
     @Override
-    public @NotNull ItemStack assemble(@NotNull SimpleContainer container, @NotNull RegistryAccess registryAccess) {
-        return results.isEmpty() ? ItemStack.EMPTY : results.get(0).copy();
+    public @NotNull ItemStack assemble(@NotNull RecipeInput input, @NotNull HolderLookup.Provider registries) {
+        return results.isEmpty() ? ItemStack.EMPTY : results.getFirst().copy();
     }
 
     @Override
@@ -78,13 +72,8 @@ public class InfusingRecipe implements Recipe<SimpleContainer> {
     }
 
     @Override
-    public @NotNull ItemStack getResultItem(@NotNull RegistryAccess registryAccess) {
-        return results.isEmpty() ? ItemStack.EMPTY : results.get(0);
-    }
-
-    @Override
-    public @NotNull ResourceLocation getId() {
-        return id;
+    public @NotNull ItemStack getResultItem(@NotNull HolderLookup.Provider registries) {
+        return results.isEmpty() ? ItemStack.EMPTY : results.getFirst();
     }
 
     @Override
@@ -108,63 +97,35 @@ public class InfusingRecipe implements Recipe<SimpleContainer> {
     public static class Serializer implements RecipeSerializer<InfusingRecipe> {
         public static final Serializer INSTANCE = new Serializer();
 
-        @Override
-        public @NotNull InfusingRecipe fromJson(@NotNull ResourceLocation id, @NotNull JsonObject json) {
-            JsonArray ingredientsJson = GsonHelper.getAsJsonArray(json, "ingredients");
-            Ingredient base = Ingredient.fromJson(json.get("base"));
-            NonNullList<Ingredient> ingredients = NonNullList.create();
+        public static final MapCodec<InfusingRecipe> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
+                Ingredient.CODEC.fieldOf("base").forGetter(r -> r.base),
+                Ingredient.CODEC.listOf().fieldOf("ingredients").forGetter(r -> r.ingredients),
+                ItemStack.CODEC.listOf().fieldOf("results").forGetter(r -> r.results)
+        ).apply(inst, (base, ingredients, results) -> {
+            NonNullList<Ingredient> list = NonNullList.create();
+            list.addAll(ingredients);
+            return new InfusingRecipe(base, list, results);
+        }));
 
-            for (int i = 0; i < ingredientsJson.size(); i++) {
-                ingredients.add(Ingredient.fromJson(ingredientsJson.get(i)));
-            }
-
-            List<ItemStack> results = new ArrayList<>();
-            if (json.has("results")) {
-                JsonArray arr = GsonHelper.getAsJsonArray(json, "results");
-                for (int i = 0; i < arr.size(); i++) {
-                    results.add(ShapedRecipe.itemStackFromJson(arr.get(i).getAsJsonObject()));
+        public static final StreamCodec<RegistryFriendlyByteBuf, InfusingRecipe> STREAM_CODEC = StreamCodec.composite(
+                Ingredient.CONTENTS_STREAM_CODEC, r -> r.base,
+                Ingredient.CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.list()), r -> r.ingredients,
+                ItemStack.STREAM_CODEC.apply(ByteBufCodecs.list()), r -> r.results,
+                (base, ingredients, results) -> {
+                    NonNullList<Ingredient> list = NonNullList.create();
+                    list.addAll(ingredients);
+                    return new InfusingRecipe(base, list, results);
                 }
-            } else if (json.has("result")) {
-                results.add(ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "result")));
-            }
+        );
 
-            return new InfusingRecipe(id, base, ingredients, results);
+        @Override
+        public @NotNull MapCodec<InfusingRecipe> codec() {
+            return CODEC;
         }
 
         @Override
-        public @NotNull InfusingRecipe fromNetwork(@NotNull ResourceLocation id, FriendlyByteBuf buf) {
-            int size = buf.readVarInt();
-            NonNullList<Ingredient> ingredients = NonNullList.withSize(size, Ingredient.EMPTY);
-
-            for (int i = 0; i < size; i++) {
-                ingredients.set(i, Ingredient.fromNetwork(buf));
-            }
-
-            Ingredient base = Ingredient.fromNetwork(buf);
-
-            int resultsSize = buf.readVarInt();
-            List<ItemStack> results = new ArrayList<>();
-            for (int i = 0; i < resultsSize; i++) {
-                results.add(buf.readItem());
-            }
-
-            return new InfusingRecipe(id, base, ingredients, results);
-        }
-
-        @Override
-        public void toNetwork(FriendlyByteBuf buf, InfusingRecipe recipe) {
-            buf.writeVarInt(recipe.ingredients.size());
-
-            for (Ingredient ing : recipe.ingredients) {
-                ing.toNetwork(buf);
-            }
-
-            recipe.base.toNetwork(buf);
-
-            buf.writeVarInt(recipe.results.size());
-            for (ItemStack stack : recipe.results) {
-                buf.writeItem(stack);
-            }
+        public @NotNull StreamCodec<RegistryFriendlyByteBuf, InfusingRecipe> streamCodec() {
+            return STREAM_CODEC;
         }
     }
 }

@@ -1,35 +1,29 @@
 package com.baisylia.modestmagic.recipe.custom;
 
 import com.baisylia.modestmagic.recipe.ModRecipes;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
-import net.minecraft.world.SimpleContainer;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class EnchantingRecipe implements Recipe<SimpleContainer> {
+public class EnchantingRecipe implements Recipe<RecipeInput> {
 
-    private final ResourceLocation id;
     private final NonNullList<Ingredient> ingredients;
-    private final List<List<Enchantment>> enchantmentPools;
+    private final List<List<ResourceKey<Enchantment>>> enchantmentPools;
 
-    public EnchantingRecipe(ResourceLocation id, NonNullList<Ingredient> ingredients, List<List<Enchantment>> enchantmentPools) {
-        this.id = id;
+    public EnchantingRecipe(NonNullList<Ingredient> ingredients, List<List<ResourceKey<Enchantment>>> enchantmentPools) {
         this.ingredients = ingredients;
         this.enchantmentPools = enchantmentPools;
     }
@@ -53,12 +47,12 @@ public class EnchantingRecipe implements Recipe<SimpleContainer> {
     }
 
     @Override
-    public boolean matches(@NotNull SimpleContainer container, @NotNull Level level) {
+    public boolean matches(@NotNull RecipeInput input, @NotNull Level level) {
         return false;
     }
 
     @Override
-    public @NotNull ItemStack assemble(@NotNull SimpleContainer container, @NotNull RegistryAccess registryAccess) {
+    public @NotNull ItemStack assemble(@NotNull RecipeInput input, @NotNull HolderLookup.Provider registries) {
         return ItemStack.EMPTY;
     }
 
@@ -73,13 +67,8 @@ public class EnchantingRecipe implements Recipe<SimpleContainer> {
     }
 
     @Override
-    public @NotNull ItemStack getResultItem(@NotNull RegistryAccess registryAccess) {
+    public @NotNull ItemStack getResultItem(@NotNull HolderLookup.Provider registries) {
         return ItemStack.EMPTY;
-    }
-
-    @Override
-    public @NotNull ResourceLocation getId() {
-        return id;
     }
 
     @Override
@@ -96,72 +85,38 @@ public class EnchantingRecipe implements Recipe<SimpleContainer> {
         return ingredients;
     }
 
-    public List<List<Enchantment>> getEnchantmentPools() {
+    public List<List<ResourceKey<Enchantment>>> getEnchantmentPools() {
         return enchantmentPools;
     }
 
     public static class Serializer implements RecipeSerializer<EnchantingRecipe> {
+        public static final MapCodec<EnchantingRecipe> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
+                Ingredient.CODEC.listOf().fieldOf("ingredients").forGetter(r -> r.ingredients),
+                ResourceKey.codec(Registries.ENCHANTMENT).listOf().listOf().fieldOf("enchantments").forGetter(r -> r.enchantmentPools)
+        ).apply(inst, (ing, pools) -> {
+            NonNullList<Ingredient> list = NonNullList.create();
+            list.addAll(ing);
+            return new EnchantingRecipe(list, pools);
+        }));
+
+        public static final StreamCodec<RegistryFriendlyByteBuf, EnchantingRecipe> STREAM_CODEC = StreamCodec.composite(
+                Ingredient.CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.list()), r -> r.ingredients,
+                ResourceKey.streamCodec(Registries.ENCHANTMENT).apply(ByteBufCodecs.list()).apply(ByteBufCodecs.list()), r -> r.enchantmentPools,
+                (ing, pools) -> {
+                    NonNullList<Ingredient> list = NonNullList.create();
+                    list.addAll(ing);
+                    return new EnchantingRecipe(list, pools);
+                }
+        );
 
         @Override
-        public @NotNull EnchantingRecipe fromJson(@NotNull ResourceLocation id, @NotNull JsonObject json) {
-            JsonArray ingredientsJson = GsonHelper.getAsJsonArray(json, "ingredients");
-            NonNullList<Ingredient> ingredients = NonNullList.create();
-            for (int i = 0; i < ingredientsJson.size(); i++)
-                ingredients.add(Ingredient.fromJson(ingredientsJson.get(i)));
-
-            JsonArray enchantsJson = GsonHelper.getAsJsonArray(json, "enchantments");
-            List<List<Enchantment>> enchantmentPools = new ArrayList<>();
-
-            for (int i = 0; i < enchantsJson.size(); i++) {
-                List<Enchantment> pool = new ArrayList<>();
-                if (enchantsJson.get(i).isJsonArray()) {
-                    JsonArray group = enchantsJson.get(i).getAsJsonArray();
-                    for (int j = 0; j < group.size(); j++) {
-                        Enchantment e = BuiltInRegistries.ENCHANTMENT.get(new ResourceLocation(group.get(j).getAsString()));
-                        if (e != null) pool.add(e);
-                    }
-                } else {
-                    Enchantment e = BuiltInRegistries.ENCHANTMENT.get(new ResourceLocation(enchantsJson.get(i).getAsString()));
-                    if (e != null) pool.add(e);
-                }
-                if (!pool.isEmpty()) enchantmentPools.add(pool);
-            }
-
-            return new EnchantingRecipe(id, ingredients, enchantmentPools);
+        public @NotNull MapCodec<EnchantingRecipe> codec() {
+            return CODEC;
         }
 
         @Override
-        public @NotNull EnchantingRecipe fromNetwork(@NotNull ResourceLocation id, FriendlyByteBuf buf) {
-            int size = buf.readVarInt();
-            NonNullList<Ingredient> ingredients = NonNullList.withSize(size, Ingredient.EMPTY);
-            for (int i = 0; i < size; i++) ingredients.set(i, Ingredient.fromNetwork(buf));
-
-            int poolsSize = buf.readVarInt();
-            List<List<Enchantment>> enchantmentPools = new ArrayList<>();
-            for (int i = 0; i < poolsSize; i++) {
-                int poolSize = buf.readVarInt();
-                List<Enchantment> pool = new ArrayList<>();
-                for (int j = 0; j < poolSize; j++) {
-                    pool.add(BuiltInRegistries.ENCHANTMENT.get(buf.readResourceLocation()));
-                }
-                enchantmentPools.add(pool);
-            }
-
-            return new EnchantingRecipe(id, ingredients, enchantmentPools);
-        }
-
-        @Override
-        public void toNetwork(FriendlyByteBuf buf, EnchantingRecipe recipe) {
-            buf.writeVarInt(recipe.ingredients.size());
-            for (Ingredient ing : recipe.ingredients) ing.toNetwork(buf);
-
-            buf.writeVarInt(recipe.enchantmentPools.size());
-            for (List<Enchantment> pool : recipe.enchantmentPools) {
-                buf.writeVarInt(pool.size());
-                for (Enchantment e : pool) {
-                    buf.writeResourceLocation(BuiltInRegistries.ENCHANTMENT.getKey(e));
-                }
-            }
+        public @NotNull StreamCodec<RegistryFriendlyByteBuf, EnchantingRecipe> streamCodec() {
+            return STREAM_CODEC;
         }
     }
 }

@@ -14,7 +14,7 @@ import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
 
 import java.util.ArrayList;
@@ -24,17 +24,17 @@ import java.util.List;
 public class ModestMagicEmiPlugin implements EmiPlugin {
 
     public static final EmiRecipeCategory INFUSING = new EmiRecipeCategory(
-            new ResourceLocation(Constants.MOD_ID, "infusing"),
+            ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "infusing"),
             EmiStack.of(ModBlocks.ALTAR.get())
     );
 
     public static final EmiRecipeCategory ENCHANTING = new EmiRecipeCategory(
-            new ResourceLocation(Constants.MOD_ID, "enchanting"),
+            ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "enchanting"),
             EmiStack.of(ModBlocks.ALTAR.get())
     );
 
     public static final EmiRecipeCategory SUMMONING = new EmiRecipeCategory(
-            new ResourceLocation(Constants.MOD_ID, "summoning"),
+            ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "summoning"),
             EmiStack.of(ModBlocks.ALTAR.get())
     );
 
@@ -52,7 +52,7 @@ public class ModestMagicEmiPlugin implements EmiPlugin {
             for (int i = 0; i < uniqueIngredients.size(); i++) {
                 EmiIngredient existing = uniqueIngredients.get(i);
                 // compare the first stack to see if they are the same ingredient requirement
-                if (!existing.getEmiStacks().isEmpty() && existing.getEmiStacks().get(0).isEqual(ing.getEmiStacks().get(0))) {
+                if (!existing.getEmiStacks().isEmpty() && existing.getEmiStacks().getFirst().isEqual(ing.getEmiStacks().getFirst())) {
                     amounts.set(i, amounts.get(i) + ing.getAmount());
                     found = true;
                     break;
@@ -91,23 +91,24 @@ public class ModestMagicEmiPlugin implements EmiPlugin {
         registry.addWorkstation(ENCHANTING, EmiStack.of(ModBlocks.ALTAR.get()));
         registry.addWorkstation(SUMMONING, EmiStack.of(ModBlocks.ALTAR.get()));
 
-        for (InfusingRecipe recipe : registry.getRecipeManager().getAllRecipesFor(ModRecipes.INFUSING_TYPE.get())) {
-            registry.addRecipe(new InfusingEmiRecipe(recipe));
+        for (RecipeHolder<InfusingRecipe> holder : registry.getRecipeManager().getAllRecipesFor(ModRecipes.INFUSING_TYPE.get())) {
+            registry.addRecipe(new InfusingEmiRecipe(holder));
         }
 
-        for (EnchantingRecipe recipe : registry.getRecipeManager().getAllRecipesFor(ModRecipes.ENCHANTING_TYPE.get())) {
-            registry.addRecipe(new EnchantingEmiRecipe(recipe));
+        for (RecipeHolder<EnchantingRecipe> holder : registry.getRecipeManager().getAllRecipesFor(ModRecipes.ENCHANTING_TYPE.get())) {
+            registry.addRecipe(new EnchantingEmiRecipe(holder));
         }
 
-        for (SummoningRecipe recipe : registry.getRecipeManager().getAllRecipesFor(ModRecipes.SUMMONING_TYPE.get())) {
-            registry.addRecipe(new SummoningEmiRecipe(recipe));
+        for (RecipeHolder<SummoningRecipe> holder : registry.getRecipeManager().getAllRecipesFor(ModRecipes.SUMMONING_TYPE.get())) {
+            registry.addRecipe(new SummoningEmiRecipe(holder));
         }
 
-        // fix for our custom EMI smithing recipes
-        for (Recipe<?> recipe : registry.getRecipeManager().getAllRecipesFor(RecipeType.SMITHING)) {
-            if (recipe instanceof TabletSmithingRecipe tabletRecipe) {
-                registry.removeRecipes(tabletRecipe.getId());
-                registry.addRecipe(new TabletSmithingEmiRecipe(tabletRecipe));
+        for (RecipeHolder<?> holder : registry.getRecipeManager().getAllRecipesFor(RecipeType.SMITHING)) {
+            if (holder.value() instanceof TabletSmithingRecipe) {
+                registry.removeRecipes(holder.id());
+                @SuppressWarnings("unchecked")
+                RecipeHolder<TabletSmithingRecipe> typedHolder = (RecipeHolder<TabletSmithingRecipe>) holder;
+                registry.addRecipe(new TabletSmithingEmiRecipe(typedHolder));
             }
         }
     }

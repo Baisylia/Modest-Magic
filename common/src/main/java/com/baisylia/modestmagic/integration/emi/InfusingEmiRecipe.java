@@ -11,20 +11,22 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class InfusingEmiRecipe implements EmiRecipe {
 
-    private static final ResourceLocation BACKGROUND = new ResourceLocation(Constants.MOD_ID, "textures/gui/emi_background.png");
+    private static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/emi_background.png");
     private final ResourceLocation id;
     private final EmiIngredient base;
     private final List<EmiIngredient> inputs;
     private final List<EmiStack> outputs;
 
-    public InfusingEmiRecipe(InfusingRecipe recipe) {
-        this.id = recipe.getId();
+    public InfusingEmiRecipe(RecipeHolder<InfusingRecipe> recipeHolder) {
+        this.id = recipeHolder.id();
+        InfusingRecipe recipe = recipeHolder.value();
         this.base = EmiIngredient.of(recipe.getBase());
         this.outputs = recipe.getResults().stream().map(EmiStack::of).toList();
 
@@ -83,7 +85,7 @@ public class InfusingEmiRecipe implements EmiRecipe {
         RotationState state = new RotationState(cx, cy, radius, circleItems.size());
 
         widgets.add(new RotatingLettersWidget(
-                new ResourceLocation(Constants.MOD_ID, "textures/gui/enchanted_letters.png"),
+                ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/enchanted_letters.png"),
                 cx, cy, radius + 6
         ));
 
@@ -93,10 +95,8 @@ public class InfusingEmiRecipe implements EmiRecipe {
             widgets.add(new RotatingSlotWidget(state, circleItems.get(i), i + 1));
         }
 
-        // Pedestal Count slot
         widgets.addSlot(EmiStack.of(new ItemStack(ModBlocks.PEDESTAL.get(), pedestalItems.size())), getDisplayWidth() - 18, getDisplayHeight() - 18).drawBack(true);
 
-        // Arrow and cycling output
         widgets.addTexture(EmiTexture.EMPTY_ARROW, cx + radius + 16, cy - 8);
         widgets.add(new HoveringSlotWidget(EmiIngredient.of(outputs), cx + radius + 51, cy - 9, 2)).recipeContext(this);
         widgets.add(new WheelListTooltipWidget(cx, cy, radius, circleItems));

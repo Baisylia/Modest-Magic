@@ -1,0 +1,34 @@
+{
+  "type": "modestmagic:infusing",
+  "base": { 
+    "item": "modestmagic:enchantment_tablet" 
+  },
+  "ingredients": [
+    {
+	  "item": "modestmagic:stardust"
+	},
+    {
+	  "item": "minecraft:diamond"
+	},
+    {
+	  "item": "minecraft:diamond"
+	},
+    {
+	  "item": "minecraft:lapis_lazuli"
+	},
+    {
+      "item": "minecraft:lapis_lazuli"
+    },
+    {
+      "item": "minecraft:lapis_lazuli"
+    },
+    {
+      "item": "minecraft:lapis_lazuli"
+    }
+  ],
+  "results": [
+  {
+    "id": "modestmagic:enchantment_tablet_secure"
+  }
+]
+}

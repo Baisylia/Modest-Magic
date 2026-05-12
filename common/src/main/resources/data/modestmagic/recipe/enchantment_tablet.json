@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "O": {
+      "item": "minecraft:amethyst_shard"
+    },
+    "#": {
+      "item": "minecraft:lapis_block"
+    }
+  },
+  "pattern": [
+    "OOO",
+    "O#O",
+    "OOO"
+  ],
+  "result": {
+    "id": "modestmagic:enchantment_tablet",
+    "count": 1
+  }
+}

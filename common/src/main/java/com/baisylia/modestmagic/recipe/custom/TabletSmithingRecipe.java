@@ -1,44 +1,36 @@
 package com.baisylia.modestmagic.recipe.custom;
 
 import com.baisylia.modestmagic.recipe.ModRecipes;
-import com.google.gson.*;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
-import net.minecraft.world.Container;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SmithingRecipe;
+import net.minecraft.world.item.crafting.SmithingRecipeInput;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Map;
+import java.util.Optional;
 
-public class TabletSmithingRecipe implements SmithingRecipe {
-    private final ResourceLocation recipeId;
-    private final Ingredient base;
-    private final Ingredient addition;
-    private final NonNullList<Enchantment> enchantments;
-
-    public TabletSmithingRecipe(ResourceLocation recipeId, Ingredient base, Ingredient addition, NonNullList<Enchantment> enchantments) {
-        this.recipeId = recipeId;
-        this.base = base;
-        this.addition = addition;
-        this.enchantments = enchantments;
-    }
+public record TabletSmithingRecipe(Ingredient template, Ingredient base,
+                                   NonNullList<ResourceKey<Enchantment>> enchantments) implements SmithingRecipe {
 
     @Override
     public boolean isTemplateIngredient(@NotNull ItemStack stack) {
-        return false;
+        return this.template.test(stack);
     }
 
     @Override
@@ -48,22 +40,20 @@ public class TabletSmithingRecipe implements SmithingRecipe {
 
     @Override
     public boolean isAdditionIngredient(@NotNull ItemStack stack) {
-        return this.addition.test(stack);
+        return false;
     }
 
     @Override
-    public boolean matches(Container inv, @NotNull Level level) {
-        ItemStack baseStack = inv.getItem(1);
-        ItemStack additionStack = inv.getItem(2);
+    public boolean matches(SmithingRecipeInput inv, @NotNull Level level) {
+        ItemStack templateStack = inv.template();
+        ItemStack baseStack = inv.base();
 
-        if (baseStack.isEmpty() || additionStack.isEmpty()) {
+        if (templateStack.isEmpty() || baseStack.isEmpty()) {
             return false;
         }
-
-        if (!this.addition.test(additionStack)) {
+        if (!this.template.test(templateStack)) {
             return false;
         }
-
         if (!this.base.isEmpty() && !this.base.test(baseStack)) {
             return false;
         }
@@ -72,67 +62,47 @@ public class TabletSmithingRecipe implements SmithingRecipe {
     }
 
     @Override
-    public @NotNull ItemStack assemble(Container inv, @NotNull RegistryAccess registryAccess) {
-        ItemStack itemstack = inv.getItem(1).copy();
-        CompoundTag compoundtag = inv.getItem(1).getTag();
-
+    public @NotNull ItemStack assemble(SmithingRecipeInput inv, @NotNull HolderLookup.Provider registries) {
+        ItemStack itemstack = inv.base().copy();
         if (itemstack.isEmpty()) return ItemStack.EMPTY;
 
-        if (compoundtag != null) {
-            itemstack.setTag(compoundtag.copy());
-        }
+        var enchantRegistry = registries.lookupOrThrow(Registries.ENCHANTMENT);
+        ItemEnchantments existing = itemstack.getOrDefault(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY);
+        ItemEnchantments.Mutable mutable = new ItemEnchantments.Mutable(existing);
 
         boolean itemEnchanted = false;
 
-        outerLoop:
-        for (Enchantment enchantment : enchantments) {
-            if (enchantment.canEnchant(itemstack) && areEnchantsCompatible(itemstack, enchantment)) {
-                ListTag nbtList = itemstack.getEnchantmentTags();
+        for (ResourceKey<Enchantment> key : enchantments) {
+            Optional<Holder.Reference<Enchantment>> opt = enchantRegistry.get(key);
+            if (opt.isEmpty()) continue;
+            Holder<Enchantment> enchantHolder = opt.get();
+            Enchantment enchantment = enchantHolder.value();
 
-                for (int i = 0; i < nbtList.size(); i++) {
-                    CompoundTag idTag = nbtList.getCompound(i);
-                    ResourceLocation enchantId = BuiltInRegistries.ENCHANTMENT.getKey(enchantment);
-
-                    if (enchantId != null && idTag.getString("id").equals(enchantId.toString())) {
-                        int targetLevel = idTag.getInt("lvl") + 1;
-                        if (targetLevel > enchantment.getMaxLevel()) {
-                            continue outerLoop;
-                        }
-                        itemEnchanted = true;
-                        nbtList.remove(i);
-                        itemstack.enchant(enchantment, targetLevel);
-                        continue outerLoop;
-                    }
+            if (enchantment.canEnchant(itemstack) && areEnchantsCompatible(existing, enchantHolder)) {
+                int currentLevel = mutable.getLevel(enchantHolder);
+                int targetLevel = currentLevel + 1;
+                if (targetLevel <= enchantment.getMaxLevel()) {
+                    mutable.set(enchantHolder, targetLevel);
+                    itemEnchanted = true;
                 }
-
-                itemEnchanted = true;
-                itemstack.enchant(enchantment, 1);
             }
         }
 
-        return itemEnchanted ? itemstack : ItemStack.EMPTY;
+        if (itemEnchanted) {
+            EnchantmentHelper.setEnchantments(itemstack, mutable.toImmutable());
+            return itemstack;
+        }
+
+        return ItemStack.EMPTY;
     }
 
-    private boolean areEnchantsCompatible(ItemStack itemStack, Enchantment enchant) {
-        Map<Enchantment, Integer> map = EnchantmentHelper.getEnchantments(itemStack);
-        for (Enchantment e : map.keySet()) {
-            if (enchant != e && !enchant.isCompatibleWith(e)) {
+    private boolean areEnchantsCompatible(ItemEnchantments existing, Holder<Enchantment> enchant) {
+        for (Holder<Enchantment> e : existing.keySet()) {
+            if (!e.equals(enchant) && !Enchantment.areCompatible(e, enchant)) {
                 return false;
             }
         }
         return true;
-    }
-
-    public Ingredient getBase() {
-        return base;
-    }
-
-    public Ingredient getAddition() {
-        return addition;
-    }
-
-    public NonNullList<Enchantment> getEnchantments() {
-        return enchantments;
     }
 
     @Override
@@ -141,13 +111,8 @@ public class TabletSmithingRecipe implements SmithingRecipe {
     }
 
     @Override
-    public @NotNull ItemStack getResultItem(@NotNull RegistryAccess registryAccess) {
+    public @NotNull ItemStack getResultItem(@NotNull HolderLookup.Provider registryAccess) {
         return ItemStack.EMPTY;
-    }
-
-    @Override
-    public @NotNull ResourceLocation getId() {
-        return this.recipeId;
     }
 
     @Override
@@ -155,82 +120,38 @@ public class TabletSmithingRecipe implements SmithingRecipe {
         return ModRecipes.TABLET_SMITHING_SERIALIZER.get();
     }
 
-    @Override
-    public @NotNull RecipeType<?> getType() {
-        return RecipeType.SMITHING;
-    }
-
     public static class Serializer implements RecipeSerializer<TabletSmithingRecipe> {
         public static final Serializer INSTANCE = new Serializer();
 
-        private static NonNullList<Enchantment> readEnchantments(JsonArray enchantmentArray) {
-            NonNullList<Enchantment> enchantments = NonNullList.create();
-            for (int i = 0; i < enchantmentArray.size(); ++i) {
-                enchantments.add(parseEnchantment(enchantmentArray.get(i)));
-            }
-            return enchantments;
-        }
+        public static final MapCodec<TabletSmithingRecipe> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
+                Ingredient.CODEC.fieldOf("template").forGetter(r -> r.template),
+                Ingredient.CODEC.optionalFieldOf("base", Ingredient.EMPTY).forGetter(r -> r.base),
+                ResourceKey.codec(Registries.ENCHANTMENT).listOf().fieldOf("enchantments").forGetter(r -> r.enchantments)
+        ).apply(inst, (template, base, enchantments) -> {
+            NonNullList<ResourceKey<Enchantment>> list = NonNullList.create();
+            list.addAll(enchantments);
+            return new TabletSmithingRecipe(template, base, list);
+        }));
 
-        private static Enchantment parseEnchantment(JsonElement element) {
-            if (element.isJsonArray()) {
-                throw new JsonSyntaxException("Expected string to be a single Enchantment");
-            }
-            ResourceLocation enchantId = ResourceLocation.tryParse(element.getAsString());
-            Enchantment enchantment = BuiltInRegistries.ENCHANTMENT.get(enchantId);
-
-            if (enchantment == null) {
-                throw new JsonSyntaxException("No valid Enchantment name supplied: " + element.getAsString());
-            }
-            return enchantment;
-        }
-
-        @Override
-        public @NotNull TabletSmithingRecipe fromJson(@NotNull ResourceLocation recipeId, JsonObject json) {
-            Ingredient base = Ingredient.EMPTY;
-            if (json.has("base")) {
-                base = Ingredient.fromJson(json.get("base"));
-            }
-
-            Ingredient addition = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "addition"));
-            NonNullList<Enchantment> enchantmentList = readEnchantments(GsonHelper.getAsJsonArray(json, "enchantments"));
-
-            if (enchantmentList.isEmpty()) {
-                throw new JsonParseException("No enchantments provided for tablet smithing recipe");
-            }
-
-            return new TabletSmithingRecipe(recipeId, base, addition, enchantmentList);
-        }
-
-        @Override
-        public @NotNull TabletSmithingRecipe fromNetwork(@NotNull ResourceLocation recipeId, @NotNull FriendlyByteBuf buffer) {
-            Ingredient base = Ingredient.fromNetwork(buffer);
-            Ingredient addition = Ingredient.fromNetwork(buffer);
-
-            int k = buffer.readVarInt();
-            NonNullList<Enchantment> enchantmentList = NonNullList.create();
-
-            for (int j = 0; j < k; j++) {
-                Enchantment enchantment = BuiltInRegistries.ENCHANTMENT.get(buffer.readResourceLocation());
-                if (enchantment != null) {
-                    enchantmentList.add(enchantment);
+        public static final StreamCodec<RegistryFriendlyByteBuf, TabletSmithingRecipe> STREAM_CODEC = StreamCodec.composite(
+                Ingredient.CONTENTS_STREAM_CODEC, r -> r.template,
+                Ingredient.CONTENTS_STREAM_CODEC, r -> r.base,
+                ResourceKey.streamCodec(Registries.ENCHANTMENT).apply(ByteBufCodecs.list()), r -> r.enchantments,
+                (template, base, enchantments) -> {
+                    NonNullList<ResourceKey<Enchantment>> list = NonNullList.create();
+                    list.addAll(enchantments);
+                    return new TabletSmithingRecipe(template, base, list);
                 }
-            }
+        );
 
-            return new TabletSmithingRecipe(recipeId, base, addition, enchantmentList);
+        @Override
+        public @NotNull MapCodec<TabletSmithingRecipe> codec() {
+            return CODEC;
         }
 
         @Override
-        public void toNetwork(@NotNull FriendlyByteBuf buffer, TabletSmithingRecipe recipe) {
-            recipe.base.toNetwork(buffer);
-            recipe.addition.toNetwork(buffer);
-
-            buffer.writeVarInt(recipe.enchantments.size());
-            for (Enchantment enchantment : recipe.enchantments) {
-                ResourceLocation key = BuiltInRegistries.ENCHANTMENT.getKey(enchantment);
-                if (key != null) {
-                    buffer.writeResourceLocation(key);
-                }
-            }
+        public @NotNull StreamCodec<RegistryFriendlyByteBuf, TabletSmithingRecipe> streamCodec() {
+            return STREAM_CODEC;
         }
     }
 }

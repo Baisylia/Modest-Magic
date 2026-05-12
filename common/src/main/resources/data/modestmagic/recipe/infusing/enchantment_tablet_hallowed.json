@@ -1,0 +1,31 @@
+{
+  "type": "modestmagic:infusing",
+  "base": { 
+    "item": "modestmagic:enchantment_tablet" 
+  },
+  "ingredients": [
+    {
+	  "item": "minecraft:glistering_melon_slice"
+	},
+    {
+	  "item": "minecraft:glistering_melon_slice"
+	},
+    {
+	  "item": "minecraft:gold_ingot"
+	},
+    {
+	  "item": "minecraft:gold_ingot"
+	},
+    {
+      "item": "minecraft:gold_ingot"
+    },
+    {
+      "item": "minecraft:gold_ingot"
+    }
+  ],
+  "results": [
+  {
+    "id": "modestmagic:enchantment_tablet_hallowed"
+  }
+]
+}

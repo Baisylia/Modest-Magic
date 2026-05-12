@@ -1,0 +1,31 @@
+{
+  "type": "modestmagic:infusing",
+  "base": { 
+    "item": "modestmagic:enchantment_tablet" 
+  },
+  "ingredients": [
+    {
+	  "item": "minecraft:spider_eye"
+	},
+    {
+	  "item": "minecraft:spider_eye"
+	},
+    {
+	  "item": "minecraft:cobweb"
+	},
+    {
+	  "item": "minecraft:cobweb"
+	},
+    {
+      "item": "minecraft:cobweb"
+    },
+    {
+      "item": "minecraft:cobweb"
+    }
+  ],
+  "results": [
+  {
+    "id": "modestmagic:enchantment_tablet_infested"
+  }
+]
+}

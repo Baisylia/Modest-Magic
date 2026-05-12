@@ -24,10 +24,10 @@ public class ModBlocks {
     public static final Map<Supplier<Item>, Integer> FUEL_ITEMS = new HashMap<>();
 
     public static final Supplier<Block> ALTAR = registerBlock("altar",
-            () -> new AltarBlock(BlockBehaviour.Properties.copy(Blocks.OBSIDIAN).noOcclusion()), false, 0);
+            () -> new AltarBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.OBSIDIAN).noOcclusion()), false, 0);
 
     public static final Supplier<Block> PEDESTAL = registerBlock("pedestal",
-            () -> new PedestalBlock(BlockBehaviour.Properties.copy(Blocks.STONE_BRICKS).noOcclusion()), false, 0);
+            () -> new PedestalBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_BRICKS).noOcclusion()), false, 0);
 
     private static <T extends Block> Supplier<T> registerBlock(String name, Supplier<T> block, boolean isFuel, int fuelAmount) {
         Supplier<T> toReturn = BLOCKS.register(name, block);

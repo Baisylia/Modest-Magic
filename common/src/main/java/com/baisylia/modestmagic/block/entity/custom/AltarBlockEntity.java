@@ -7,23 +7,28 @@ import com.baisylia.modestmagic.recipe.custom.EnchantingRecipe;
 import com.baisylia.modestmagic.recipe.custom.InfusingRecipe;
 import com.baisylia.modestmagic.recipe.custom.SummoningRecipe;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class AltarBlockEntity extends PedestalBlockEntity {
 
@@ -47,7 +52,7 @@ public class AltarBlockEntity extends PedestalBlockEntity {
     }
 
     public boolean tryCraft() {
-        if (level == null || level.isClientSide)
+        if (level == null)
             return false;
 
         List<PedestalBlockEntity> pedestals = new ArrayList<>();
@@ -70,100 +75,155 @@ public class AltarBlockEntity extends PedestalBlockEntity {
             return false;
 
         // Infusing Recipe
-        for (InfusingRecipe recipe : level.getRecipeManager().getAllRecipesFor(ModRecipes.INFUSING_TYPE.get())) {
+        for (RecipeHolder<InfusingRecipe> recipeHolder : level.getRecipeManager().getAllRecipesFor(ModRecipes.INFUSING_TYPE.get())) {
+            InfusingRecipe recipe = recipeHolder.value();
             if (recipe.matches(this.getItem(), items)) {
                 if (!recipe.getResults().isEmpty()) {
-                    spawnItemEntity(this.level, getCraftingRemainder(this.getItem()),
-                            this.worldPosition.getX() + 0.5, this.worldPosition.getY() + 1.25, this.worldPosition.getZ() + 0.5,
-                            0, 0, 0);
+                    if (!level.isClientSide) {
+                        spawnItemEntity(this.level, getCraftingRemainder(this.getItem()),
+                                this.worldPosition.getX() + 0.5, this.worldPosition.getY() + 1.25, this.worldPosition.getZ() + 0.5,
+                                0, 0, 0);
 
-                    // Select a random result from the outputs
-                    ItemStack result = recipe.getResults().get(level.random.nextInt(recipe.getResults().size()));
-                    this.setItem(result.copy());
+                        // Select a random result from the outputs
+                        ItemStack result = recipe.getResults().get(level.random.nextInt(recipe.getResults().size()));
+                        this.setItem(result.copy());
 
-                    enchantEffects(pedestals, ParticleTypes.FLAME, ModSounds.ALTAR_ENCHANT.get());
+                        enchantEffects(pedestals, ParticleTypes.FLAME, ModSounds.ALTAR_ENCHANT.get());
+                    }
                     return true;
                 }
             }
         }
 
         // Enchanting Recipe
-        for (EnchantingRecipe recipe : level.getRecipeManager().getAllRecipesFor(ModRecipes.ENCHANTING_TYPE.get())) {
+        for (RecipeHolder<EnchantingRecipe> recipeHolder : level.getRecipeManager().getAllRecipesFor(ModRecipes.ENCHANTING_TYPE.get())) {
+            EnchantingRecipe recipe = recipeHolder.value();
             if (recipe.matches(items)) {
                 if (!recipe.getEnchantmentPools().isEmpty()) {
-                    Map<Enchantment, Integer> existing = EnchantmentHelper.getEnchantments(this.getItem());
+                    ItemEnchantments existingEnchants = this.getItem().getOrDefault(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY);
+                    ItemEnchantments.Mutable mutable = new ItemEnchantments.Mutable(existingEnchants);
                     boolean appliedAny = false;
 
-                    // Select a random pool of enchantments
-                    List<Enchantment> pool = recipe.getEnchantmentPools().get(level.random.nextInt(recipe.getEnchantmentPools().size()));
+                    var enchantRegistry = level.registryAccess().registryOrThrow(Registries.ENCHANTMENT);
 
-                    for (Enchantment enchantment : pool) {
-                        if (!enchantment.canEnchant(this.getItem())) continue;
+                    // Check if there are applicable enchantments available
+                    for (List<ResourceKey<Enchantment>> poolCheck : recipe.getEnchantmentPools()) {
+                        for (ResourceKey<Enchantment> key : poolCheck) {
+                            var opt = enchantRegistry.getHolder(key);
+                            if (opt.isEmpty()) continue;
+                            Holder<Enchantment> enchantHolder = opt.get();
+                            Enchantment enchantment = enchantHolder.value();
 
-                        boolean incompatible = existing.keySet().stream().anyMatch(e -> e != enchantment && !e.isCompatibleWith(enchantment));
-                        if (incompatible) continue;
+                            if (!enchantment.canEnchant(this.getItem())) continue;
 
-                        int currentLevel = existing.getOrDefault(enchantment, 0);
-                        int newLevel = Math.min(currentLevel + 1, enchantment.getMaxLevel());
+                            boolean incompatible = false;
+                            for (Holder<Enchantment> e : existingEnchants.keySet()) {
+                                if (!e.equals(enchantHolder) && !Enchantment.areCompatible(e, enchantHolder)) {
+                                    incompatible = true;
+                                    break;
+                                }
+                            }
+                            if (incompatible) continue;
 
-                        if (newLevel > currentLevel) {
-                            existing.put(enchantment, newLevel);
-                            EnchantmentHelper.setEnchantments(existing, this.getItem());
-                            appliedAny = true;
+                            int currentLevel = existingEnchants.getLevel(enchantHolder);
+                            int newLevel = Math.min(currentLevel + 1, enchantment.getMaxLevel());
+
+                            if (newLevel > currentLevel) {
+                                appliedAny = true;
+                                break;
+                            }
                         }
+                        if (appliedAny) break;
                     }
+
                     if (!appliedAny) return false;
 
-                    enchantEffects(pedestals, ParticleTypes.SOUL_FIRE_FLAME, ModSounds.ALTAR_ENCHANT.get());
+                    if (!level.isClientSide) {
+                        // Select a random pool of enchantments
+                        List<ResourceKey<Enchantment>> pool = recipe.getEnchantmentPools().get(level.random.nextInt(recipe.getEnchantmentPools().size()));
+
+                        for (ResourceKey<Enchantment> key : pool) {
+                            var opt = enchantRegistry.getHolder(key);
+                            if (opt.isEmpty()) continue;
+                            Holder<Enchantment> enchantHolder = opt.get();
+                            Enchantment enchantment = enchantHolder.value();
+
+                            if (!enchantment.canEnchant(this.getItem())) continue;
+
+                            boolean incompatible = false;
+                            for (Holder<Enchantment> e : existingEnchants.keySet()) {
+                                if (!e.equals(enchantHolder) && !Enchantment.areCompatible(e, enchantHolder)) {
+                                    incompatible = true;
+                                    break;
+                                }
+                            }
+                            if (incompatible) continue;
+
+                            int currentLevel = existingEnchants.getLevel(enchantHolder);
+                            int newLevel = Math.min(currentLevel + 1, enchantment.getMaxLevel());
+
+                            if (newLevel > currentLevel) {
+                                mutable.set(enchantHolder, newLevel);
+                            }
+                        }
+
+                        EnchantmentHelper.setEnchantments(this.getItem(), mutable.toImmutable());
+                        enchantEffects(pedestals, ParticleTypes.SOUL_FIRE_FLAME, ModSounds.ALTAR_ENCHANT.get());
+                    }
                     return true;
                 }
             }
         }
 
         // Summoning Recipe
-        for (SummoningRecipe recipe : level.getRecipeManager().getAllRecipesFor(ModRecipes.SUMMONING_TYPE.get())) {
+        for (RecipeHolder<SummoningRecipe> recipeHolder : level.getRecipeManager().getAllRecipesFor(ModRecipes.SUMMONING_TYPE.get())) {
+            SummoningRecipe recipe = recipeHolder.value();
             if (recipe.matches(this.getItem(), items)) {
                 if (!recipe.getOutcomes().isEmpty()) {
-                    if (level instanceof ServerLevel server) {
-                        SummoningRecipe.SummonOutcome outcome = recipe.getOutcomes().get(level.random.nextInt(recipe.getOutcomes().size()));
-                        var entity = outcome.entity().create(server);
-                        if (entity != null) {
-                            if (!outcome.nbt().isEmpty()) {
-                                CompoundTag nbt = outcome.nbt().copy();
-                                nbt.remove("Pos");
-                                nbt.remove("Motion");
-                                nbt.remove("Rotation");
-                                entity.load(nbt);
-                            }
-                            entity.moveTo(worldPosition.getX() + 0.5, worldPosition.getY() + 1, worldPosition.getZ() + 0.5, server.random.nextFloat() * 360F, 0);
-                            server.addFreshEntity(entity);
-                        }
-                    }
-
-                    ItemStack stack = this.getItem();
-                    if (recipe.shouldConsumeBase()) {
-                        spawnItemEntity(this.level, getCraftingRemainder(this.getItem()),
-                                this.worldPosition.getX() + 0.5, this.worldPosition.getY() + 1.25, this.worldPosition.getZ() + 0.5,
-                                0, 0, 0);
-                        this.clearContent();
-                    } else {
-                        int damage = recipe.getDurabilityCost();
-                        if (damage > 0 && stack.isDamageableItem()) {
-                            if (stack.hurt(damage, level.random, null)) {
-                                spawnItemEntity(this.level, getCraftingRemainder(this.getItem()),
-                                        this.worldPosition.getX() + 0.5, this.worldPosition.getY() + 1.25, this.worldPosition.getZ() + 0.5,
-                                        0, 0, 0);
-                                this.clearContent();
-                            } else {
-                                spawnItemEntity(this.level, getCraftingRemainder(this.getItem()),
-                                        this.worldPosition.getX() + 0.5, this.worldPosition.getY() + 1.25, this.worldPosition.getZ() + 0.5,
-                                        0, 0, 0);
-                                this.setItem(stack);
+                    if (!level.isClientSide) {
+                        if (level instanceof ServerLevel server) {
+                            SummoningRecipe.SummonOutcome outcome = recipe.getOutcomes().get(level.random.nextInt(recipe.getOutcomes().size()));
+                            var entity = outcome.entity().create(server);
+                            if (entity != null) {
+                                if (!outcome.nbt().isEmpty()) {
+                                    CompoundTag nbt = outcome.nbt().copy();
+                                    nbt.remove("Pos");
+                                    nbt.remove("Motion");
+                                    nbt.remove("Rotation");
+                                    entity.load(nbt);
+                                }
+                                entity.moveTo(worldPosition.getX() + 0.5, worldPosition.getY() + 1, worldPosition.getZ() + 0.5, server.random.nextFloat() * 360F, 0);
+                                server.addFreshEntity(entity);
                             }
                         }
-                    }
 
-                    enchantEffects(pedestals, ParticleTypes.AMBIENT_ENTITY_EFFECT, ModSounds.ALTAR_SUMMON.get());
+                        ItemStack stack = this.getItem();
+                        if (recipe.shouldConsumeBase()) {
+                            spawnItemEntity(this.level, getCraftingRemainder(this.getItem()),
+                                    this.worldPosition.getX() + 0.5, this.worldPosition.getY() + 1.25, this.worldPosition.getZ() + 0.5,
+                                    0, 0, 0);
+                            this.clearContent();
+                        } else {
+                            int damage = recipe.getDurabilityCost();
+                            if (damage > 0 && stack.isDamageableItem()) {
+                                int newDamage = stack.getDamageValue() + damage;
+                                if (newDamage >= stack.getMaxDamage()) {
+                                    spawnItemEntity(this.level, getCraftingRemainder(this.getItem()),
+                                            this.worldPosition.getX() + 0.5, this.worldPosition.getY() + 1.25, this.worldPosition.getZ() + 0.5,
+                                            0, 0, 0);
+                                    this.clearContent();
+                                } else {
+                                    stack.setDamageValue(newDamage);
+                                    spawnItemEntity(this.level, getCraftingRemainder(this.getItem()),
+                                            this.worldPosition.getX() + 0.5, this.worldPosition.getY() + 1.25, this.worldPosition.getZ() + 0.5,
+                                            0, 0, 0);
+                                    this.setItem(stack);
+                                }
+                            }
+                        }
+
+                        enchantEffects(pedestals, ParticleTypes.PORTAL, ModSounds.ALTAR_SUMMON.get());
+                    }
                     return true;
                 }
             }
@@ -193,36 +253,18 @@ public class AltarBlockEntity extends PedestalBlockEntity {
                 BlockPos pPos = pedestal.getBlockPos();
                 makeParticles(serverLevel, pPos, particle);
             }
-            serverLevel.sendParticles(
-                    ParticleTypes.WITCH,
-                    worldPosition.getX() + 0.5,
-                    worldPosition.getY() + 1.0,
-                    worldPosition.getZ() + 0.5,
-                    20,
-                    0.0, 0.0, 0.0,
-                    0.05
-            );
-            serverLevel.sendParticles(
-                    ParticleTypes.ENCHANT,
-                    worldPosition.getX() + 0.5,
-                    worldPosition.getY() + 2,
-                    worldPosition.getZ() + 0.5,
-                    35,
-                    0.0, 0.0, 0.0,
-                    3.0
-            );
+            serverLevel.sendParticles(ParticleTypes.WITCH,
+                    worldPosition.getX() + 0.5, worldPosition.getY() + 1.0, worldPosition.getZ() + 0.5,
+                    20, 0.0, 0.0, 0.0, 0.05);
+            serverLevel.sendParticles(ParticleTypes.ENCHANT,
+                    worldPosition.getX() + 0.5, worldPosition.getY() + 2, worldPosition.getZ() + 0.5,
+                    35, 0.0, 0.0, 0.0, 3.0);
         }
     }
 
     public <T extends ParticleOptions> void makeParticles(ServerLevel serverLevel, BlockPos pos, T particle) {
-        serverLevel.sendParticles(
-                particle,
-                pos.getX() + 0.5,
-                pos.getY() + 1.5,
-                pos.getZ() + 0.5,
-                10,
-                0.0, 0.0, 0.0,
-                0.05
-        );
+        serverLevel.sendParticles(particle,
+                pos.getX() + 0.5, pos.getY() + 1.5, pos.getZ() + 0.5,
+                10, 0.0, 0.0, 0.0, 0.05);
     }
 }

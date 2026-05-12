@@ -1,0 +1,21 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "type": "create:milling",
+  "ingredients": [
+    {
+      "item": "minecraft:nether_star"
+    }
+  ],
+  "results": [
+    {
+      "item": "modestmagic:stardust",
+      "count": 8
+    }
+  ],
+  "processingTime": 50
+}

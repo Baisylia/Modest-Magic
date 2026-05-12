@@ -1,0 +1,15 @@
+{
+  "type": "modestmagic:tablet_smithing",
+  "template": {
+    "item": "modestmagic:enchantment_tablet_puncturing"
+  },
+  "base": {
+    "tag": "minecraft:enchantable/durability"
+  },
+  "enchantments": [
+    "minecraft:power",
+    "minecraft:piercing",
+    "minecraft:projectile_protection",
+    "minecraft:breach"
+  ]
+}

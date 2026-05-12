@@ -1,0 +1,31 @@
+{
+  "type": "modestmagic:infusing",
+  "base": { 
+    "item": "modestmagic:enchantment_tablet" 
+  },
+  "ingredients": [
+    {
+	  "item": "minecraft:echo_shard"
+	},
+    {
+	  "item": "minecraft:echo_shard"
+	},
+    {
+	  "item": "minecraft:echo_shard"
+	},
+    {
+	  "item": "minecraft:echo_shard"
+	},
+    {
+      "item": "minecraft:echo_shard"
+    },
+    {
+      "item": "minecraft:echo_shard"
+    }
+  ],
+  "results": [
+  {
+    "id": "modestmagic:enchantment_tablet_haunted"
+  }
+]
+}

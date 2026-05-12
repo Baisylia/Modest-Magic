@@ -1,40 +1,34 @@
 package com.baisylia.modestmagic.recipe.custom;
 
 import com.baisylia.modestmagic.recipe.ModRecipes;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.TagParser;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
-import net.minecraft.world.SimpleContainer;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class SummoningRecipe implements Recipe<SimpleContainer> {
+public class SummoningRecipe implements Recipe<RecipeInput> {
 
-    private final ResourceLocation id;
-    private final NonNullList<Ingredient> ingredients;
     private final Ingredient base;
+    private final NonNullList<Ingredient> ingredients;
     private final List<SummonOutcome> outcomes;
     private final boolean consumeBase;
     private final int durabilityCost;
 
-    public SummoningRecipe(ResourceLocation id, Ingredient base, NonNullList<Ingredient> ingredients, List<SummonOutcome> outcomes, boolean consumeBase, int durabilityCost) {
-        this.id = id;
+    public SummoningRecipe(Ingredient base, NonNullList<Ingredient> ingredients, List<SummonOutcome> outcomes, boolean consumeBase, int durabilityCost) {
         this.base = base;
         this.ingredients = ingredients;
         this.outcomes = outcomes;
@@ -57,7 +51,6 @@ public class SummoningRecipe implements Recipe<SimpleContainer> {
     public boolean matches(ItemStack centerItem, List<ItemStack> pedestalItems) {
         if (!base.test(centerItem)) return false;
         if (pedestalItems.size() != ingredients.size()) return false;
-
         return matchIngredients(pedestalItems, ingredients, new boolean[pedestalItems.size()], 0);
     }
 
@@ -80,12 +73,12 @@ public class SummoningRecipe implements Recipe<SimpleContainer> {
     }
 
     @Override
-    public boolean matches(@NotNull SimpleContainer container, @NotNull Level level) {
+    public boolean matches(@NotNull RecipeInput input, @NotNull Level level) {
         return false;
     }
 
     @Override
-    public @NotNull ItemStack assemble(@NotNull SimpleContainer container, @NotNull RegistryAccess registryAccess) {
+    public @NotNull ItemStack assemble(@NotNull RecipeInput input, @NotNull HolderLookup.Provider registries) {
         return ItemStack.EMPTY;
     }
 
@@ -95,13 +88,8 @@ public class SummoningRecipe implements Recipe<SimpleContainer> {
     }
 
     @Override
-    public @NotNull ItemStack getResultItem(@NotNull RegistryAccess registryAccess) {
+    public @NotNull ItemStack getResultItem(@NotNull HolderLookup.Provider registries) {
         return ItemStack.EMPTY;
-    }
-
-    @Override
-    public @NotNull ResourceLocation getId() {
-        return id;
     }
 
     @Override
@@ -128,82 +116,50 @@ public class SummoningRecipe implements Recipe<SimpleContainer> {
     public static class Serializer implements RecipeSerializer<SummoningRecipe> {
         public static final Serializer INSTANCE = new Serializer();
 
+        public static final Codec<SummonOutcome> OUTCOME_CODEC = RecordCodecBuilder.create(inst -> inst.group(
+                BuiltInRegistries.ENTITY_TYPE.byNameCodec().fieldOf("result_entity").forGetter(SummonOutcome::entity),
+                CompoundTag.CODEC.optionalFieldOf("entity_nbt", new CompoundTag()).forGetter(SummonOutcome::nbt)
+        ).apply(inst, SummonOutcome::new));
+
+        public static final MapCodec<SummoningRecipe> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
+                Ingredient.CODEC.fieldOf("base").forGetter(r -> r.base),
+                Ingredient.CODEC.listOf().fieldOf("ingredients").forGetter(r -> r.ingredients),
+                OUTCOME_CODEC.listOf().fieldOf("outcomes").forGetter(r -> r.outcomes),
+                Codec.BOOL.optionalFieldOf("consume_base", true).forGetter(r -> r.consumeBase),
+                Codec.INT.optionalFieldOf("durability_taken", 0).forGetter(r -> r.durabilityCost)
+        ).apply(inst, (base, ingredients, outcomes, consume, durability) -> {
+            NonNullList<Ingredient> list = NonNullList.create();
+            list.addAll(ingredients);
+            return new SummoningRecipe(base, list, outcomes, consume, durability);
+        }));
+
+        public static final StreamCodec<RegistryFriendlyByteBuf, SummonOutcome> OUTCOME_STREAM_CODEC = StreamCodec.composite(
+                ByteBufCodecs.registry(Registries.ENTITY_TYPE), SummonOutcome::entity,
+                ByteBufCodecs.COMPOUND_TAG, SummonOutcome::nbt,
+                SummonOutcome::new
+        );
+
+        public static final StreamCodec<RegistryFriendlyByteBuf, SummoningRecipe> STREAM_CODEC = StreamCodec.composite(
+                Ingredient.CONTENTS_STREAM_CODEC, r -> r.base,
+                Ingredient.CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.list()), r -> r.ingredients,
+                OUTCOME_STREAM_CODEC.apply(ByteBufCodecs.list()), r -> r.outcomes,
+                ByteBufCodecs.BOOL, r -> r.consumeBase,
+                ByteBufCodecs.INT, r -> r.durabilityCost,
+                (base, ingredients, outcomes, consume, durability) -> {
+                    NonNullList<Ingredient> list = NonNullList.create();
+                    list.addAll(ingredients);
+                    return new SummoningRecipe(base, list, outcomes, consume, durability);
+                }
+        );
+
         @Override
-        public @NotNull SummoningRecipe fromJson(@NotNull ResourceLocation id, @NotNull JsonObject json) {
-            JsonArray ingredientsJson = GsonHelper.getAsJsonArray(json, "ingredients");
-            Ingredient base = Ingredient.fromJson(json.get("base"));
-            NonNullList<Ingredient> ingredients = NonNullList.create();
-            for (int i = 0; i < ingredientsJson.size(); i++) {
-                ingredients.add(Ingredient.fromJson(ingredientsJson.get(i)));
-            }
-            boolean consumeBase = GsonHelper.getAsBoolean(json, "consume_base", true);
-            int durability = GsonHelper.getAsInt(json, "durability_taken", 0);
-
-            List<SummonOutcome> outcomes = new ArrayList<>();
-            if (json.has("outcomes")) {
-                JsonArray arr = json.getAsJsonArray("outcomes");
-                for (int i = 0; i < arr.size(); i++) {
-                    JsonObject obj = arr.get(i).getAsJsonObject();
-                    EntityType<?> entity = BuiltInRegistries.ENTITY_TYPE.get(new ResourceLocation(GsonHelper.getAsString(obj, "result_entity")));
-                    CompoundTag nbt = new CompoundTag();
-                    if (obj.has("entity_nbt")) {
-                        try {
-                            nbt = TagParser.parseTag(obj.get("entity_nbt").toString());
-                        } catch (Exception e) {
-                            throw new RuntimeException("Invalid entity_nbt", e);
-                        }
-                    }
-                    outcomes.add(new SummonOutcome(entity, nbt));
-                }
-            } else if (json.has("result_entity")) {
-                EntityType<?> entity = BuiltInRegistries.ENTITY_TYPE.get(new ResourceLocation(GsonHelper.getAsString(json, "result_entity")));
-                CompoundTag nbt = new CompoundTag();
-                if (json.has("entity_nbt")) {
-                    try {
-                        nbt = TagParser.parseTag(json.get("entity_nbt").toString());
-                    } catch (Exception e) {
-                        throw new RuntimeException("Invalid entity_nbt", e);
-                    }
-                }
-                outcomes.add(new SummonOutcome(entity, nbt));
-            }
-
-            return new SummoningRecipe(id, base, ingredients, outcomes, consumeBase, durability);
+        public @NotNull MapCodec<SummoningRecipe> codec() {
+            return CODEC;
         }
 
         @Override
-        public @NotNull SummoningRecipe fromNetwork(@NotNull ResourceLocation id, FriendlyByteBuf buf) {
-            int size = buf.readVarInt();
-            NonNullList<Ingredient> ingredients = NonNullList.withSize(size, Ingredient.EMPTY);
-            for (int i = 0; i < size; i++) ingredients.set(i, Ingredient.fromNetwork(buf));
-            boolean consumeBase = buf.readBoolean();
-            int durability = buf.readVarInt();
-            Ingredient base = Ingredient.fromNetwork(buf);
-
-            int outcomesSize = buf.readVarInt();
-            List<SummonOutcome> outcomes = new ArrayList<>();
-            for (int i = 0; i < outcomesSize; i++) {
-                EntityType<?> entity = BuiltInRegistries.ENTITY_TYPE.get(buf.readResourceLocation());
-                CompoundTag nbt = buf.readNbt();
-                outcomes.add(new SummonOutcome(entity, nbt));
-            }
-
-            return new SummoningRecipe(id, base, ingredients, outcomes, consumeBase, durability);
-        }
-
-        @Override
-        public void toNetwork(FriendlyByteBuf buf, SummoningRecipe recipe) {
-            buf.writeVarInt(recipe.ingredients.size());
-            for (Ingredient ing : recipe.ingredients) ing.toNetwork(buf);
-            buf.writeBoolean(recipe.consumeBase);
-            buf.writeVarInt(recipe.durabilityCost);
-            recipe.base.toNetwork(buf);
-
-            buf.writeVarInt(recipe.outcomes.size());
-            for (SummonOutcome outcome : recipe.outcomes) {
-                buf.writeResourceLocation(BuiltInRegistries.ENTITY_TYPE.getKey(outcome.entity));
-                buf.writeNbt(outcome.nbt);
-            }
+        public @NotNull StreamCodec<RegistryFriendlyByteBuf, SummoningRecipe> streamCodec() {
+            return STREAM_CODEC;
         }
     }
 }

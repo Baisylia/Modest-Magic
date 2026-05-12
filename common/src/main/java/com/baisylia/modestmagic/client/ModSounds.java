@@ -14,19 +14,19 @@ public class ModSounds {
             Services.REGISTRIES.create(Registries.SOUND_EVENT, Constants.MOD_ID);
 
     public static final Supplier<SoundEvent> ADD_ITEM_ALTAR = SOUND_EVENTS.register("add_item_altar",
-            () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(Constants.MOD_ID, "block.altar.add_item")));
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "block.altar.add_item")));
 
     public static final Supplier<SoundEvent> ADD_ITEM_PEDESTAL = SOUND_EVENTS.register("add_item_pedestal",
-            () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(Constants.MOD_ID, "block.pedestal.add_item")));
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "block.pedestal.add_item")));
 
     public static final Supplier<SoundEvent> REMOVE_ITEM_PEDESTAL = SOUND_EVENTS.register("remove_item_pedestal",
-            () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(Constants.MOD_ID, "block.pedestal.remove_item")));
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "block.pedestal.remove_item")));
 
     public static final Supplier<SoundEvent> ALTAR_ENCHANT = SOUND_EVENTS.register("altar_enchant",
-            () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(Constants.MOD_ID, "block.altar.enchant")));
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "block.altar.enchant")));
 
     public static final Supplier<SoundEvent> ALTAR_SUMMON = SOUND_EVENTS.register("altar_summon",
-            () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(Constants.MOD_ID, "block.altar.summon")));
+            () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "block.altar.summon")));
 
     public static void init() {
     }

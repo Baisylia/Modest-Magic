@@ -1,0 +1,14 @@
+{
+  "type": "modestmagic:tablet_smithing",
+  "template": {
+    "item": "modestmagic:enchantment_tablet_flinging"
+  },
+  "base": {
+    "tag": "minecraft:enchantable/durability"
+  },
+  "enchantments": [
+    "minecraft:knockback",
+    "minecraft:punch",
+    "minecraft:wind_burst"
+  ]
+}

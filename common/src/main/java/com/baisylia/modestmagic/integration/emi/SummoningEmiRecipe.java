@@ -15,20 +15,22 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SummoningEmiRecipe implements EmiRecipe {
 
-    private static final ResourceLocation BACKGROUND = new ResourceLocation(Constants.MOD_ID, "textures/gui/emi_background.png");
+    private static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/emi_background.png");
     private final ResourceLocation id;
     private final EmiIngredient base;
     private final List<EmiIngredient> inputs;
     private final List<Entity> cachedEntities;
 
-    public SummoningEmiRecipe(SummoningRecipe recipe) {
-        this.id = recipe.getId();
+    public SummoningEmiRecipe(RecipeHolder<SummoningRecipe> recipeHolder) {
+        this.id = recipeHolder.id();
+        SummoningRecipe recipe = recipeHolder.value();
         this.base = EmiIngredient.of(recipe.getBase());
 
         this.inputs = new ArrayList<>();
@@ -95,7 +97,7 @@ public class SummoningEmiRecipe implements EmiRecipe {
         RotationState state = new RotationState(cx, cy, radius, circleItems.size());
 
         widgets.add(new RotatingLettersWidget(
-                new ResourceLocation(Constants.MOD_ID, "textures/gui/enchanted_letters.png"),
+                ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/enchanted_letters.png"),
                 cx, cy, radius + 6
         ));
 
@@ -105,10 +107,8 @@ public class SummoningEmiRecipe implements EmiRecipe {
             widgets.add(new RotatingSlotWidget(state, circleItems.get(i), i + 1));
         }
 
-        // Pedestal Count slot
         widgets.addSlot(EmiStack.of(new ItemStack(ModBlocks.PEDESTAL.get(), pedestalItems.size())), getDisplayWidth() - 18, getDisplayHeight() - 18).drawBack(true);
 
-        // Arrow
         widgets.addTexture(EmiTexture.EMPTY_ARROW, cx + radius + 16, cy - 8);
 
         int slotX = cx + radius - 4;
@@ -126,14 +126,10 @@ public class SummoningEmiRecipe implements EmiRecipe {
                     float maxDim = (float) Math.max(width, height);
                     float scale = 24.0f / Math.max(maxDim, 0.5f);
 
-                    int entityX = slotX + 9;
-                    int entityY = (int) (slotY + 9 + (height * scale) / 2.0f);
-
                     InventoryScreen.renderEntityInInventoryFollowsMouse(
                             guiGraphics,
-                            entityX, entityY, (int) scale,
-                            entityX - mouseX, entityY - mouseY - (scale * 1.5f),
-                            living
+                            slotX, slotY, slotX + 18, slotY + 18, (int) scale,
+                            0.05f, (float) mouseX, (float) mouseY, living
                     );
                 }
             }

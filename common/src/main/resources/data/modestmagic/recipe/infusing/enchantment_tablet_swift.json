@@ -1,0 +1,31 @@
+{
+  "type": "modestmagic:infusing",
+  "base": { 
+    "item": "modestmagic:enchantment_tablet" 
+  },
+  "ingredients": [
+    {
+	  "item": "minecraft:diamond"
+	},
+    {
+	  "item": "minecraft:diamond"
+	},
+    {
+	  "item": "minecraft:redstone"
+	},
+    {
+	  "item": "minecraft:redstone"
+	},
+    {
+      "item": "minecraft:sugar"
+    },
+    {
+      "item": "minecraft:sugar"
+    }
+  ],
+  "results": [
+  {
+    "id": "modestmagic:enchantment_tablet_swift"
+  }
+]
+}

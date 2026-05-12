@@ -44,7 +44,7 @@ public class WheelListTooltipWidget extends Widget {
         for (EmiIngredient ing : allItems) {
             if (ing.getEmiStacks().isEmpty()) continue;
 
-            EmiStack firstStack = ing.getEmiStacks().get(0);
+            EmiStack firstStack = ing.getEmiStacks().getFirst();
             boolean found = false;
 
             for (EmiStack existing : consolidated) {

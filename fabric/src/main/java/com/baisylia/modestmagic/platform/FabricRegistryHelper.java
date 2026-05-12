@@ -26,7 +26,7 @@ public class FabricRegistryHelper implements IRegistryHelper {
 
         @Override
         public <I extends T> Supplier<I> register(String name, Supplier<? extends I> supplier) {
-            I registered = Registry.register(registry, new ResourceLocation(modId, name), supplier.get());
+            I registered = Registry.register(registry, ResourceLocation.fromNamespaceAndPath(modId, name), supplier.get());
             return () -> registered;
         }
     }

@@ -1,0 +1,38 @@
+{
+  "type": "modestmagic:summoning",
+  "base": {
+    "item": "minecraft:water_bucket"
+  },
+  "ingredients": [
+    {
+	  "item": "minecraft:slime_ball"
+	},
+    {
+      "item": "minecraft:slime_ball"
+    },
+    {
+      "item": "minecraft:slime_ball"
+    },
+    {
+      "item": "minecraft:slime_ball"
+    },
+    {
+      "item": "minecraft:slime_ball"
+    },
+    {
+      "item": "minecraft:slime_ball"
+    },
+    {
+      "item": "minecraft:slime_ball"
+    },
+    {
+      "item": "minecraft:slime_ball"
+    }
+  ],
+  "consume_base": true,
+  "outcomes": [
+  {
+    "result_entity": "minecraft:slime"
+  }
+]
+}

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "O": {
+      "item": "minecraft:obsidian"
+    },
+    "A": {
+      "item": "minecraft:amethyst_shard"
+    }
+  },
+  "pattern": [
+    "OOO",
+    "AOA",
+    "OOO"
+  ],
+  "result": {
+    "id": "modestmagic:altar"
+  }
+}

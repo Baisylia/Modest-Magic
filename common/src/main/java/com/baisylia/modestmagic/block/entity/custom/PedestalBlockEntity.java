@@ -7,6 +7,7 @@ import com.baisylia.modestmagic.client.ModSounds;
 import com.baisylia.modestmagic.config.ModConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -23,8 +24,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public class PedestalBlockEntity extends BlockEntity implements WorldlyContainer {
@@ -96,19 +97,24 @@ public class PedestalBlockEntity extends BlockEntity implements WorldlyContainer
     }
 
     @Override
-    protected void saveAdditional(@NotNull CompoundTag tag) {
-        super.saveAdditional(tag);
-        tag.put("Inventory", this.inventory.save(new CompoundTag()));
+    protected void saveAdditional(@NotNull CompoundTag tag, @NotNull HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        tag.put("Inventory", this.inventory.saveOptional(registries));
     }
 
     @Override
-    public void load(@NotNull CompoundTag tag) {
-        super.load(tag);
+    public void loadAdditional(@NotNull CompoundTag tag, @NotNull HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
         if (tag.contains("Inventory")) {
-            this.inventory = ItemStack.of(tag.getCompound("Inventory"));
+            this.inventory = ItemStack.parseOptional(registries, tag.getCompound("Inventory"));
         } else {
             this.inventory = ItemStack.EMPTY;
         }
+    }
+
+    @Override
+    public @NotNull CompoundTag getUpdateTag(HolderLookup.@NotNull Provider registries) {
+        return saveCustomOnly(registries);
     }
 
     @Override
@@ -185,10 +191,5 @@ public class PedestalBlockEntity extends BlockEntity implements WorldlyContainer
     @Override
     public Packet<ClientGamePacketListener> getUpdatePacket() {
         return ClientboundBlockEntityDataPacket.create(this);
-    }
-
-    @Override
-    public @NotNull CompoundTag getUpdateTag() {
-        return saveWithoutMetadata();
     }
 }

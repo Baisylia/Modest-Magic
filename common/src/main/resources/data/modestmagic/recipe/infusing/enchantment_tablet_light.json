@@ -1,0 +1,31 @@
+{
+  "type": "modestmagic:infusing",
+  "base": { 
+    "item": "modestmagic:enchantment_tablet" 
+  },
+  "ingredients": [
+    {
+	  "item": "minecraft:feather"
+	},
+    {
+	  "item": "minecraft:feather"
+	},
+    {
+	  "item": "minecraft:string"
+	},
+    {
+	  "item": "minecraft:string"
+	},
+    {
+      "item": "minecraft:lapis_lazuli"
+    },
+    {
+      "item": "minecraft:lapis_lazuli"
+    }
+  ],
+  "results": [
+  {
+    "id": "modestmagic:enchantment_tablet_light"
+  }
+]
+}

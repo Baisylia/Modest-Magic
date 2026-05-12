@@ -3,6 +3,7 @@ package com.baisylia.modestmagic.block.custom;
 import com.baisylia.modestmagic.block.entity.ModBlockEntities;
 import com.baisylia.modestmagic.block.entity.custom.PedestalBlockEntity;
 import com.baisylia.modestmagic.client.ModSounds;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -11,6 +12,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -35,8 +37,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class PedestalBlock extends BaseEntityBlock implements SimpleWaterloggedBlock {
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
@@ -44,6 +46,7 @@ public class PedestalBlock extends BaseEntityBlock implements SimpleWaterloggedB
     public static final BooleanProperty TOP = BooleanProperty.create("top");
     public static final BooleanProperty BOTTOM = BooleanProperty.create("bottom");
     public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.AXIS;
+    public static final MapCodec<PedestalBlock> CODEC = simpleCodec(PedestalBlock::new);
 
     public PedestalBlock(Properties properties) {
         super(properties);
@@ -95,7 +98,7 @@ public class PedestalBlock extends BaseEntityBlock implements SimpleWaterloggedB
     }
 
     @Override
-    public FluidState getFluidState(BlockState state) {
+    public @NotNull FluidState getFluidState(BlockState state) {
         return state.getValue(WATERLOGGED)
                 ? Fluids.WATER.getSource(false)
                 : super.getFluidState(state);
@@ -103,13 +106,13 @@ public class PedestalBlock extends BaseEntityBlock implements SimpleWaterloggedB
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, @NotNull BlockState state, @NotNull BlockEntityType<T> type) {
         if (level.isClientSide) return null;
         return createTickerHelper(type, ModBlockEntities.PEDESTAL_BLOCK_ENTITY.get(), PedestalBlockEntity::tick);
     }
 
     @Override
-    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+    public @NotNull BlockState updateShape(BlockState state, @NotNull Direction direction, @NotNull BlockState neighborState, @NotNull LevelAccessor level, @NotNull BlockPos pos, @NotNull BlockPos neighborPos) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
@@ -167,7 +170,7 @@ public class PedestalBlock extends BaseEntityBlock implements SimpleWaterloggedB
     }
 
     @Override
-    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean moved) {
+    public void onPlace(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull BlockState oldState, boolean moved) {
         super.onPlace(state, level, pos, oldState, moved);
 
         if (oldState.getBlock() == state.getBlock()) {
@@ -177,12 +180,12 @@ public class PedestalBlock extends BaseEntityBlock implements SimpleWaterloggedB
 
     @Nullable
     @Override
-    public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
+    public BlockEntity newBlockEntity(@NotNull BlockPos pPos, @NotNull BlockState pState) {
         return new PedestalBlockEntity(pPos, pState);
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    public @NotNull VoxelShape getShape(BlockState state, @NotNull BlockGetter level, @NotNull BlockPos pos, @NotNull CollisionContext context) {
 
         boolean top = state.getValue(TOP);
         boolean bottom = state.getValue(BOTTOM);
@@ -202,49 +205,63 @@ public class PedestalBlock extends BaseEntityBlock implements SimpleWaterloggedB
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected @NotNull ItemInteractionResult useItemOn(@NotNull ItemStack stack, @NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull InteractionHand hand, @NotNull BlockHitResult hit) {
         return pedestalUse(level, pos, player, hand, state, ModSounds.ADD_ITEM_PEDESTAL.get());
     }
 
-    protected InteractionResult pedestalUse(Level level, BlockPos pos, Player player, InteractionHand hand, BlockState state, SoundEvent soundEvent) {
-        if (state.getValue(AXIS) != Direction.Axis.Y) return InteractionResult.PASS;
-        if (!state.getValue(TOP)) return InteractionResult.PASS;
-
-        BlockEntity be = level.getBlockEntity(pos);
-        if (!(be instanceof PedestalBlockEntity pedestal))
-            return InteractionResult.PASS;
-
-        ItemStack held = player.getItemInHand(hand);
-
-        if (pedestal.getItem().isEmpty()) {
-            if (held.isEmpty()) return InteractionResult.PASS;
-
-            if (!level.isClientSide) {
-                pedestal.setItem(held.split(1));
-            }
-
-            level.playSound(null, pos, soundEvent, SoundSource.BLOCKS, 1.0f, 1.0f);
-        } else {
-            if (!level.isClientSide) {
-                ItemStack stack = pedestal.getItem();
-                pedestal.clear();
-                level.playSound(null, pos, ModSounds.REMOVE_ITEM_PEDESTAL.get(), SoundSource.BLOCKS, 1.0f, 1.0f);
-
-                if (!player.addItem(stack)) {
-                    player.drop(stack, false);
-                }
-            }
-        }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+    @Override
+    protected @NotNull InteractionResult useWithoutItem(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull BlockHitResult hit) {
+        return pedestalUse(level, pos, player, player.getUsedItemHand(), state, ModSounds.ADD_ITEM_PEDESTAL.get()).result();
     }
 
     @Override
-    public RenderShape getRenderShape(BlockState state) {
+    protected @NotNull MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
+
+    protected ItemInteractionResult pedestalUse(Level level, BlockPos pos, Player player, InteractionHand hand, BlockState state, SoundEvent soundEvent) {
+        if (state.getValue(AXIS) != Direction.Axis.Y || !state.getValue(TOP)) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
+
+        BlockEntity be = level.getBlockEntity(pos);
+        if (!(be instanceof PedestalBlockEntity pedestal)) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
+
+        ItemStack held = player.getItemInHand(hand);
+
+        if (pedestal.getItem().isEmpty() && held.isEmpty()) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
+
+        if (level.isClientSide) {
+            return ItemInteractionResult.SUCCESS;
+        }
+
+        if (pedestal.getItem().isEmpty()) {
+            ItemStack stackToPlace = held.split(1);
+            pedestal.setItem(stackToPlace);
+            level.playSound(null, pos, soundEvent, SoundSource.BLOCKS, 1.0f, 1.0f);
+        } else {
+            ItemStack stack = pedestal.getItem();
+            pedestal.clear();
+            level.playSound(null, pos, ModSounds.REMOVE_ITEM_PEDESTAL.get(), SoundSource.BLOCKS, 1.0f, 1.0f);
+
+            if (!player.getInventory().add(stack)) {
+                player.drop(stack, false);
+            }
+        }
+        return ItemInteractionResult.CONSUME;
+    }
+
+    @Override
+    public @NotNull RenderShape getRenderShape(@NotNull BlockState state) {
         return RenderShape.MODEL;
     }
 
     @Override
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moved) {
+    public void onRemove(BlockState state, @NotNull Level level, @NotNull BlockPos pos, BlockState newState, boolean moved) {
         if (state.getBlock() != newState.getBlock()) {
             BlockEntity be = level.getBlockEntity(pos);
 
