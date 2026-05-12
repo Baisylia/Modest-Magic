@@ -2,13 +2,14 @@ package com.baisylia.modestmagic.block.renderer;
 
 import com.baisylia.modestmagic.block.entity.custom.AltarBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
 
@@ -16,7 +17,7 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
     }
 
     @Override
-    public void render(AltarBlockEntity enchantingTable, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int light, int overlay) {
+    public void render(AltarBlockEntity enchantingTable, float partialTick, @NotNull PoseStack poseStack, @NotNull MultiBufferSource buffer, int light, int overlay) {
         ItemStack stack = enchantingTable.getItem();
         if (stack.isEmpty()) return;
 
@@ -24,16 +25,18 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity> {
         poseStack.translate(0.5D, 1.4D, 0.5D);
 
         float rotation = ((enchantingTable.getLevel().getGameTime() % 360) + partialTick) * 2f;
-        poseStack.mulPose(Vector3f.YP.rotationDegrees(rotation));
+
+        poseStack.mulPose(Axis.YP.rotationDegrees(rotation));
         poseStack.scale(0.6f, 0.6f, 0.6f);
 
         Minecraft.getInstance().getItemRenderer().renderStatic(
                 stack,
-                ItemTransforms.TransformType.FIXED,
+                ItemDisplayContext.FIXED,
                 light,
                 overlay,
                 poseStack,
                 buffer,
+                enchantingTable.getLevel(),
                 0
         );
 

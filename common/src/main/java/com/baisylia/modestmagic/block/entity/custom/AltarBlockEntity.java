@@ -12,6 +12,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -33,9 +34,16 @@ public class AltarBlockEntity extends PedestalBlockEntity {
     }
 
     public static void spawnItemEntity(Level level, ItemStack stack, double x, double y, double z, double xMotion, double yMotion, double zMotion) {
+        if (stack.isEmpty()) return;
         ItemEntity entity = new ItemEntity(level, x, y, z, stack);
         entity.setDeltaMovement(xMotion, yMotion, zMotion);
         level.addFreshEntity(entity);
+    }
+
+    private ItemStack getCraftingRemainder(ItemStack stack) {
+        return stack.getItem().hasCraftingRemainingItem()
+                ? new ItemStack(stack.getItem().getCraftingRemainingItem())
+                : ItemStack.EMPTY;
     }
 
     public boolean tryCraft() {
@@ -45,7 +53,6 @@ public class AltarBlockEntity extends PedestalBlockEntity {
         List<PedestalBlockEntity> pedestals = new ArrayList<>();
         List<ItemStack> items = new ArrayList<>();
 
-        // Scan Pedestals
         for (BlockPos pos : BlockPos.betweenClosed(worldPosition.offset(-PEDESTAL_RANGE, -PEDESTAL_RANGE, -PEDESTAL_RANGE),
                 worldPosition.offset(PEDESTAL_RANGE, PEDESTAL_RANGE, PEDESTAL_RANGE))) {
             BlockEntity be = level.getBlockEntity(pos);
@@ -66,11 +73,10 @@ public class AltarBlockEntity extends PedestalBlockEntity {
         for (InfusingRecipe recipe : level.getRecipeManager().getAllRecipesFor(ModRecipes.INFUSING_TYPE.get())) {
             if (recipe.matches(this.getItem(), items)) {
                 if (!recipe.getResults().isEmpty()) {
-                    // Do Thingy
-                    spawnItemEntity(this.level, this.getItem().getCraftingRemainingItem(),
+                    spawnItemEntity(this.level, getCraftingRemainder(this.getItem()),
                             this.worldPosition.getX() + 0.5, this.worldPosition.getY() + 1.25, this.worldPosition.getZ() + 0.5,
                             0, 0, 0);
-                    
+
                     // Select a random result from the outputs
                     ItemStack result = recipe.getResults().get(level.random.nextInt(recipe.getResults().size()));
                     this.setItem(result.copy());
@@ -118,7 +124,6 @@ public class AltarBlockEntity extends PedestalBlockEntity {
         for (SummoningRecipe recipe : level.getRecipeManager().getAllRecipesFor(ModRecipes.SUMMONING_TYPE.get())) {
             if (recipe.matches(this.getItem(), items)) {
                 if (!recipe.getOutcomes().isEmpty()) {
-                    // Do Thingy
                     if (level instanceof ServerLevel server) {
                         SummoningRecipe.SummonOutcome outcome = recipe.getOutcomes().get(level.random.nextInt(recipe.getOutcomes().size()));
                         var entity = outcome.entity().create(server);
@@ -137,7 +142,7 @@ public class AltarBlockEntity extends PedestalBlockEntity {
 
                     ItemStack stack = this.getItem();
                     if (recipe.shouldConsumeBase()) {
-                        spawnItemEntity(this.level, this.getItem().getCraftingRemainingItem(),
+                        spawnItemEntity(this.level, getCraftingRemainder(this.getItem()),
                                 this.worldPosition.getX() + 0.5, this.worldPosition.getY() + 1.25, this.worldPosition.getZ() + 0.5,
                                 0, 0, 0);
                         this.clearContent();
@@ -145,12 +150,12 @@ public class AltarBlockEntity extends PedestalBlockEntity {
                         int damage = recipe.getDurabilityCost();
                         if (damage > 0 && stack.isDamageableItem()) {
                             if (stack.hurt(damage, level.random, null)) {
-                                spawnItemEntity(this.level, this.getItem().getCraftingRemainingItem(),
+                                spawnItemEntity(this.level, getCraftingRemainder(this.getItem()),
                                         this.worldPosition.getX() + 0.5, this.worldPosition.getY() + 1.25, this.worldPosition.getZ() + 0.5,
                                         0, 0, 0);
                                 this.clearContent();
                             } else {
-                                spawnItemEntity(this.level, this.getItem().getCraftingRemainingItem(),
+                                spawnItemEntity(this.level, getCraftingRemainder(this.getItem()),
                                         this.worldPosition.getX() + 0.5, this.worldPosition.getY() + 1.25, this.worldPosition.getZ() + 0.5,
                                         0, 0, 0);
                                 this.setItem(stack);
@@ -167,9 +172,9 @@ public class AltarBlockEntity extends PedestalBlockEntity {
     }
 
     public <T extends ParticleOptions> void enchantEffects(List<PedestalBlockEntity> pedestals, T particle, SoundEvent soundEvent) {
-        // Eat Ingredients Nyum Nyum Nyum
+        // Eat ingredients nyum nyum nyum
         for (PedestalBlockEntity pedestal : pedestals) {
-            spawnItemEntity(pedestal.getLevel(), pedestal.getItem().getCraftingRemainingItem(),
+            spawnItemEntity(pedestal.getLevel(), getCraftingRemainder(pedestal.getItem()),
                     pedestal.getBlockPos().getX() + 0.5, pedestal.getBlockPos().getY() + 1.25, pedestal.getBlockPos().getZ() + 0.5,
                     0, 0, 0);
             pedestal.clear();
@@ -180,7 +185,7 @@ public class AltarBlockEntity extends PedestalBlockEntity {
         if (level instanceof ServerLevel serverLevel) {
             // Sound
             serverLevel.playSound(null, worldPosition, soundEvent,
-                    net.minecraft.sounds.SoundSource.BLOCKS, 1.0f, 1.0f);
+                    SoundSource.BLOCKS, 1.0f, 1.0f);
 
             // Particles
             makeParticles(serverLevel, worldPosition, particle);

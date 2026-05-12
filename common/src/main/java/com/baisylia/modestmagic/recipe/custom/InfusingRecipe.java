@@ -4,6 +4,7 @@ import com.baisylia.modestmagic.recipe.ModRecipes;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -11,7 +12,7 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.RecipeMatcher;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,12 +32,25 @@ public class InfusingRecipe implements Recipe<SimpleContainer> {
     }
 
     public boolean matches(ItemStack centerItem, List<ItemStack> pedestalItems) {
-
         if (!base.test(centerItem))
             return false;
 
-        List<ItemStack> inputs = new ArrayList<>(pedestalItems);
-        return RecipeMatcher.findMatches(inputs, ingredients) != null;
+        if (pedestalItems.size() != ingredients.size()) return false;
+
+        return matchIngredients(pedestalItems, ingredients, new boolean[pedestalItems.size()], 0);
+    }
+
+    private boolean matchIngredients(List<ItemStack> inputs, List<Ingredient> ingredients, boolean[] used, int index) {
+        if (index == ingredients.size()) return true;
+        Ingredient ing = ingredients.get(index);
+        for (int i = 0; i < inputs.size(); i++) {
+            if (!used[i] && ing.test(inputs.get(i))) {
+                used[i] = true;
+                if (matchIngredients(inputs, ingredients, used, index + 1)) return true;
+                used[i] = false;
+            }
+        }
+        return false;
     }
 
     public List<ItemStack> getResults() {
@@ -44,12 +58,12 @@ public class InfusingRecipe implements Recipe<SimpleContainer> {
     }
 
     @Override
-    public boolean matches(SimpleContainer container, Level level) {
-        return false; // unused
+    public boolean matches(@NotNull SimpleContainer container, @NotNull Level level) {
+        return false;
     }
 
     @Override
-    public ItemStack assemble(SimpleContainer container) {
+    public @NotNull ItemStack assemble(@NotNull SimpleContainer container, @NotNull RegistryAccess registryAccess) {
         return results.isEmpty() ? ItemStack.EMPTY : results.get(0).copy();
     }
 
@@ -64,26 +78,26 @@ public class InfusingRecipe implements Recipe<SimpleContainer> {
     }
 
     @Override
-    public ItemStack getResultItem() {
+    public @NotNull ItemStack getResultItem(@NotNull RegistryAccess registryAccess) {
         return results.isEmpty() ? ItemStack.EMPTY : results.get(0);
     }
 
     @Override
-    public ResourceLocation getId() {
+    public @NotNull ResourceLocation getId() {
         return id;
     }
 
     @Override
-    public RecipeSerializer<?> getSerializer() {
+    public @NotNull RecipeSerializer<?> getSerializer() {
         return ModRecipes.INFUSING_SERIALIZER.get();
     }
 
     @Override
-    public RecipeType<?> getType() {
+    public @NotNull RecipeType<?> getType() {
         return ModRecipes.INFUSING_TYPE.get();
     }
 
-    public NonNullList<Ingredient> getIngredients() {
+    public @NotNull NonNullList<Ingredient> getIngredients() {
         return ingredients;
     }
 
@@ -95,8 +109,7 @@ public class InfusingRecipe implements Recipe<SimpleContainer> {
         public static final Serializer INSTANCE = new Serializer();
 
         @Override
-        public InfusingRecipe fromJson(ResourceLocation id, JsonObject json) {
-
+        public @NotNull InfusingRecipe fromJson(@NotNull ResourceLocation id, @NotNull JsonObject json) {
             JsonArray ingredientsJson = GsonHelper.getAsJsonArray(json, "ingredients");
             Ingredient base = Ingredient.fromJson(json.get("base"));
             NonNullList<Ingredient> ingredients = NonNullList.create();
@@ -119,10 +132,8 @@ public class InfusingRecipe implements Recipe<SimpleContainer> {
         }
 
         @Override
-        public InfusingRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
-
+        public @NotNull InfusingRecipe fromNetwork(@NotNull ResourceLocation id, FriendlyByteBuf buf) {
             int size = buf.readVarInt();
-
             NonNullList<Ingredient> ingredients = NonNullList.withSize(size, Ingredient.EMPTY);
 
             for (int i = 0; i < size; i++) {
@@ -142,7 +153,6 @@ public class InfusingRecipe implements Recipe<SimpleContainer> {
 
         @Override
         public void toNetwork(FriendlyByteBuf buf, InfusingRecipe recipe) {
-
             buf.writeVarInt(recipe.ingredients.size());
 
             for (Ingredient ing : recipe.ingredients) {

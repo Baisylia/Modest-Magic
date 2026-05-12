@@ -1,5 +1,6 @@
 package com.baisylia.modestmagic.integration.emi;
 
+import com.baisylia.modestmagic.Constants;
 import com.baisylia.modestmagic.block.ModBlocks;
 import com.baisylia.modestmagic.recipe.custom.InfusingRecipe;
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -16,7 +17,7 @@ import java.util.List;
 
 public class InfusingEmiRecipe implements EmiRecipe {
 
-    private static final ResourceLocation BACKGROUND = new ResourceLocation("modestmagic", "textures/gui/emi_background.png");
+    private static final ResourceLocation BACKGROUND = new ResourceLocation(Constants.MOD_ID, "textures/gui/emi_background.png");
     private final ResourceLocation id;
     private final EmiIngredient base;
     private final List<EmiIngredient> inputs;
@@ -82,7 +83,7 @@ public class InfusingEmiRecipe implements EmiRecipe {
         RotationState state = new RotationState(cx, cy, radius, circleItems.size());
 
         widgets.add(new RotatingLettersWidget(
-                new ResourceLocation("modestmagic", "textures/gui/enchanted_letters.png"),
+                new ResourceLocation(Constants.MOD_ID, "textures/gui/enchanted_letters.png"),
                 cx, cy, radius + 6
         ));
 

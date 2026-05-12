@@ -4,6 +4,8 @@ import com.baisylia.modestmagic.recipe.ModRecipes;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.network.FriendlyByteBuf;
@@ -17,7 +19,7 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,11 +55,23 @@ public class SummoningRecipe implements Recipe<SimpleContainer> {
     }
 
     public boolean matches(ItemStack centerItem, List<ItemStack> pedestalItems) {
-        if (!base.test(centerItem))
-            return false;
+        if (!base.test(centerItem)) return false;
+        if (pedestalItems.size() != ingredients.size()) return false;
 
-        List<ItemStack> inputs = new ArrayList<>(pedestalItems);
-        return net.minecraftforge.common.util.RecipeMatcher.findMatches(inputs, ingredients) != null;
+        return matchIngredients(pedestalItems, ingredients, new boolean[pedestalItems.size()], 0);
+    }
+
+    private boolean matchIngredients(List<ItemStack> inputs, List<Ingredient> ingredients, boolean[] used, int index) {
+        if (index == ingredients.size()) return true;
+        Ingredient ing = ingredients.get(index);
+        for (int i = 0; i < inputs.size(); i++) {
+            if (!used[i] && ing.test(inputs.get(i))) {
+                used[i] = true;
+                if (matchIngredients(inputs, ingredients, used, index + 1)) return true;
+                used[i] = false;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -66,12 +80,12 @@ public class SummoningRecipe implements Recipe<SimpleContainer> {
     }
 
     @Override
-    public boolean matches(SimpleContainer container, Level level) {
+    public boolean matches(@NotNull SimpleContainer container, @NotNull Level level) {
         return false;
     }
 
     @Override
-    public ItemStack assemble(SimpleContainer container) {
+    public @NotNull ItemStack assemble(@NotNull SimpleContainer container, @NotNull RegistryAccess registryAccess) {
         return ItemStack.EMPTY;
     }
 
@@ -81,26 +95,26 @@ public class SummoningRecipe implements Recipe<SimpleContainer> {
     }
 
     @Override
-    public ItemStack getResultItem() {
+    public @NotNull ItemStack getResultItem(@NotNull RegistryAccess registryAccess) {
         return ItemStack.EMPTY;
     }
 
     @Override
-    public ResourceLocation getId() {
+    public @NotNull ResourceLocation getId() {
         return id;
     }
 
     @Override
-    public RecipeSerializer<?> getSerializer() {
+    public @NotNull RecipeSerializer<?> getSerializer() {
         return ModRecipes.SUMMONING_SERIALIZER.get();
     }
 
     @Override
-    public RecipeType<?> getType() {
+    public @NotNull RecipeType<?> getType() {
         return ModRecipes.SUMMONING_TYPE.get();
     }
 
-    public NonNullList<Ingredient> getIngredients() {
+    public @NotNull NonNullList<Ingredient> getIngredients() {
         return ingredients;
     }
 
@@ -115,7 +129,7 @@ public class SummoningRecipe implements Recipe<SimpleContainer> {
         public static final Serializer INSTANCE = new Serializer();
 
         @Override
-        public SummoningRecipe fromJson(ResourceLocation id, JsonObject json) {
+        public @NotNull SummoningRecipe fromJson(@NotNull ResourceLocation id, @NotNull JsonObject json) {
             JsonArray ingredientsJson = GsonHelper.getAsJsonArray(json, "ingredients");
             Ingredient base = Ingredient.fromJson(json.get("base"));
             NonNullList<Ingredient> ingredients = NonNullList.create();
@@ -127,11 +141,10 @@ public class SummoningRecipe implements Recipe<SimpleContainer> {
 
             List<SummonOutcome> outcomes = new ArrayList<>();
             if (json.has("outcomes")) {
-                // randomized outcomes
                 JsonArray arr = json.getAsJsonArray("outcomes");
                 for (int i = 0; i < arr.size(); i++) {
                     JsonObject obj = arr.get(i).getAsJsonObject();
-                    EntityType<?> entity = ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(GsonHelper.getAsString(obj, "result_entity")));
+                    EntityType<?> entity = BuiltInRegistries.ENTITY_TYPE.get(new ResourceLocation(GsonHelper.getAsString(obj, "result_entity")));
                     CompoundTag nbt = new CompoundTag();
                     if (obj.has("entity_nbt")) {
                         try {
@@ -143,8 +156,7 @@ public class SummoningRecipe implements Recipe<SimpleContainer> {
                     outcomes.add(new SummonOutcome(entity, nbt));
                 }
             } else if (json.has("result_entity")) {
-                // single outcome
-                EntityType<?> entity = ForgeRegistries.ENTITY_TYPES.getValue(new ResourceLocation(GsonHelper.getAsString(json, "result_entity")));
+                EntityType<?> entity = BuiltInRegistries.ENTITY_TYPE.get(new ResourceLocation(GsonHelper.getAsString(json, "result_entity")));
                 CompoundTag nbt = new CompoundTag();
                 if (json.has("entity_nbt")) {
                     try {
@@ -160,7 +172,7 @@ public class SummoningRecipe implements Recipe<SimpleContainer> {
         }
 
         @Override
-        public SummoningRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
+        public @NotNull SummoningRecipe fromNetwork(@NotNull ResourceLocation id, FriendlyByteBuf buf) {
             int size = buf.readVarInt();
             NonNullList<Ingredient> ingredients = NonNullList.withSize(size, Ingredient.EMPTY);
             for (int i = 0; i < size; i++) ingredients.set(i, Ingredient.fromNetwork(buf));
@@ -171,7 +183,7 @@ public class SummoningRecipe implements Recipe<SimpleContainer> {
             int outcomesSize = buf.readVarInt();
             List<SummonOutcome> outcomes = new ArrayList<>();
             for (int i = 0; i < outcomesSize; i++) {
-                EntityType<?> entity = ForgeRegistries.ENTITY_TYPES.getValue(buf.readResourceLocation());
+                EntityType<?> entity = BuiltInRegistries.ENTITY_TYPE.get(buf.readResourceLocation());
                 CompoundTag nbt = buf.readNbt();
                 outcomes.add(new SummonOutcome(entity, nbt));
             }
@@ -189,7 +201,7 @@ public class SummoningRecipe implements Recipe<SimpleContainer> {
 
             buf.writeVarInt(recipe.outcomes.size());
             for (SummonOutcome outcome : recipe.outcomes) {
-                buf.writeResourceLocation(ForgeRegistries.ENTITY_TYPES.getKey(outcome.entity));
+                buf.writeResourceLocation(BuiltInRegistries.ENTITY_TYPE.getKey(outcome.entity));
                 buf.writeNbt(outcome.nbt);
             }
         }

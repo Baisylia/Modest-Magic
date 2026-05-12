@@ -11,5 +11,4 @@ public class ModestMagic implements ModInitializer {
         CommonClass.init();
         ModBlocks.FUEL_ITEMS.forEach((item, time) -> FuelRegistry.INSTANCE.add(item.get(), time));
     }
-
 }

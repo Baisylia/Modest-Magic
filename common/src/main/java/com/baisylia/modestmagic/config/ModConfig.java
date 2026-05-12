@@ -4,7 +4,6 @@ import com.baisylia.modestmagic.Constants;
 import com.baisylia.modestmagic.platform.Services;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.annotations.SerializedName;
 
 import java.io.File;
 import java.io.FileReader;
@@ -16,29 +15,8 @@ public class ModConfig {
     private static final File CONFIG_FILE = Services.PLATFORM.getConfigDirectory().resolve("modestmagic.json").toFile();
     private static ModConfig INSTANCE;
 
-    // TODO: un-forgeify
-    public static final ForgeConfigSpec SPEC;
-    public static final ForgeConfigSpec.BooleanValue THROW_ITEMS_ON_PEDESTALS;
-    public static final ForgeConfigSpec.BooleanValue REDUCED_EMI_MOTION;
-
-    // TODO: un-forgeify
-    static {
-        ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
-
-        builder.push("general");
-        THROW_ITEMS_ON_PEDESTALS = builder
-                .comment("If true, dropped items will automatically be picked up by empty pedestals.")
-                .define("throwItemsOnPedestals", true);
-        builder.pop();
-
-        builder.push("client");
-        REDUCED_EMI_MOTION = builder
-                .comment("If true, disables hovering and rotating animations in EMI recipes.")
-                .define("reducedEmiMotion", false);
-        builder.pop();
-
-        SPEC = builder.build();
-    }
+    public boolean throwItemsOnPedestals = true;
+    public boolean reducedEmiMotion = false;
 
     public static ModConfig get() {
         if (INSTANCE == null) {

@@ -8,13 +8,13 @@ import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,7 +29,7 @@ public class TabletSmithingEmiRecipe implements EmiRecipe {
     private final List<EmiStack> outputs;
 
     public TabletSmithingEmiRecipe(TabletSmithingRecipe recipe) {
-        this.id = new ResourceLocation(recipe.getId().getNamespace(), "/" + recipe.getId().getPath() + "_emi");
+        this.id = new ResourceLocation(recipe.getId().getNamespace(), recipe.getId().getPath() + "_emi");
         this.addition = EmiIngredient.of(recipe.getAddition());
 
         List<EmiStack> validBases = new ArrayList<>();
@@ -39,7 +39,7 @@ public class TabletSmithingEmiRecipe implements EmiRecipe {
         List<ItemStack> testStacks = new ArrayList<>();
 
         if (baseItems.length == 0) {
-            for (Item item : ForgeRegistries.ITEMS) {
+            for (Item item : BuiltInRegistries.ITEM) {
                 testStacks.add(new ItemStack(item));
             }
         } else {
@@ -100,7 +100,7 @@ public class TabletSmithingEmiRecipe implements EmiRecipe {
 
     @Override
     public List<EmiIngredient> getInputs() {
-        return List.of(base, addition);
+        return List.of(EmiStack.EMPTY, base, addition);
     }
 
     @Override
@@ -110,7 +110,7 @@ public class TabletSmithingEmiRecipe implements EmiRecipe {
 
     @Override
     public int getDisplayWidth() {
-        return 125;
+        return 112;
     }
 
     @Override
@@ -120,10 +120,10 @@ public class TabletSmithingEmiRecipe implements EmiRecipe {
 
     @Override
     public void addWidgets(WidgetHolder widgets) {
-        widgets.addSlot(base, 0, 0);
-        widgets.addTexture(EmiTexture.PLUS, 27, 3);
-        widgets.addSlot(addition, 49, 0);
-        widgets.addTexture(EmiTexture.EMPTY_ARROW, 76, 1);
-        widgets.addSlot(EmiIngredient.of(outputs), 107, 0).recipeContext(this);
+        widgets.addSlot(EmiStack.EMPTY, 0, 0);
+        widgets.addSlot(base, 18, 0);
+        widgets.addSlot(addition, 36, 0);
+        widgets.addTexture(EmiTexture.EMPTY_ARROW, 60, 1);
+        widgets.addSlot(EmiIngredient.of(outputs), 92, 0).recipeContext(this);
     }
 }

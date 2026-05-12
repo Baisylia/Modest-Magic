@@ -3,6 +3,8 @@ package com.baisylia.modestmagic.recipe.custom;
 import com.baisylia.modestmagic.recipe.ModRecipes;
 import com.google.gson.*;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -13,23 +15,21 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.item.crafting.UpgradeRecipe;
+import net.minecraft.world.item.crafting.SmithingRecipe;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 
-public class TabletSmithingRecipe extends UpgradeRecipe {
+public class TabletSmithingRecipe implements SmithingRecipe {
     private final ResourceLocation recipeId;
     private final Ingredient base;
     private final Ingredient addition;
     private final NonNullList<Enchantment> enchantments;
 
     public TabletSmithingRecipe(ResourceLocation recipeId, Ingredient base, Ingredient addition, NonNullList<Enchantment> enchantments) {
-        super(recipeId, base, addition, ItemStack.EMPTY);
         this.recipeId = recipeId;
         this.base = base;
         this.addition = addition;
@@ -37,9 +37,24 @@ public class TabletSmithingRecipe extends UpgradeRecipe {
     }
 
     @Override
-    public boolean matches(Container inv, Level level) {
-        ItemStack baseStack = inv.getItem(0);
-        ItemStack additionStack = inv.getItem(1);
+    public boolean isTemplateIngredient(@NotNull ItemStack stack) {
+        return false;
+    }
+
+    @Override
+    public boolean isBaseIngredient(@NotNull ItemStack stack) {
+        return this.base.test(stack);
+    }
+
+    @Override
+    public boolean isAdditionIngredient(@NotNull ItemStack stack) {
+        return this.addition.test(stack);
+    }
+
+    @Override
+    public boolean matches(Container inv, @NotNull Level level) {
+        ItemStack baseStack = inv.getItem(1);
+        ItemStack additionStack = inv.getItem(2);
 
         if (baseStack.isEmpty() || additionStack.isEmpty()) {
             return false;
@@ -53,13 +68,13 @@ public class TabletSmithingRecipe extends UpgradeRecipe {
             return false;
         }
 
-        return !assemble(inv).isEmpty();
+        return !assemble(inv, level.registryAccess()).isEmpty();
     }
 
     @Override
-    public ItemStack assemble(Container inv) {
-        ItemStack itemstack = inv.getItem(0).copy();
-        CompoundTag compoundtag = inv.getItem(0).getTag();
+    public @NotNull ItemStack assemble(Container inv, @NotNull RegistryAccess registryAccess) {
+        ItemStack itemstack = inv.getItem(1).copy();
+        CompoundTag compoundtag = inv.getItem(1).getTag();
 
         if (itemstack.isEmpty()) return ItemStack.EMPTY;
 
@@ -76,7 +91,7 @@ public class TabletSmithingRecipe extends UpgradeRecipe {
 
                 for (int i = 0; i < nbtList.size(); i++) {
                     CompoundTag idTag = nbtList.getCompound(i);
-                    ResourceLocation enchantId = ForgeRegistries.ENCHANTMENTS.getKey(enchantment);
+                    ResourceLocation enchantId = BuiltInRegistries.ENCHANTMENT.getKey(enchantment);
 
                     if (enchantId != null && idTag.getString("id").equals(enchantId.toString())) {
                         int targetLevel = idTag.getInt("lvl") + 1;
@@ -126,28 +141,23 @@ public class TabletSmithingRecipe extends UpgradeRecipe {
     }
 
     @Override
-    public ItemStack getResultItem() {
+    public @NotNull ItemStack getResultItem(@NotNull RegistryAccess registryAccess) {
         return ItemStack.EMPTY;
     }
 
     @Override
-    public ResourceLocation getId() {
+    public @NotNull ResourceLocation getId() {
         return this.recipeId;
     }
 
     @Override
-    public RecipeSerializer<?> getSerializer() {
+    public @NotNull RecipeSerializer<?> getSerializer() {
         return ModRecipes.TABLET_SMITHING_SERIALIZER.get();
     }
 
     @Override
-    public RecipeType<?> getType() {
+    public @NotNull RecipeType<?> getType() {
         return RecipeType.SMITHING;
-    }
-
-    @Override
-    public boolean isSpecial() {
-        return true;
     }
 
     public static class Serializer implements RecipeSerializer<TabletSmithingRecipe> {
@@ -166,7 +176,7 @@ public class TabletSmithingRecipe extends UpgradeRecipe {
                 throw new JsonSyntaxException("Expected string to be a single Enchantment");
             }
             ResourceLocation enchantId = ResourceLocation.tryParse(element.getAsString());
-            Enchantment enchantment = ForgeRegistries.ENCHANTMENTS.getValue(enchantId);
+            Enchantment enchantment = BuiltInRegistries.ENCHANTMENT.get(enchantId);
 
             if (enchantment == null) {
                 throw new JsonSyntaxException("No valid Enchantment name supplied: " + element.getAsString());
@@ -175,7 +185,7 @@ public class TabletSmithingRecipe extends UpgradeRecipe {
         }
 
         @Override
-        public TabletSmithingRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
+        public @NotNull TabletSmithingRecipe fromJson(@NotNull ResourceLocation recipeId, JsonObject json) {
             Ingredient base = Ingredient.EMPTY;
             if (json.has("base")) {
                 base = Ingredient.fromJson(json.get("base"));
@@ -191,9 +201,8 @@ public class TabletSmithingRecipe extends UpgradeRecipe {
             return new TabletSmithingRecipe(recipeId, base, addition, enchantmentList);
         }
 
-        @Nullable
         @Override
-        public TabletSmithingRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
+        public @NotNull TabletSmithingRecipe fromNetwork(@NotNull ResourceLocation recipeId, @NotNull FriendlyByteBuf buffer) {
             Ingredient base = Ingredient.fromNetwork(buffer);
             Ingredient addition = Ingredient.fromNetwork(buffer);
 
@@ -201,7 +210,7 @@ public class TabletSmithingRecipe extends UpgradeRecipe {
             NonNullList<Enchantment> enchantmentList = NonNullList.create();
 
             for (int j = 0; j < k; j++) {
-                Enchantment enchantment = ForgeRegistries.ENCHANTMENTS.getValue(buffer.readResourceLocation());
+                Enchantment enchantment = BuiltInRegistries.ENCHANTMENT.get(buffer.readResourceLocation());
                 if (enchantment != null) {
                     enchantmentList.add(enchantment);
                 }
@@ -211,13 +220,13 @@ public class TabletSmithingRecipe extends UpgradeRecipe {
         }
 
         @Override
-        public void toNetwork(FriendlyByteBuf buffer, TabletSmithingRecipe recipe) {
+        public void toNetwork(@NotNull FriendlyByteBuf buffer, TabletSmithingRecipe recipe) {
             recipe.base.toNetwork(buffer);
             recipe.addition.toNetwork(buffer);
 
             buffer.writeVarInt(recipe.enchantments.size());
             for (Enchantment enchantment : recipe.enchantments) {
-                ResourceLocation key = ForgeRegistries.ENCHANTMENTS.getKey(enchantment);
+                ResourceLocation key = BuiltInRegistries.ENCHANTMENT.getKey(enchantment);
                 if (key != null) {
                     buffer.writeResourceLocation(key);
                 }

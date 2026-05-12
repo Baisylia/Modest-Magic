@@ -92,7 +92,7 @@ public class PedestalBlockEntity extends BlockEntity implements WorldlyContainer
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag) {
+    protected void saveAdditional(@NotNull CompoundTag tag) {
         super.saveAdditional(tag);
         if (!this.inventory.isEmpty()) {
             tag.put("Inventory", this.inventory.save(new CompoundTag()));
@@ -100,7 +100,7 @@ public class PedestalBlockEntity extends BlockEntity implements WorldlyContainer
     }
 
     @Override
-    public void load(CompoundTag tag) {
+    public void load(@NotNull CompoundTag tag) {
         super.load(tag);
         if (tag.contains("Inventory")) {
             this.inventory = ItemStack.of(tag.getCompound("Inventory"));
@@ -176,13 +176,8 @@ public class PedestalBlockEntity extends BlockEntity implements WorldlyContainer
     }
 
     @Override
-    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) {
+    public boolean canTakeItemThroughFace(int slot, @NotNull ItemStack stack, @NotNull Direction side) {
         return true;
-    }
-
-    @Override
-    public AABB getRenderBoundingBox() {
-        return new AABB(worldPosition).inflate(2);
     }
 
     @Override

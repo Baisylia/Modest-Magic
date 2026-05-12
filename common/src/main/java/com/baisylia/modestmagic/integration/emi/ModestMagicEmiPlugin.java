@@ -1,6 +1,6 @@
 package com.baisylia.modestmagic.integration.emi;
 
-import com.baisylia.modestmagic.ModestMagic;
+import com.baisylia.modestmagic.Constants;
 import com.baisylia.modestmagic.block.ModBlocks;
 import com.baisylia.modestmagic.recipe.ModRecipes;
 import com.baisylia.modestmagic.recipe.custom.EnchantingRecipe;
@@ -24,17 +24,17 @@ import java.util.List;
 public class ModestMagicEmiPlugin implements EmiPlugin {
 
     public static final EmiRecipeCategory INFUSING = new EmiRecipeCategory(
-            new ResourceLocation(ModestMagic.MOD_ID, "infusing"),
+            new ResourceLocation(Constants.MOD_ID, "infusing"),
             EmiStack.of(ModBlocks.ALTAR.get())
     );
 
     public static final EmiRecipeCategory ENCHANTING = new EmiRecipeCategory(
-            new ResourceLocation(ModestMagic.MOD_ID, "enchanting"),
+            new ResourceLocation(Constants.MOD_ID, "enchanting"),
             EmiStack.of(ModBlocks.ALTAR.get())
     );
 
     public static final EmiRecipeCategory SUMMONING = new EmiRecipeCategory(
-            new ResourceLocation(ModestMagic.MOD_ID, "summoning"),
+            new ResourceLocation(Constants.MOD_ID, "summoning"),
             EmiStack.of(ModBlocks.ALTAR.get())
     );
 

@@ -1,12 +1,12 @@
 package com.baisylia.modestmagic.integration.emi;
 
-import com.baisylia.modestmagic.config.ModestMagicConfig;
+import com.baisylia.modestmagic.config.ModConfig;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.api.widget.Widget;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 
 public class RotatingLettersWidget extends Widget {
     private final ResourceLocation texture;
@@ -27,13 +27,13 @@ public class RotatingLettersWidget extends Widget {
     }
 
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float delta) {
+    public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         RenderSystem.setShaderTexture(0, texture);
         RenderSystem.enableBlend();
 
         double baseAngle = 0.0;
 
-        if (!ModestMagicConfig.REDUCED_EMI_MOTION.get()) {
+        if (!ModConfig.get().reducedEmiMotion) {
             baseAngle = -((System.currentTimeMillis() % 24000L) / 24000.0) * 360.0;
         }
 
@@ -46,12 +46,12 @@ public class RotatingLettersWidget extends Widget {
             int u = i * letterSize;
             int v = 0;
 
-            poseStack.pushPose();
-            poseStack.translate(exactX, exactY, 0);
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().translate(exactX, exactY, 0);
 
-            GuiComponent.blit(poseStack, 0, 0, u, v, letterSize, letterSize, letterSize * numLetters, letterSize);
+            guiGraphics.blit(texture, 0, 0, u, v, letterSize, letterSize, letterSize * numLetters, letterSize);
 
-            poseStack.popPose();
+            guiGraphics.pose().popPose();
         }
     }
 }

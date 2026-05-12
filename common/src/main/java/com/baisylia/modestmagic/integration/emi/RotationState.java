@@ -1,6 +1,6 @@
 package com.baisylia.modestmagic.integration.emi;
 
-import com.baisylia.modestmagic.config.ModestMagicConfig;
+import com.baisylia.modestmagic.config.ModConfig;
 
 public class RotationState {
     public final int cx, cy, radius, total;
@@ -41,7 +41,7 @@ public class RotationState {
     }
 
     private double getAngleWithoutAdvancing() {
-        if (ModestMagicConfig.REDUCED_EMI_MOTION.get()) {
+        if (ModConfig.get().reducedEmiMotion) {
             return 0.0;
         }
         long activeTime = lastTime - pauseOffset;

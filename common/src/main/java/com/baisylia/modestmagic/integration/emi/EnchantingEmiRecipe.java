@@ -1,5 +1,6 @@
 package com.baisylia.modestmagic.integration.emi;
 
+import com.baisylia.modestmagic.Constants;
 import com.baisylia.modestmagic.block.ModBlocks;
 import com.baisylia.modestmagic.recipe.custom.EnchantingRecipe;
 import dev.emi.emi.api.recipe.EmiRecipe;
@@ -8,13 +9,13 @@ import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
 
 public class EnchantingEmiRecipe implements EmiRecipe {
 
-    private static final ResourceLocation BACKGROUND = new ResourceLocation("modestmagic", "textures/gui/emi_background.png");
+    private static final ResourceLocation BACKGROUND = new ResourceLocation(Constants.MOD_ID, "textures/gui/emi_background.png");
     private final ResourceLocation id;
     private final List<EmiIngredient> inputs;
     private final EmiIngredient baseIngredient;
@@ -38,7 +39,7 @@ public class EnchantingEmiRecipe implements EmiRecipe {
         List<EmiStack> validOutputs = new ArrayList<>();
 
         // test all registered items
-        for (Item item : ForgeRegistries.ITEMS) {
+        for (Item item : BuiltInRegistries.ITEM) {
             ItemStack testStack = new ItemStack(item);
             boolean isValid = false;
 
@@ -140,7 +141,7 @@ public class EnchantingEmiRecipe implements EmiRecipe {
         RotationState state = new RotationState(cx, cy, radius, circleItems.size());
 
         widgets.add(new RotatingLettersWidget(
-                new ResourceLocation("modestmagic", "textures/gui/enchanted_letters.png"),
+                new ResourceLocation(Constants.MOD_ID, "textures/gui/enchanted_letters.png"),
                 cx, cy, radius + 6
         ));
 

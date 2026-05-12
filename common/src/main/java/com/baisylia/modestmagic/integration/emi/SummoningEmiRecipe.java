@@ -1,9 +1,8 @@
 package com.baisylia.modestmagic.integration.emi;
 
+import com.baisylia.modestmagic.Constants;
 import com.baisylia.modestmagic.block.ModBlocks;
 import com.baisylia.modestmagic.recipe.custom.SummoningRecipe;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.render.EmiTexture;
@@ -22,7 +21,7 @@ import java.util.List;
 
 public class SummoningEmiRecipe implements EmiRecipe {
 
-    private static final ResourceLocation BACKGROUND = new ResourceLocation("modestmagic", "textures/gui/emi_background.png");
+    private static final ResourceLocation BACKGROUND = new ResourceLocation(Constants.MOD_ID, "textures/gui/emi_background.png");
     private final ResourceLocation id;
     private final EmiIngredient base;
     private final List<EmiIngredient> inputs;
@@ -96,7 +95,7 @@ public class SummoningEmiRecipe implements EmiRecipe {
         RotationState state = new RotationState(cx, cy, radius, circleItems.size());
 
         widgets.add(new RotatingLettersWidget(
-                new ResourceLocation("modestmagic", "textures/gui/enchanted_letters.png"),
+                new ResourceLocation(Constants.MOD_ID, "textures/gui/enchanted_letters.png"),
                 cx, cy, radius + 6
         ));
 
@@ -115,7 +114,7 @@ public class SummoningEmiRecipe implements EmiRecipe {
         int slotX = cx + radius - 4;
         int slotY = cy - 24;
 
-        widgets.addDrawable(slotX, slotY, 18, 18, (poseStack, mouseX, mouseY, delta) -> {
+        widgets.addDrawable(slotX, slotY, 18, 18, (guiGraphics, mouseX, mouseY, delta) -> {
             if (!cachedEntities.isEmpty()) {
                 int index = (int) ((System.currentTimeMillis() / 1500L) % cachedEntities.size());
                 Entity currentEntity = cachedEntities.get(index);
@@ -130,19 +129,12 @@ public class SummoningEmiRecipe implements EmiRecipe {
                     int entityX = slotX + 9;
                     int entityY = (int) (slotY + 9 + (height * scale) / 2.0f);
 
-                    PoseStack modelViewStack = RenderSystem.getModelViewStack();
-                    modelViewStack.pushPose();
-                    modelViewStack.mulPoseMatrix(poseStack.last().pose());
-                    RenderSystem.applyModelViewMatrix();
-
-                    InventoryScreen.renderEntityInInventory(
+                    InventoryScreen.renderEntityInInventoryFollowsMouse(
+                            guiGraphics,
                             entityX, entityY, (int) scale,
                             entityX - mouseX, entityY - mouseY - (scale * 1.5f),
                             living
                     );
-
-                    modelViewStack.popPose();
-                    RenderSystem.applyModelViewMatrix();
                 }
             }
         });

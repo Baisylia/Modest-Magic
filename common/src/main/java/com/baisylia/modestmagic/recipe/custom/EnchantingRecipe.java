@@ -4,6 +4,8 @@ import com.baisylia.modestmagic.recipe.ModRecipes;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -15,8 +17,7 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.RecipeMatcher;
-import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,18 +35,30 @@ public class EnchantingRecipe implements Recipe<SimpleContainer> {
     }
 
     public boolean matches(List<ItemStack> pedestalItems) {
-        NonNullList<ItemStack> inputs = NonNullList.create();
-        inputs.addAll(pedestalItems);
-        return RecipeMatcher.findMatches(inputs, ingredients) != null;
+        if (pedestalItems.size() != ingredients.size()) return false;
+        return matchIngredients(pedestalItems, ingredients, new boolean[pedestalItems.size()], 0);
     }
 
-    @Override
-    public boolean matches(SimpleContainer container, Level level) {
+    private boolean matchIngredients(List<ItemStack> inputs, List<Ingredient> ingredients, boolean[] used, int index) {
+        if (index == ingredients.size()) return true;
+        Ingredient ing = ingredients.get(index);
+        for (int i = 0; i < inputs.size(); i++) {
+            if (!used[i] && ing.test(inputs.get(i))) {
+                used[i] = true;
+                if (matchIngredients(inputs, ingredients, used, index + 1)) return true;
+                used[i] = false;
+            }
+        }
         return false;
     }
 
     @Override
-    public ItemStack assemble(SimpleContainer container) {
+    public boolean matches(@NotNull SimpleContainer container, @NotNull Level level) {
+        return false;
+    }
+
+    @Override
+    public @NotNull ItemStack assemble(@NotNull SimpleContainer container, @NotNull RegistryAccess registryAccess) {
         return ItemStack.EMPTY;
     }
 
@@ -60,26 +73,26 @@ public class EnchantingRecipe implements Recipe<SimpleContainer> {
     }
 
     @Override
-    public ItemStack getResultItem() {
+    public @NotNull ItemStack getResultItem(@NotNull RegistryAccess registryAccess) {
         return ItemStack.EMPTY;
     }
 
     @Override
-    public ResourceLocation getId() {
+    public @NotNull ResourceLocation getId() {
         return id;
     }
 
     @Override
-    public RecipeSerializer<?> getSerializer() {
+    public @NotNull RecipeSerializer<?> getSerializer() {
         return ModRecipes.ENCHANTING_SERIALIZER.get();
     }
 
     @Override
-    public RecipeType<?> getType() {
+    public @NotNull RecipeType<?> getType() {
         return ModRecipes.ENCHANTING_TYPE.get();
     }
 
-    public NonNullList<Ingredient> getIngredients() {
+    public @NotNull NonNullList<Ingredient> getIngredients() {
         return ingredients;
     }
 
@@ -90,7 +103,7 @@ public class EnchantingRecipe implements Recipe<SimpleContainer> {
     public static class Serializer implements RecipeSerializer<EnchantingRecipe> {
 
         @Override
-        public EnchantingRecipe fromJson(ResourceLocation id, JsonObject json) {
+        public @NotNull EnchantingRecipe fromJson(@NotNull ResourceLocation id, @NotNull JsonObject json) {
             JsonArray ingredientsJson = GsonHelper.getAsJsonArray(json, "ingredients");
             NonNullList<Ingredient> ingredients = NonNullList.create();
             for (int i = 0; i < ingredientsJson.size(); i++)
@@ -104,11 +117,11 @@ public class EnchantingRecipe implements Recipe<SimpleContainer> {
                 if (enchantsJson.get(i).isJsonArray()) {
                     JsonArray group = enchantsJson.get(i).getAsJsonArray();
                     for (int j = 0; j < group.size(); j++) {
-                        Enchantment e = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation(group.get(j).getAsString()));
+                        Enchantment e = BuiltInRegistries.ENCHANTMENT.get(new ResourceLocation(group.get(j).getAsString()));
                         if (e != null) pool.add(e);
                     }
                 } else {
-                    Enchantment e = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation(enchantsJson.get(i).getAsString()));
+                    Enchantment e = BuiltInRegistries.ENCHANTMENT.get(new ResourceLocation(enchantsJson.get(i).getAsString()));
                     if (e != null) pool.add(e);
                 }
                 if (!pool.isEmpty()) enchantmentPools.add(pool);
@@ -118,7 +131,7 @@ public class EnchantingRecipe implements Recipe<SimpleContainer> {
         }
 
         @Override
-        public EnchantingRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buf) {
+        public @NotNull EnchantingRecipe fromNetwork(@NotNull ResourceLocation id, FriendlyByteBuf buf) {
             int size = buf.readVarInt();
             NonNullList<Ingredient> ingredients = NonNullList.withSize(size, Ingredient.EMPTY);
             for (int i = 0; i < size; i++) ingredients.set(i, Ingredient.fromNetwork(buf));
@@ -129,7 +142,7 @@ public class EnchantingRecipe implements Recipe<SimpleContainer> {
                 int poolSize = buf.readVarInt();
                 List<Enchantment> pool = new ArrayList<>();
                 for (int j = 0; j < poolSize; j++) {
-                    pool.add(ForgeRegistries.ENCHANTMENTS.getValue(buf.readResourceLocation()));
+                    pool.add(BuiltInRegistries.ENCHANTMENT.get(buf.readResourceLocation()));
                 }
                 enchantmentPools.add(pool);
             }
@@ -146,7 +159,7 @@ public class EnchantingRecipe implements Recipe<SimpleContainer> {
             for (List<Enchantment> pool : recipe.enchantmentPools) {
                 buf.writeVarInt(pool.size());
                 for (Enchantment e : pool) {
-                    buf.writeResourceLocation(ForgeRegistries.ENCHANTMENTS.getKey(e));
+                    buf.writeResourceLocation(BuiltInRegistries.ENCHANTMENT.getKey(e));
                 }
             }
         }

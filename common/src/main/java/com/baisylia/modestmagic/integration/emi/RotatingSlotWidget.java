@@ -1,9 +1,9 @@
 package com.baisylia.modestmagic.integration.emi;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.api.widget.SlotWidget;
+import net.minecraft.client.gui.GuiGraphics;
 
 public class RotatingSlotWidget extends SlotWidget {
     private final RotationState state;
@@ -36,17 +36,17 @@ public class RotatingSlotWidget extends SlotWidget {
     }
 
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         state.update(mouseX, mouseY);
 
         double exactX = getExactDoubleX();
         double exactY = getExactDoubleY();
 
-        poseStack.pushPose();
-        poseStack.translate(exactX + 1, exactY + 1, 0);
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(exactX + 1, exactY + 1, 0);
 
-        ingredient.render(poseStack, 0, 0, delta);
+        ingredient.render(guiGraphics, 0, 0, delta);
 
-        poseStack.popPose();
+        guiGraphics.pose().popPose();
     }
 }

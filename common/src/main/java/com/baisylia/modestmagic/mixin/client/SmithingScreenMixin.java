@@ -1,6 +1,7 @@
 package com.baisylia.modestmagic.mixin.client;
 
 import com.baisylia.modestmagic.Constants;
+import com.baisylia.modestmagic.mixin.accessor.AbstractContainerScreenAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.SmithingScreen;
@@ -20,10 +21,11 @@ public class SmithingScreenMixin {
     private void modestmagic$renderTabletSlot(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY, CallbackInfo ci) {
         SmithingScreen screen = (SmithingScreen) (Object) this;
 
+        AbstractContainerScreenAccessor accessor = (AbstractContainerScreenAccessor) screen;
         Slot additionSlot = screen.getMenu().getSlot(2);
 
-        int x = screen.getGuiLeft() + additionSlot.x;
-        int y = screen.getGuiTop() + additionSlot.y;
+        int x = accessor.getLeftPos() + additionSlot.x;
+        int y = accessor.getTopPos() + additionSlot.y;
 
         boolean hasItem = additionSlot.hasItem();
         boolean showTablet = (System.currentTimeMillis() / 1500L) % 2 != 0;
