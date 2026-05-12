@@ -13,9 +13,19 @@ import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.enchantment.Enchantment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,12 +113,57 @@ public class ModestMagicEmiPlugin implements EmiPlugin {
             registry.addRecipe(new SummoningEmiRecipe(holder));
         }
 
+        Registry<Enchantment> enchantRegistry = null;
+        if (Minecraft.getInstance().level != null) {
+            enchantRegistry = Minecraft.getInstance().level.registryAccess().registryOrThrow(Registries.ENCHANTMENT);
+        }
+
         for (RecipeHolder<?> holder : registry.getRecipeManager().getAllRecipesFor(RecipeType.SMITHING)) {
             if (holder.value() instanceof TabletSmithingRecipe) {
                 registry.removeRecipes(holder.id());
+
                 @SuppressWarnings("unchecked")
                 RecipeHolder<TabletSmithingRecipe> typedHolder = (RecipeHolder<TabletSmithingRecipe>) holder;
-                registry.addRecipe(new TabletSmithingEmiRecipe(typedHolder));
+                TabletSmithingRecipe recipe = typedHolder.value();
+
+                if (enchantRegistry == null) continue;
+
+                ItemStack[] baseItems = recipe.base().getItems();
+                List<ItemStack> testStacks = new ArrayList<>();
+
+                if (baseItems.length == 0) {
+                    for (Item item : BuiltInRegistries.ITEM) {
+                        testStacks.add(item.getDefaultInstance());
+                    }
+                } else {
+                    testStacks.addAll(List.of(baseItems));
+                }
+
+                List<Holder<Enchantment>> resolvedEnchants = new ArrayList<>();
+                for (ResourceKey<Enchantment> key : recipe.enchantments()) {
+                    enchantRegistry.getHolder(key).ifPresent(resolvedEnchants::add);
+                }
+
+                boolean addedAny = false;
+                for (ItemStack baseStack : testStacks) {
+                    boolean isValid = false;
+
+                    for (Holder<Enchantment> e : resolvedEnchants) {
+                        if (e.value().canEnchant(baseStack) || baseStack.is(Items.BOOK)) {
+                            isValid = true;
+                            break;
+                        }
+                    }
+
+                    if (isValid) {
+                        registry.addRecipe(new TabletSmithingEmiRecipe(typedHolder, baseStack, resolvedEnchants));
+                        addedAny = true;
+                    }
+                }
+
+                if (!addedAny) {
+                    registry.addRecipe(new TabletSmithingEmiRecipe(typedHolder, new ItemStack(Items.BOOK), resolvedEnchants));
+                }
             }
         }
     }

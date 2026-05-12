@@ -1,1 +1,3 @@
-- Initial 1.21.1 release.
+### Changed
+
+- Reworked EMI smithing plugin for parity with EMI's anvil enchanting plugin.
