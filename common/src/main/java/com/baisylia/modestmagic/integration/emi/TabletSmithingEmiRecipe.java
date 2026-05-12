@@ -27,9 +27,10 @@ public class TabletSmithingEmiRecipe implements EmiRecipe {
     private final EmiIngredient base;
     private final EmiIngredient addition;
     private final List<EmiStack> outputs;
+    private final EmiStack enchantmentIndicator;
 
     public TabletSmithingEmiRecipe(TabletSmithingRecipe recipe) {
-        this.id = new ResourceLocation(recipe.getId().getNamespace(), recipe.getId().getPath() + "_emi");
+        this.id = new ResourceLocation(recipe.getId().getNamespace(), "/" + recipe.getId().getPath() + "_emi");
         this.addition = EmiIngredient.of(recipe.getAddition());
 
         List<EmiStack> validBases = new ArrayList<>();
@@ -75,13 +76,17 @@ public class TabletSmithingEmiRecipe implements EmiRecipe {
             }
         }
 
+        ItemStack indicatorBook = new ItemStack(Items.ENCHANTED_BOOK);
+        Map<Enchantment, Integer> map = new HashMap<>();
+        for (Enchantment e : recipe.getEnchantments()) {
+            map.put(e, 1);
+        }
+        EnchantmentHelper.setEnchantments(map, indicatorBook);
+        this.enchantmentIndicator = EmiStack.of(indicatorBook);
+
         if (validBases.isEmpty()) {
             validBases.add(EmiStack.of(Items.BOOK));
-            ItemStack book = new ItemStack(Items.ENCHANTED_BOOK);
-            Map<Enchantment, Integer> map = new HashMap<>();
-            for (Enchantment e : recipe.getEnchantments()) map.put(e, 1);
-            EnchantmentHelper.setEnchantments(map, book);
-            validOutputs.add(EmiStack.of(book));
+            validOutputs.add(this.enchantmentIndicator);
         }
 
         this.base = EmiIngredient.of(validBases);
@@ -121,9 +126,12 @@ public class TabletSmithingEmiRecipe implements EmiRecipe {
     @Override
     public void addWidgets(WidgetHolder widgets) {
         widgets.addSlot(EmiStack.EMPTY, 0, 0);
+
+        widgets.addSlot(enchantmentIndicator, 0, 0).drawBack(false);
+
         widgets.addSlot(base, 18, 0);
         widgets.addSlot(addition, 36, 0);
-        widgets.addTexture(EmiTexture.EMPTY_ARROW, 60, 1);
-        widgets.addSlot(EmiIngredient.of(outputs), 92, 0).recipeContext(this);
+        widgets.addTexture(EmiTexture.EMPTY_ARROW, 62, 1);
+        widgets.addSlot(EmiIngredient.of(outputs), 94, 0).recipeContext(this);
     }
 }

@@ -21,6 +21,16 @@ public class ClothConfigIntegration {
         ConfigCategory general = builder.getOrCreateCategory(Component.translatable("config.modestmagic.category.general"));
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
 
+        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.modestmagic.option.throwItemsOnPedestals"), config.throwItemsOnPedestals)
+                .setDefaultValue(true)
+                .setSaveConsumer(newValue -> config.throwItemsOnPedestals = newValue)
+                .build());
+
+        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.modestmagic.option.reducedEmiMotion"), config.reducedEmiMotion)
+                .setDefaultValue(false)
+                .setSaveConsumer(newValue -> config.reducedEmiMotion = newValue)
+                .build());
+
         return builder.build();
     }
 }

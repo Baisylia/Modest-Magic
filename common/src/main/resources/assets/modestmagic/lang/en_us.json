@@ -38,5 +38,7 @@
   "subtitles.modestmagic.block.altar.summon": "Altar summons",
 
   "config.modestmagic.title": "Modest Magic Config",
-  "config.modestmagic.category.general": "General"
+  "config.modestmagic.category.general": "General",
+  "config.modestmagic.option.throwItemsOnPedestals": "Throw Items on Pedestals",
+  "config.modestmagic.option.reducedEmiMotion": "Reduced EMI Motion"
 }

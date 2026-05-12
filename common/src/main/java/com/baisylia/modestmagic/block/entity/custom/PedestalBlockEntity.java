@@ -80,12 +80,16 @@ public class PedestalBlockEntity extends BlockEntity implements WorldlyContainer
     public void setItem(ItemStack stack) {
         this.inventory = stack;
         this.setChanged();
+
         if (level != null && !level.isClientSide) {
-            BlockState state = getBlockState();
-            level.setBlock(worldPosition, state.setValue(PedestalBlock.HAS_ITEM, !inventory.isEmpty()), 3);
-            level.sendBlockUpdated(worldPosition, state, state, 3);
+            BlockState oldState = getBlockState();
+            BlockState newState = oldState.setValue(PedestalBlock.HAS_ITEM, !inventory.isEmpty());
+
+            level.setBlock(worldPosition, newState, 3);
+            level.sendBlockUpdated(worldPosition, oldState, newState, 3);
         }
     }
+
 
     public void clear() {
         this.setItem(ItemStack.EMPTY);
@@ -94,9 +98,7 @@ public class PedestalBlockEntity extends BlockEntity implements WorldlyContainer
     @Override
     protected void saveAdditional(@NotNull CompoundTag tag) {
         super.saveAdditional(tag);
-        if (!this.inventory.isEmpty()) {
-            tag.put("Inventory", this.inventory.save(new CompoundTag()));
-        }
+        tag.put("Inventory", this.inventory.save(new CompoundTag()));
     }
 
     @Override

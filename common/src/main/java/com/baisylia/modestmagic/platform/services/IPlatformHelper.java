@@ -44,6 +44,7 @@ public interface IPlatformHelper {
 
     /**
      * Checks if the code is running on the physical client.
+     *
      * @return True if on the client, false if on a dedicated server.
      */
     boolean isPhysicalClient();

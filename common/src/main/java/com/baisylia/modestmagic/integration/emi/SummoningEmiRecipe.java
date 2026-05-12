@@ -124,7 +124,7 @@ public class SummoningEmiRecipe implements EmiRecipe {
                     double height = living.getBbHeight();
 
                     float maxDim = (float) Math.max(width, height);
-                    float scale = 16.0f / Math.max(maxDim, 0.5f);
+                    float scale = 24.0f / Math.max(maxDim, 0.5f);
 
                     int entityX = slotX + 9;
                     int entityY = (int) (slotY + 9 + (height * scale) / 2.0f);
