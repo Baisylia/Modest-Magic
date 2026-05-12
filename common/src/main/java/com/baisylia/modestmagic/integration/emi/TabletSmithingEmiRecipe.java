@@ -24,14 +24,14 @@ import java.util.Map;
 public class TabletSmithingEmiRecipe implements EmiRecipe {
 
     private final ResourceLocation id;
+    private final EmiIngredient template;
     private final EmiIngredient base;
-    private final EmiIngredient addition;
     private final List<EmiStack> outputs;
     private final EmiStack enchantmentIndicator;
 
     public TabletSmithingEmiRecipe(TabletSmithingRecipe recipe) {
         this.id = new ResourceLocation(recipe.getId().getNamespace(), "/" + recipe.getId().getPath() + "_emi");
-        this.addition = EmiIngredient.of(recipe.getAddition());
+        this.template = EmiIngredient.of(recipe.getTemplate());
 
         List<EmiStack> validBases = new ArrayList<>();
         List<EmiStack> validOutputs = new ArrayList<>();
@@ -105,7 +105,7 @@ public class TabletSmithingEmiRecipe implements EmiRecipe {
 
     @Override
     public List<EmiIngredient> getInputs() {
-        return List.of(EmiStack.EMPTY, base, addition);
+        return List.of(template, base, EmiStack.EMPTY);
     }
 
     @Override
@@ -125,13 +125,10 @@ public class TabletSmithingEmiRecipe implements EmiRecipe {
 
     @Override
     public void addWidgets(WidgetHolder widgets) {
-        widgets.addSlot(EmiStack.EMPTY, 0, 0);
-
-        widgets.addSlot(enchantmentIndicator, 0, 0).drawBack(false);
-
+        widgets.addSlot(template, 0, 0);
         widgets.addSlot(base, 18, 0);
-        widgets.addSlot(addition, 36, 0);
+        widgets.addSlot(EmiStack.EMPTY, 36, 0);
         widgets.addTexture(EmiTexture.EMPTY_ARROW, 62, 1);
-        widgets.addSlot(EmiIngredient.of(outputs), 94, 0).recipeContext(this);
+        widgets.addSlot(enchantmentIndicator, 94, 0).recipeContext(this);
     }
 }

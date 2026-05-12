@@ -1,6 +1,6 @@
 {
   "type": "modestmagic:tablet_smithing",
-  "addition": {
+  "template": {
     "item": "modestmagic:enchantment_tablet_lucky"
   },
   "enchantments": [

@@ -12,6 +12,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.SmithingTemplateItem;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -25,46 +27,53 @@ import java.util.Map;
 
 public class TabletSmithingRecipe implements SmithingRecipe {
     private final ResourceLocation recipeId;
+    private final Ingredient template;
     private final Ingredient base;
-    private final Ingredient addition;
     private final NonNullList<Enchantment> enchantments;
 
-    public TabletSmithingRecipe(ResourceLocation recipeId, Ingredient base, Ingredient addition, NonNullList<Enchantment> enchantments) {
+    public TabletSmithingRecipe(ResourceLocation recipeId, Ingredient template, Ingredient base, NonNullList<Enchantment> enchantments) {
         this.recipeId = recipeId;
+        this.template = template;
         this.base = base;
-        this.addition = addition;
         this.enchantments = enchantments;
     }
 
     @Override
     public boolean isTemplateIngredient(@NotNull ItemStack stack) {
-        return false;
+        return this.template.test(stack);
     }
 
     @Override
     public boolean isBaseIngredient(@NotNull ItemStack stack) {
-        return this.base.test(stack);
+        if (!this.base.isEmpty()) {
+            return this.base.test(stack);
+        }
+
+        if (stack.getItem() instanceof SmithingTemplateItem || this.template.test(stack)) {
+            return false;
+        }
+        return stack.getMaxStackSize() == 1 || stack.is(Items.BOOK) || stack.is(Items.ENCHANTED_BOOK);
     }
 
     @Override
     public boolean isAdditionIngredient(@NotNull ItemStack stack) {
-        return this.addition.test(stack);
+        return false;
     }
 
     @Override
     public boolean matches(Container inv, @NotNull Level level) {
+        ItemStack templateStack = inv.getItem(0);
         ItemStack baseStack = inv.getItem(1);
-        ItemStack additionStack = inv.getItem(2);
 
-        if (baseStack.isEmpty() || additionStack.isEmpty()) {
+        if (templateStack.isEmpty() || baseStack.isEmpty()) {
             return false;
         }
 
-        if (!this.addition.test(additionStack)) {
+        if (!this.template.test(templateStack)) {
             return false;
         }
 
-        if (!this.base.isEmpty() && !this.base.test(baseStack)) {
+        if (!isBaseIngredient(baseStack)) {
             return false;
         }
 
@@ -123,12 +132,12 @@ public class TabletSmithingRecipe implements SmithingRecipe {
         return true;
     }
 
-    public Ingredient getBase() {
-        return base;
+    public Ingredient getTemplate() {
+        return template;
     }
 
-    public Ingredient getAddition() {
-        return addition;
+    public Ingredient getBase() {
+        return base;
     }
 
     public NonNullList<Enchantment> getEnchantments() {
@@ -191,20 +200,20 @@ public class TabletSmithingRecipe implements SmithingRecipe {
                 base = Ingredient.fromJson(json.get("base"));
             }
 
-            Ingredient addition = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "addition"));
+            Ingredient template = Ingredient.fromJson(GsonHelper.getAsJsonObject(json, "template"));
             NonNullList<Enchantment> enchantmentList = readEnchantments(GsonHelper.getAsJsonArray(json, "enchantments"));
 
             if (enchantmentList.isEmpty()) {
                 throw new JsonParseException("No enchantments provided for tablet smithing recipe");
             }
 
-            return new TabletSmithingRecipe(recipeId, base, addition, enchantmentList);
+            return new TabletSmithingRecipe(recipeId, template, base, enchantmentList);
         }
 
         @Override
         public @NotNull TabletSmithingRecipe fromNetwork(@NotNull ResourceLocation recipeId, @NotNull FriendlyByteBuf buffer) {
+            Ingredient template = Ingredient.fromNetwork(buffer);
             Ingredient base = Ingredient.fromNetwork(buffer);
-            Ingredient addition = Ingredient.fromNetwork(buffer);
 
             int k = buffer.readVarInt();
             NonNullList<Enchantment> enchantmentList = NonNullList.create();
@@ -216,13 +225,13 @@ public class TabletSmithingRecipe implements SmithingRecipe {
                 }
             }
 
-            return new TabletSmithingRecipe(recipeId, base, addition, enchantmentList);
+            return new TabletSmithingRecipe(recipeId, template, base, enchantmentList);
         }
 
         @Override
         public void toNetwork(@NotNull FriendlyByteBuf buffer, TabletSmithingRecipe recipe) {
+            recipe.template.toNetwork(buffer);
             recipe.base.toNetwork(buffer);
-            recipe.addition.toNetwork(buffer);
 
             buffer.writeVarInt(recipe.enchantments.size());
             for (Enchantment enchantment : recipe.enchantments) {

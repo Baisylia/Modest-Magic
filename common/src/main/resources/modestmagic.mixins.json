@@ -7,7 +7,6 @@
   "mixins": [
   ],
   "client": [
-    "accessor.AbstractContainerScreenAccessor",
     "client.SmithingScreenMixin"
   ],
   "server": [],

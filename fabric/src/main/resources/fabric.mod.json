@@ -8,8 +8,8 @@
     "${mod_author}"
   ],
   "contact": {
-    "homepage": "https://github.com/evanbones/Modest-Magic",
-    "sources": "https://github.com/evanbones/Modest-Magic"
+    "homepage": "https://github.com/Baisylia/Modest-Magic",
+    "sources": "https://github.com/Baisylia/Modest-Magic"
   },
   "license": "${license}",
   "icon": "${mod_id}.png",
