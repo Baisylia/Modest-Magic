@@ -10,14 +10,12 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,72 +23,33 @@ public class TabletSmithingEmiRecipe implements EmiRecipe {
 
     private final ResourceLocation id;
     private final EmiIngredient template;
-    private final EmiIngredient base;
-    private final List<EmiStack> outputs;
-    private final EmiStack enchantmentIndicator;
+    private final EmiStack base;
+    private final EmiStack output;
 
-    public TabletSmithingEmiRecipe(TabletSmithingRecipe recipe) {
-        this.id = new ResourceLocation(recipe.getId().getNamespace(), "/" + recipe.getId().getPath() + "_emi");
+    public TabletSmithingEmiRecipe(ResourceLocation recipeId, TabletSmithingRecipe recipe, ItemStack baseStack, List<Enchantment> resolvedEnchants) {
         this.template = EmiIngredient.of(recipe.getTemplate());
+        this.base = EmiStack.of(baseStack);
 
-        List<EmiStack> validBases = new ArrayList<>();
-        List<EmiStack> validOutputs = new ArrayList<>();
+        ResourceLocation baseId = BuiltInRegistries.ITEM.getKey(baseStack.getItem());
+        this.id = new ResourceLocation(
+                recipeId.getNamespace(),
+                "/" + recipeId.getPath() + "_emi/" + baseId.getNamespace() + "/" + baseId.getPath()
+        );
 
-        ItemStack[] baseItems = recipe.getBase().getItems();
-        List<ItemStack> testStacks = new ArrayList<>();
-
-        if (baseItems.length == 0) {
-            for (Item item : BuiltInRegistries.ITEM) {
-                testStacks.add(new ItemStack(item));
-            }
-        } else {
-            testStacks.addAll(List.of(baseItems));
+        ItemStack outStack = baseStack.copy();
+        if (outStack.getItem() == Items.BOOK) {
+            outStack = new ItemStack(Items.ENCHANTED_BOOK);
         }
 
-        for (ItemStack baseStack : testStacks) {
-            boolean isValid = false;
-
-            for (Enchantment e : recipe.getEnchantments()) {
-                if (e.canEnchant(baseStack) || baseStack.is(Items.BOOK)) {
-                    isValid = true;
-                    break;
-                }
-            }
-
-            if (isValid) {
-                validBases.add(EmiStack.of(baseStack));
-
-                ItemStack outStack = baseStack.copy();
-                if (outStack.getItem() == Items.BOOK) {
-                    outStack = new ItemStack(Items.ENCHANTED_BOOK);
-                }
-
-                Map<Enchantment, Integer> map = new HashMap<>();
-                for (Enchantment e : recipe.getEnchantments()) {
-                    if (e.canEnchant(baseStack) || baseStack.is(Items.BOOK)) {
-                        map.put(e, 1);
-                    }
-                }
-                EnchantmentHelper.setEnchantments(map, outStack);
-                validOutputs.add(EmiStack.of(outStack));
+        Map<Enchantment, Integer> map = new LinkedHashMap<>();
+        for (Enchantment e : resolvedEnchants) {
+            if (e.canEnchant(baseStack) || baseStack.is(Items.BOOK)) {
+                map.put(e, 1);
             }
         }
 
-        ItemStack indicatorBook = new ItemStack(Items.ENCHANTED_BOOK);
-        Map<Enchantment, Integer> map = new HashMap<>();
-        for (Enchantment e : recipe.getEnchantments()) {
-            map.put(e, 1);
-        }
-        EnchantmentHelper.setEnchantments(map, indicatorBook);
-        this.enchantmentIndicator = EmiStack.of(indicatorBook);
-
-        if (validBases.isEmpty()) {
-            validBases.add(EmiStack.of(Items.BOOK));
-            validOutputs.add(this.enchantmentIndicator);
-        }
-
-        this.base = EmiIngredient.of(validBases);
-        this.outputs = validOutputs;
+        EnchantmentHelper.setEnchantments(map, outStack);
+        this.output = EmiStack.of(outStack);
     }
 
     @Override
@@ -110,7 +69,7 @@ public class TabletSmithingEmiRecipe implements EmiRecipe {
 
     @Override
     public List<EmiStack> getOutputs() {
-        return outputs;
+        return List.of(output);
     }
 
     @Override
@@ -124,11 +83,16 @@ public class TabletSmithingEmiRecipe implements EmiRecipe {
     }
 
     @Override
+    public boolean supportsRecipeTree() {
+        return false;
+    }
+
+    @Override
     public void addWidgets(WidgetHolder widgets) {
         widgets.addSlot(template, 0, 0);
         widgets.addSlot(base, 18, 0);
         widgets.addSlot(EmiStack.EMPTY, 36, 0);
         widgets.addTexture(EmiTexture.EMPTY_ARROW, 62, 1);
-        widgets.addSlot(enchantmentIndicator, 94, 0).recipeContext(this);
+        widgets.addSlot(output, 94, 0).recipeContext(this);
     }
 }

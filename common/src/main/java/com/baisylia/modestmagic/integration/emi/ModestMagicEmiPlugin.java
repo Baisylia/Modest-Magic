@@ -13,9 +13,14 @@ import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.enchantment.Enchantment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,9 +43,6 @@ public class ModestMagicEmiPlugin implements EmiPlugin {
             EmiStack.of(ModBlocks.ALTAR.get())
     );
 
-    /**
-     * Consolidates a list of EmiIngredients, combining identical items and summing their amounts.
-     */
     public static List<EmiIngredient> consolidateItems(List<EmiIngredient> inputs) {
         List<EmiIngredient> uniqueIngredients = new ArrayList<>();
         List<Long> amounts = new ArrayList<>();
@@ -51,7 +53,6 @@ public class ModestMagicEmiPlugin implements EmiPlugin {
             boolean found = false;
             for (int i = 0; i < uniqueIngredients.size(); i++) {
                 EmiIngredient existing = uniqueIngredients.get(i);
-                // compare the first stack to see if they are the same ingredient requirement
                 if (!existing.getEmiStacks().isEmpty() && existing.getEmiStacks().get(0).isEqual(ing.getEmiStacks().get(0))) {
                     amounts.set(i, amounts.get(i) + ing.getAmount());
                     found = true;
@@ -65,7 +66,6 @@ public class ModestMagicEmiPlugin implements EmiPlugin {
             }
         }
 
-        // rebuild the EmiIngredients with the summed amounts
         List<EmiIngredient> consolidated = new ArrayList<>();
         for (int i = 0; i < uniqueIngredients.size(); i++) {
             long amount = amounts.get(i);
@@ -103,11 +103,42 @@ public class ModestMagicEmiPlugin implements EmiPlugin {
             registry.addRecipe(new SummoningEmiRecipe(recipe));
         }
 
-        // fix for our custom EMI smithing recipes
-        for (Recipe<?> recipe : registry.getRecipeManager().getAllRecipesFor(RecipeType.SMITHING)) {
-            if (recipe instanceof TabletSmithingRecipe tabletRecipe) {
-                registry.removeRecipes(tabletRecipe.getId());
-                registry.addRecipe(new TabletSmithingEmiRecipe(tabletRecipe));
+        for (Recipe<?> genericRecipe : registry.getRecipeManager().getAllRecipesFor(RecipeType.SMITHING)) {
+            if (genericRecipe instanceof TabletSmithingRecipe recipe) {
+                ResourceLocation recipeId = recipe.getId();
+                registry.removeRecipes(recipeId);
+
+                ItemStack[] baseItems = recipe.getBase().getItems();
+                List<ItemStack> testStacks = new ArrayList<>();
+
+                if (baseItems.length == 0) {
+                    for (Item item : BuiltInRegistries.ITEM) {
+                        testStacks.add(item.getDefaultInstance());
+                    }
+                } else {
+                    testStacks.addAll(List.of(baseItems));
+                }
+
+                boolean addedAny = false;
+                for (ItemStack baseStack : testStacks) {
+                    boolean isValid = false;
+
+                    for (Enchantment e : recipe.getEnchantments()) {
+                        if (e.canEnchant(baseStack) || baseStack.is(Items.BOOK)) {
+                            isValid = true;
+                            break;
+                        }
+                    }
+
+                    if (isValid) {
+                        registry.addRecipe(new TabletSmithingEmiRecipe(recipeId, recipe, baseStack, recipe.getEnchantments()));
+                        addedAny = true;
+                    }
+                }
+
+                if (!addedAny) {
+                    registry.addRecipe(new TabletSmithingEmiRecipe(recipeId, recipe, new ItemStack(Items.BOOK), recipe.getEnchantments()));
+                }
             }
         }
     }
