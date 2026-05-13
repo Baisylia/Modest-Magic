@@ -16,6 +16,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +28,9 @@ public class SummoningEmiRecipe implements EmiRecipe {
     private final ResourceLocation id;
     private final EmiIngredient base;
     private final List<EmiIngredient> inputs;
-    private final List<Entity> cachedEntities;
+
+    private final List<SummoningRecipe.SummonOutcome> outcomes;
+    private List<Entity> cachedEntities = null;
 
     public SummoningEmiRecipe(RecipeHolder<SummoningRecipe> recipeHolder) {
         this.id = recipeHolder.id();
@@ -37,12 +41,20 @@ public class SummoningEmiRecipe implements EmiRecipe {
         this.inputs.add(base);
         recipe.getIngredients().forEach(ing -> this.inputs.add(EmiIngredient.of(ing)));
 
-        this.cachedEntities = new ArrayList<>();
-        if (Minecraft.getInstance().level != null) {
-            for (SummoningRecipe.SummonOutcome outcome : recipe.getOutcomes()) {
-                Entity entity = outcome.entity().create(Minecraft.getInstance().level);
-                if (entity != null && !outcome.nbt().isEmpty()) entity.load(outcome.nbt());
-                if (entity != null) cachedEntities.add(entity);
+        this.outcomes = recipe.getOutcomes();
+    }
+
+    private void initEntities() {
+        if (cachedEntities == null) {
+            cachedEntities = new ArrayList<>();
+            if (Minecraft.getInstance().level != null) {
+                for (SummoningRecipe.SummonOutcome outcome : outcomes) {
+                    Entity entity = outcome.entity().create(Minecraft.getInstance().level);
+                    if (entity != null) {
+                        if (!outcome.nbt().isEmpty()) entity.load(outcome.nbt());
+                        cachedEntities.add(entity);
+                    }
+                }
             }
         }
     }
@@ -115,22 +127,54 @@ public class SummoningEmiRecipe implements EmiRecipe {
         int slotY = cy - 24;
 
         widgets.addDrawable(slotX, slotY, 18, 18, (guiGraphics, mouseX, mouseY, delta) -> {
-            if (!cachedEntities.isEmpty()) {
+            initEntities();
+
+            if (cachedEntities != null && !cachedEntities.isEmpty()) {
                 int index = (int) ((System.currentTimeMillis() / 1500L) % cachedEntities.size());
                 Entity currentEntity = cachedEntities.get(index);
 
                 if (currentEntity instanceof LivingEntity living) {
-                    double width = living.getBbWidth();
-                    double height = living.getBbHeight();
-
-                    float maxDim = (float) Math.max(width, height);
+                    float maxDim = Math.max(living.getBbWidth(), living.getBbHeight());
                     float scale = 24.0f / Math.max(maxDim, 0.5f);
 
-                    InventoryScreen.renderEntityInInventoryFollowsMouse(
+                    float centerX = slotX + 9;
+                    float centerY = slotY + 18;
+                    float lookX = centerX - mouseX;
+                    float lookY = centerY - 10 - mouseY;
+                    float f2 = (float) Math.atan(lookX / 40.0F);
+                    float f3 = (float) Math.atan(lookY / 40.0F);
+
+                    Quaternionf pose = (new Quaternionf()).rotateZ((float) Math.PI);
+                    Quaternionf camera = (new Quaternionf()).rotateX(f3 * 20.0F * ((float) Math.PI / 180F));
+                    pose.mul(camera);
+
+                    float yBodyRot = living.yBodyRot;
+                    float yRot = living.getYRot();
+                    float xRot = living.getXRot();
+                    float yHeadRotO = living.yHeadRotO;
+                    float yHeadRot = living.yHeadRot;
+
+                    living.yBodyRot = 180.0F + f2 * 20.0F;
+                    living.setYRot(180.0F + f2 * 40.0F);
+                    living.setXRot(-f3 * 20.0F);
+                    living.yHeadRot = living.getYRot();
+                    living.yHeadRotO = living.getYRot();
+
+                    InventoryScreen.renderEntityInInventory(
                             guiGraphics,
-                            slotX, slotY, slotX + 18, slotY + 18, (int) scale,
-                            0.05f, (float) mouseX, (float) mouseY, living
+                            centerX, centerY,
+                            scale,
+                            new Vector3f(0, 0, 0),
+                            pose,
+                            camera,
+                            living
                     );
+
+                    living.yBodyRot = yBodyRot;
+                    living.setYRot(yRot);
+                    living.setXRot(xRot);
+                    living.yHeadRotO = yHeadRotO;
+                    living.yHeadRot = yHeadRot;
                 }
             }
         });

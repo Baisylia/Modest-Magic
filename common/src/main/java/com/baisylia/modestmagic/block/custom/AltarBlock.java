@@ -64,13 +64,8 @@ public class AltarBlock extends PedestalBlock {
             return pedestalUse(level, pos, player, hand, state, ModSounds.ADD_ITEM_ALTAR.get());
         }
 
-        if (level.isClientSide) {
-            return ItemInteractionResult.SUCCESS;
-        }
-
-        boolean crafted = altar.tryCraft();
-        if (crafted) {
-            return ItemInteractionResult.CONSUME;
+        if (altar.tryCraft()) {
+            return ItemInteractionResult.sidedSuccess(level.isClientSide);
         }
 
         return pedestalUse(level, pos, player, hand, state, ModSounds.ADD_ITEM_ALTAR.get());
@@ -83,12 +78,12 @@ public class AltarBlock extends PedestalBlock {
             return InteractionResult.PASS;
         }
 
-        if (level.isClientSide) {
-            return InteractionResult.SUCCESS;
+        if (state.getValue(POWERED)) {
+            return pedestalUse(level, pos, player, InteractionHand.MAIN_HAND, state, ModSounds.ADD_ITEM_ALTAR.get()).result();
         }
 
         if (altar.tryCraft()) {
-            return InteractionResult.CONSUME;
+            return InteractionResult.sidedSuccess(level.isClientSide);
         }
 
         return pedestalUse(level, pos, player, InteractionHand.MAIN_HAND, state, ModSounds.ADD_ITEM_ALTAR.get()).result();
