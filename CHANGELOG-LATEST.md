@@ -1,3 +1,4 @@
-### Changed
+### Fixed
 
-- Reworked EMI smithing plugin for parity with EMI's anvil enchanting plugin.
+- Fixed the cloth in the Altar model not being properly cut out.
+- Fixed issues with summoning sounds.

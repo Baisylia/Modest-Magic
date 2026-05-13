@@ -2,6 +2,7 @@
 	"format_version": "1.21.6",
 	"credit": "Made with Blockbench",
 	"parent": "block/block",
+	"render_type": "minecraft:cutout",
 	"textures": {
 		"2": "modestmagic:block/altar_misc",
 		"3": "modestmagic:block/altar_bottom",
