@@ -1,4 +1,9 @@
+### Changed
+
+- Altars will no longer show their cloth when a block is placed directly above them (they're now better for
+  decoration!).
+
 ### Fixed
 
-- Fixed the cloth in the Altar model not being properly cut out.
-- Fixed issues with summoning sounds.
+- Fixed high-pitched glitch in sounds (wtf Audacity).
+- Fixed accidental face culling for one specific orientation of pillar.
