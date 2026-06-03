@@ -24,8 +24,8 @@
     "modmenu": [
       "com.baisylia.modestmagic.compat.ModMenuIntegration"
     ],
-    "emi": [
-      "com.baisylia.modestmagic.integration.emi.ModestMagicEmiPlugin"
+    "rrv_client": [
+      "com.baisylia.modestmagic.integration.rrv.ModestMagicRrvPlugin"
     ]
   },
   "mixins": [
