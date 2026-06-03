@@ -1,10 +1,19 @@
 package com.baisylia.modestmagic.platform;
 
+import com.baisylia.modestmagic.block.ModBlocks;
+import com.baisylia.modestmagic.block.entity.custom.AltarBlockEntity;
+import com.baisylia.modestmagic.block.entity.custom.PedestalBlockEntity;
 import com.baisylia.modestmagic.platform.services.IPlatformHelper;
 import net.fabricmc.api.EnvType;
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.item.crafting.RecipeMap;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import java.nio.file.Path;
+import java.util.Set;
 
 public class FabricPlatformHelper implements IPlatformHelper {
     @Override
@@ -31,4 +40,20 @@ public class FabricPlatformHelper implements IPlatformHelper {
     public boolean isPhysicalClient() {
         return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
     }
+
+    @Override
+    public RecipeMap getSynchronizedRecipeMap() {
+        return RecipeMap.create(Minecraft.getInstance().level.recipeAccess().getSynchronizedRecipes().recipes());
+    }
+
+    @Override
+    public BlockEntityType<AltarBlockEntity> createAltar() {
+        return FabricBlockEntityTypeBuilder.create(AltarBlockEntity::new, ModBlocks.ALTAR.get()).build();
+    }
+
+    @Override
+    public BlockEntityType<PedestalBlockEntity> createPedestal() {
+        return FabricBlockEntityTypeBuilder.create(PedestalBlockEntity::new, ModBlocks.PEDESTAL.get()).build();
+    }
+
 }

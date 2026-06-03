@@ -2,6 +2,7 @@ package com.baisylia.modestmagic.block.entity.custom;
 
 import com.baisylia.modestmagic.block.entity.ModBlockEntities;
 import com.baisylia.modestmagic.client.ModSounds;
+import com.baisylia.modestmagic.platform.Services;
 import com.baisylia.modestmagic.recipe.ModRecipes;
 import com.baisylia.modestmagic.recipe.custom.EnchantingRecipe;
 import com.baisylia.modestmagic.recipe.custom.InfusingRecipe;
@@ -22,6 +23,7 @@ import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeMap;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
@@ -29,7 +31,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.TagValueInput;
-import net.minecraft.world.level.storage.ValueInput;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,7 +81,7 @@ public class AltarBlockEntity extends PedestalBlockEntity {
             return false;
 
         // Infusing Recipe
-        for (RecipeHolder<InfusingRecipe> recipeHolder : level.getRecipeManager().getAllRecipesFor(ModRecipes.INFUSING_TYPE.get())) {
+        for (RecipeHolder<InfusingRecipe> recipeHolder : getRecipeManager().byType(ModRecipes.INFUSING_TYPE.get())) {
             InfusingRecipe recipe = recipeHolder.value();
             if (recipe.matches(this.getItem(), items)) {
                 if (!recipe.getResults().isEmpty()) {
@@ -101,7 +102,7 @@ public class AltarBlockEntity extends PedestalBlockEntity {
         }
 
         // Enchanting Recipe
-        for (RecipeHolder<EnchantingRecipe> recipeHolder : level.getRecipeManager().getAllRecipesFor(ModRecipes.ENCHANTING_TYPE.get())) {
+        for (RecipeHolder<EnchantingRecipe> recipeHolder : getRecipeManager().byType(ModRecipes.ENCHANTING_TYPE.get())) {
             EnchantingRecipe recipe = recipeHolder.value();
             if (recipe.matches(items)) {
                 if (!recipe.getEnchantmentPools().isEmpty()) {
@@ -181,7 +182,7 @@ public class AltarBlockEntity extends PedestalBlockEntity {
         }
 
         // Summoning Recipe
-        for (RecipeHolder<SummoningRecipe> recipeHolder : level.getRecipeManager().getAllRecipesFor(ModRecipes.SUMMONING_TYPE.get())) {
+        for (RecipeHolder<SummoningRecipe> recipeHolder : getRecipeManager().byType(ModRecipes.SUMMONING_TYPE.get())) {
             SummoningRecipe recipe = recipeHolder.value();
             if (recipe.matches(this.getItem(), items)) {
                 if (!recipe.getOutcomes().isEmpty()) {
@@ -234,6 +235,18 @@ public class AltarBlockEntity extends PedestalBlockEntity {
             }
         }
         return false;
+    }
+
+    static RecipeMap RECIPE_MAP;
+
+    private RecipeMap getRecipeManager() {
+        if (RECIPE_MAP != null) {
+            return RECIPE_MAP;
+        }
+        if (level instanceof ServerLevel server) {
+            RECIPE_MAP = RecipeMap.create(server.recipeAccess().getRecipes());
+        } else RECIPE_MAP = Services.PLATFORM.getSynchronizedRecipeMap();
+        return RECIPE_MAP;
     }
 
     public <T extends ParticleOptions> void enchantEffects(List<PedestalBlockEntity> pedestals, T particle, SoundEvent soundEvent) {

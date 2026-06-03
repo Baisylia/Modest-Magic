@@ -102,7 +102,8 @@ public class PedestalBlockEntity extends BlockEntity implements WorldlyContainer
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
-        output.store("Inventory", ItemStack.CODEC, this.inventory);
+        if (!this.inventory.isEmpty())
+            output.store("Inventory", ItemStack.CODEC, this.inventory);
     }
 
     @Override

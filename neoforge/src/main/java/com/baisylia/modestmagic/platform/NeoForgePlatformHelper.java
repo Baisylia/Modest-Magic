@@ -1,6 +1,11 @@
 package com.baisylia.modestmagic.platform;
 
+import com.baisylia.modestmagic.block.ModBlocks;
+import com.baisylia.modestmagic.block.entity.custom.AltarBlockEntity;
+import com.baisylia.modestmagic.block.entity.custom.PedestalBlockEntity;
 import com.baisylia.modestmagic.platform.services.IPlatformHelper;
+import net.minecraft.world.item.crafting.RecipeMap;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
@@ -22,7 +27,7 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
 
     @Override
     public boolean isDevelopmentEnvironment() {
-        return !FMLLoader.isProduction();
+        return !FMLLoader.getCurrent().isProduction();
     }
 
     @Override
@@ -32,6 +37,21 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
 
     @Override
     public boolean isPhysicalClient() {
-        return FMLLoader.getDist() == Dist.CLIENT;
+        return FMLLoader.getCurrent().getDist() == Dist.CLIENT;
+    }
+
+    @Override
+    public RecipeMap getSynchronizedRecipeMap() {
+        return null; //FIXME
+    }
+
+    @Override
+    public BlockEntityType<AltarBlockEntity> createAltar() {
+        return new BlockEntityType<>(AltarBlockEntity::new, ModBlocks.ALTAR.get());
+    }
+
+    @Override
+    public BlockEntityType<PedestalBlockEntity> createPedestal() {
+        return new BlockEntityType<>(PedestalBlockEntity::new, ModBlocks.PEDESTAL.get());
     }
 }

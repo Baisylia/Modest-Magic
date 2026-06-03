@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
@@ -53,7 +54,7 @@ public class PedestalRenderer implements BlockEntityRenderer<PedestalBlockEntity
         poseStack.mulPose(Axis.YP.rotationDegrees(rotation));
         poseStack.scale(0.6f, 0.6f, 0.6f);
 
-        stack.submit(poseStack, submitNodeCollector, pedestal.lightCoords, -1, -1);
+        stack.submit(poseStack, submitNodeCollector, pedestal.lightCoords, OverlayTexture.NO_OVERLAY, -1);
 
         poseStack.popPose();
     }

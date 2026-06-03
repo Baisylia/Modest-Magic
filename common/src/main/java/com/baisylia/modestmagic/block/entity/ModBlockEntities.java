@@ -20,12 +20,10 @@ public class ModBlockEntities {
             Services.REGISTRIES.create(Registries.BLOCK_ENTITY_TYPE, Constants.MOD_ID);
 
     public static final Supplier<BlockEntityType<AltarBlockEntity>> ALTAR_BLOCK_ENTITY =
-            BLOCK_ENTITIES.register("altar_block_entity", () ->
-                    new BlockEntityType<>(AltarBlockEntity::new, Set.of(ModBlocks.ALTAR.get())).build(key("altar_block_entity")));
+            BLOCK_ENTITIES.register("altar_block_entity", Services.PLATFORM::createAltar);
 
     public static final Supplier<BlockEntityType<PedestalBlockEntity>> PEDESTAL_BLOCK_ENTITY =
-            BLOCK_ENTITIES.register("pedestal_block_entity", () ->
-                    new BlockEntityType<>(PedestalBlockEntity::new, Set.of(ModBlocks.PEDESTAL.get())).build(key("pedestal_block_entity")));
+            BLOCK_ENTITIES.register("pedestal_block_entity", Services.PLATFORM::createPedestal);
 
 	private static ResourceKey<BlockEntityType<?>> key(String name) {
 		return ResourceKey.create(Registries.BLOCK_ENTITY_TYPE, Identifier.fromNamespaceAndPath(Constants.MOD_ID, name));

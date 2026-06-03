@@ -3,6 +3,7 @@ package com.baisylia.modestmagic.recipe.custom;
 import com.baisylia.modestmagic.recipe.ModRecipes;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
@@ -73,7 +74,8 @@ public record TabletSmithingRecipe(Ingredient template, Ingredient base,
         ItemStack itemstack = inv.base().copy();
         if (itemstack.isEmpty()) return ItemStack.EMPTY;
 
-        var enchantRegistry = registries.lookupOrThrow(Registries.ENCHANTMENT);
+        //FIXME
+        var enchantRegistry = Minecraft.getInstance().level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
         ItemEnchantments existing = itemstack.getOrDefault(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY);
         ItemEnchantments.Mutable mutable = new ItemEnchantments.Mutable(existing);
 
