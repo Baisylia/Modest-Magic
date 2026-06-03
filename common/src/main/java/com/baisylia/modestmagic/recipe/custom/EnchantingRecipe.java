@@ -52,33 +52,38 @@ public class EnchantingRecipe implements Recipe<RecipeInput> {
     }
 
     @Override
-    public @NotNull ItemStack assemble(@NotNull RecipeInput input, @NotNull HolderLookup.Provider registries) {
+    public @NotNull ItemStack assemble(@NotNull RecipeInput input) {
         return ItemStack.EMPTY;
     }
 
     @Override
-    public boolean canCraftInDimensions(int width, int height) {
-        return true;
+    public boolean showNotification() {
+        return false;
     }
 
     @Override
-    public boolean isSpecial() {
-        return true;
+    public String group() {
+        return "";
     }
 
     @Override
-    public @NotNull ItemStack getResultItem(@NotNull HolderLookup.Provider registries) {
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public @NotNull RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<? extends Recipe<RecipeInput>> getSerializer() {
         return ModRecipes.ENCHANTING_SERIALIZER.get();
     }
 
     @Override
-    public @NotNull RecipeType<?> getType() {
+    public RecipeType<? extends Recipe<RecipeInput>> getType() {
         return ModRecipes.ENCHANTING_TYPE.get();
+    }
+
+    @Override
+    public PlacementInfo placementInfo() {
+        return PlacementInfo.NOT_PLACEABLE;
+    }
+
+    @Override
+    public RecipeBookCategory recipeBookCategory() {
+        return null;
     }
 
     public @NotNull NonNullList<Ingredient> getIngredients() {
@@ -89,7 +94,7 @@ public class EnchantingRecipe implements Recipe<RecipeInput> {
         return enchantmentPools;
     }
 
-    public static class Serializer implements RecipeSerializer<EnchantingRecipe> {
+    public static class Serializer {
         public static final MapCodec<EnchantingRecipe> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
                 Ingredient.CODEC.listOf().fieldOf("ingredients").forGetter(r -> r.ingredients),
                 ResourceKey.codec(Registries.ENCHANTMENT).listOf().listOf().fieldOf("enchantments").forGetter(r -> r.enchantmentPools)
@@ -108,15 +113,5 @@ public class EnchantingRecipe implements Recipe<RecipeInput> {
                     return new EnchantingRecipe(list, pools);
                 }
         );
-
-        @Override
-        public @NotNull MapCodec<EnchantingRecipe> codec() {
-            return CODEC;
-        }
-
-        @Override
-        public @NotNull StreamCodec<RegistryFriendlyByteBuf, EnchantingRecipe> streamCodec() {
-            return STREAM_CODEC;
-        }
     }
 }

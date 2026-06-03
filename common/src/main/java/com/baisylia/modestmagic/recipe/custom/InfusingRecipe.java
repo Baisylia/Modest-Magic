@@ -57,7 +57,7 @@ public class InfusingRecipe implements Recipe<RecipeInput> {
     }
 
     @Override
-    public @NotNull ItemStack assemble(@NotNull RecipeInput input, @NotNull HolderLookup.Provider registries) {
+    public @NotNull ItemStack assemble(@NotNull RecipeInput input) {
         return results.isEmpty() ? ItemStack.EMPTY : results.getFirst().copy();
     }
 
@@ -67,23 +67,34 @@ public class InfusingRecipe implements Recipe<RecipeInput> {
     }
 
     @Override
-    public boolean canCraftInDimensions(int w, int h) {
-        return true;
+    public boolean showNotification() {
+        return false;
     }
 
     @Override
-    public @NotNull ItemStack getResultItem(@NotNull HolderLookup.Provider registries) {
-        return results.isEmpty() ? ItemStack.EMPTY : results.getFirst();
+    public String group() {
+        return "";
     }
 
+
     @Override
-    public @NotNull RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<? extends Recipe<RecipeInput>> getSerializer() {
         return ModRecipes.INFUSING_SERIALIZER.get();
     }
 
     @Override
-    public @NotNull RecipeType<?> getType() {
+    public RecipeType<? extends Recipe<RecipeInput>> getType() {
         return ModRecipes.INFUSING_TYPE.get();
+    }
+
+    @Override
+    public PlacementInfo placementInfo() {
+        return PlacementInfo.NOT_PLACEABLE;
+    }
+
+    @Override
+    public RecipeBookCategory recipeBookCategory() {
+        return null;
     }
 
     public @NotNull NonNullList<Ingredient> getIngredients() {
@@ -94,8 +105,7 @@ public class InfusingRecipe implements Recipe<RecipeInput> {
         return base;
     }
 
-    public static class Serializer implements RecipeSerializer<InfusingRecipe> {
-        public static final Serializer INSTANCE = new Serializer();
+    public static class Serializer {
 
         public static final MapCodec<InfusingRecipe> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
                 Ingredient.CODEC.fieldOf("base").forGetter(r -> r.base),
@@ -118,14 +128,6 @@ public class InfusingRecipe implements Recipe<RecipeInput> {
                 }
         );
 
-        @Override
-        public @NotNull MapCodec<InfusingRecipe> codec() {
-            return CODEC;
-        }
-
-        @Override
-        public @NotNull StreamCodec<RegistryFriendlyByteBuf, InfusingRecipe> streamCodec() {
-            return STREAM_CODEC;
-        }
+        public static final RecipeSerializer<InfusingRecipe> INSTANCE = new RecipeSerializer<>(CODEC, STREAM_CODEC);
     }
 }

@@ -1,5 +1,5 @@
 package com.baisylia.modestmagic.integration.emi;
-
+/*
 import com.baisylia.modestmagic.config.ModConfig;
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.emi.emi.api.widget.Bounds;
@@ -55,3 +55,5 @@ public class RotatingLettersWidget extends Widget {
         }
     }
 }
+
+ */

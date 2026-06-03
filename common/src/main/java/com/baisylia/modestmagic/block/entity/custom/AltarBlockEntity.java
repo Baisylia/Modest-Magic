@@ -17,6 +17,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -26,6 +28,8 @@ import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.ValueInput;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,8 +50,9 @@ public class AltarBlockEntity extends PedestalBlockEntity {
     }
 
     private ItemStack getCraftingRemainder(ItemStack stack) {
-        return stack.getItem().hasCraftingRemainingItem()
-                ? new ItemStack(stack.getItem().getCraftingRemainingItem())
+        var remainder = stack.getItem().getCraftingRemainder();
+        return remainder != null
+                ? remainder.create()
                 : ItemStack.EMPTY;
     }
 
@@ -79,13 +84,13 @@ public class AltarBlockEntity extends PedestalBlockEntity {
             InfusingRecipe recipe = recipeHolder.value();
             if (recipe.matches(this.getItem(), items)) {
                 if (!recipe.getResults().isEmpty()) {
-                    if (!level.isClientSide) {
+                    if (!level.isClientSide()) {
                         spawnItemEntity(this.level, getCraftingRemainder(this.getItem()),
                                 this.worldPosition.getX() + 0.5, this.worldPosition.getY() + 1.25, this.worldPosition.getZ() + 0.5,
                                 0, 0, 0);
 
                         // Select a random result from the outputs
-                        ItemStack result = recipe.getResults().get(level.random.nextInt(recipe.getResults().size()));
+                        ItemStack result = recipe.getResults().get(level.getRandom().nextInt(recipe.getResults().size()));
                         this.setItem(result.copy());
 
                         enchantEffects(pedestals, ParticleTypes.FLAME, ModSounds.ALTAR_ENCHANT.get());
@@ -104,12 +109,12 @@ public class AltarBlockEntity extends PedestalBlockEntity {
                     ItemEnchantments.Mutable mutable = new ItemEnchantments.Mutable(existingEnchants);
                     boolean appliedAny = false;
 
-                    var enchantRegistry = level.registryAccess().registryOrThrow(Registries.ENCHANTMENT);
+                    var enchantRegistry = level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
 
                     // Check if there are applicable enchantments available
                     for (List<ResourceKey<Enchantment>> poolCheck : recipe.getEnchantmentPools()) {
                         for (ResourceKey<Enchantment> key : poolCheck) {
-                            var opt = enchantRegistry.getHolder(key);
+                            var opt = enchantRegistry.get(key);
                             if (opt.isEmpty()) continue;
                             Holder<Enchantment> enchantHolder = opt.get();
                             Enchantment enchantment = enchantHolder.value();
@@ -138,12 +143,12 @@ public class AltarBlockEntity extends PedestalBlockEntity {
 
                     if (!appliedAny) return false;
 
-                    if (!level.isClientSide) {
+                    if (!level.isClientSide()) {
                         // Select a random pool of enchantments
-                        List<ResourceKey<Enchantment>> pool = recipe.getEnchantmentPools().get(level.random.nextInt(recipe.getEnchantmentPools().size()));
+                        List<ResourceKey<Enchantment>> pool = recipe.getEnchantmentPools().get(level.getRandom().nextInt(recipe.getEnchantmentPools().size()));
 
                         for (ResourceKey<Enchantment> key : pool) {
-                            var opt = enchantRegistry.getHolder(key);
+                            var opt = enchantRegistry.get(key);
                             if (opt.isEmpty()) continue;
                             Holder<Enchantment> enchantHolder = opt.get();
                             Enchantment enchantment = enchantHolder.value();
@@ -180,19 +185,19 @@ public class AltarBlockEntity extends PedestalBlockEntity {
             SummoningRecipe recipe = recipeHolder.value();
             if (recipe.matches(this.getItem(), items)) {
                 if (!recipe.getOutcomes().isEmpty()) {
-                    if (!level.isClientSide) {
+                    if (!level.isClientSide()) {
                         if (level instanceof ServerLevel server) {
-                            SummoningRecipe.SummonOutcome outcome = recipe.getOutcomes().get(level.random.nextInt(recipe.getOutcomes().size()));
-                            var entity = outcome.entity().create(server);
+                            SummoningRecipe.SummonOutcome outcome = recipe.getOutcomes().get(level.getRandom().nextInt(recipe.getOutcomes().size()));
+                            var entity = outcome.entity().create(server, EntitySpawnReason.MOB_SUMMONED);
                             if (entity != null) {
                                 if (!outcome.nbt().isEmpty()) {
                                     CompoundTag nbt = outcome.nbt().copy();
                                     nbt.remove("Pos");
                                     nbt.remove("Motion");
                                     nbt.remove("Rotation");
-                                    entity.load(nbt);
+                                    entity.load(TagValueInput.create(ProblemReporter.DISCARDING, server.registryAccess(), nbt));
                                 }
-                                entity.moveTo(worldPosition.getX() + 0.5, worldPosition.getY() + 1, worldPosition.getZ() + 0.5, server.random.nextFloat() * 360F, 0);
+                                entity.snapTo(worldPosition.getX() + 0.5, worldPosition.getY() + 1, worldPosition.getZ() + 0.5, server.getRandom().nextFloat() * 360F, 0);
                                 server.addFreshEntity(entity);
                             }
                         }

@@ -1,5 +1,5 @@
 package com.baisylia.modestmagic.integration.emi;
-
+/*
 import com.baisylia.modestmagic.Constants;
 import com.baisylia.modestmagic.block.ModBlocks;
 import com.baisylia.modestmagic.recipe.custom.SummoningRecipe;
@@ -182,3 +182,5 @@ public class SummoningEmiRecipe implements EmiRecipe {
         widgets.add(new WheelListTooltipWidget(cx, cy, radius, circleItems));
     }
 }
+
+ */

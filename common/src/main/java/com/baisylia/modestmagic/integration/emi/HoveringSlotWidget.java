@@ -1,5 +1,5 @@
 package com.baisylia.modestmagic.integration.emi;
-
+/*
 import com.baisylia.modestmagic.config.ModConfig;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.widget.SlotWidget;
@@ -31,3 +31,5 @@ public class HoveringSlotWidget extends SlotWidget {
         guiGraphics.pose().popPose();
     }
 }
+
+ */

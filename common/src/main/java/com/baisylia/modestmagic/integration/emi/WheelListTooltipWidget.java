@@ -1,5 +1,5 @@
 package com.baisylia.modestmagic.integration.emi;
-
+/*
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.Bounds;
@@ -72,3 +72,5 @@ public class WheelListTooltipWidget extends Widget {
         return tooltip;
     }
 }
+
+ */

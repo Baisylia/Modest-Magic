@@ -3,8 +3,8 @@ package com.baisylia.modestmagic;
 import com.baisylia.modestmagic.block.ModBlocks;
 import com.baisylia.modestmagic.item.ModItems;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import net.fabricmc.fabric.api.registry.FuelRegistry;
+import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
+import net.fabricmc.fabric.api.registry.FuelValueEvents;
 import net.minecraft.world.item.CreativeModeTabs;
 
 public class ModestMagic implements ModInitializer {
@@ -12,16 +12,16 @@ public class ModestMagic implements ModInitializer {
     @Override
     public void onInitialize() {
         CommonClass.init();
-        ModBlocks.FUEL_ITEMS.forEach((item, time) -> FuelRegistry.INSTANCE.add(item.get(), time));
+        FuelValueEvents.BUILD.register((builder, context)->{
+            ModBlocks.FUEL_ITEMS.forEach((item, time) -> builder.add(item.get(), time));
+        });
 
-        ModBlocks.FUEL_ITEMS.forEach((item, time) -> FuelRegistry.INSTANCE.add(item.get(), time));
-
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(entries -> {
+        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(entries -> {
             entries.accept(ModBlocks.ALTAR.get());
             entries.accept(ModBlocks.PEDESTAL.get());
         });
 
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.INGREDIENTS).register(entries -> {
+        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.INGREDIENTS).register(entries -> {
             entries.accept(ModItems.STARDUST.get());
             entries.accept(ModItems.ENCHANTMENT_TABLET.get());
             entries.accept(ModItems.ENCHANTMENT_TABLET_AQUATIC.get());

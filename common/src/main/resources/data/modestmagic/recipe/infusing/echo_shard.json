@@ -1,33 +1,15 @@
 {
   "type": "modestmagic:infusing",
-  "base": { 
-    "item": "minecraft:sculk_catalyst"
-  },
+  "base": "minecraft:sculk_catalyst",
   "ingredients": [
-    {
-	  "item": "minecraft:amethyst_shard"
-	},
-    {
-	  "item": "minecraft:amethyst_shard"
-	},
-    {
-	  "item": "minecraft:amethyst_shard"
-	},
-    {
-	  "item": "minecraft:amethyst_shard"
-	},
-    {
-      "item": "minecraft:amethyst_shard"
-    },
-    {
-      "item": "minecraft:amethyst_shard"
-    },
-    {
-      "item": "minecraft:amethyst_shard"
-    },
-    {
-      "item": "minecraft:amethyst_shard"
-    }
+    "minecraft:amethyst_shard",
+    "minecraft:amethyst_shard",
+    "minecraft:amethyst_shard",
+    "minecraft:amethyst_shard",
+    "minecraft:amethyst_shard",
+    "minecraft:amethyst_shard",
+    "minecraft:amethyst_shard",
+    "minecraft:amethyst_shard"
   ],
   "results": [
   {

@@ -9,16 +9,14 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
@@ -107,14 +105,15 @@ public class PedestalBlock extends BaseEntityBlock implements SimpleWaterloggedB
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, @NotNull BlockState state, @NotNull BlockEntityType<T> type) {
-        if (level.isClientSide) return null;
+        if (level.isClientSide()) return null;
         return createTickerHelper(type, ModBlockEntities.PEDESTAL_BLOCK_ENTITY.get(), PedestalBlockEntity::tick);
     }
 
+
     @Override
-    public @NotNull BlockState updateShape(BlockState state, @NotNull Direction direction, @NotNull BlockState neighborState, @NotNull LevelAccessor level, @NotNull BlockPos pos, @NotNull BlockPos neighborPos) {
+    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction directionToNeighbour, BlockPos neighbourPos, BlockState neighbourState, RandomSource random) {
         if (state.getValue(WATERLOGGED)) {
-            level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+            ticks.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
 
         Direction.Axis axis = state.getValue(AXIS);
@@ -148,7 +147,7 @@ public class PedestalBlock extends BaseEntityBlock implements SimpleWaterloggedB
     }
 
     private void validateItem(Level level, BlockPos pos, BlockState state) {
-        if (level.isClientSide) return;
+        if (level.isClientSide()) return;
         BlockEntity be = level.getBlockEntity(pos);
         if (!(be instanceof PedestalBlockEntity pedestal)) return;
 
@@ -205,13 +204,13 @@ public class PedestalBlock extends BaseEntityBlock implements SimpleWaterloggedB
     }
 
     @Override
-    protected @NotNull ItemInteractionResult useItemOn(@NotNull ItemStack stack, @NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull InteractionHand hand, @NotNull BlockHitResult hit) {
+    protected InteractionResult useItemOn(@NotNull ItemStack stack, @NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull InteractionHand hand, @NotNull BlockHitResult hit) {
         return pedestalUse(level, pos, player, hand, state, ModSounds.ADD_ITEM_PEDESTAL.get());
     }
 
     @Override
     protected @NotNull InteractionResult useWithoutItem(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull BlockHitResult hit) {
-        return pedestalUse(level, pos, player, player.getUsedItemHand(), state, ModSounds.ADD_ITEM_PEDESTAL.get()).result();
+        return pedestalUse(level, pos, player, player.getUsedItemHand(), state, ModSounds.ADD_ITEM_PEDESTAL.get());
     }
 
     @Override
@@ -219,24 +218,24 @@ public class PedestalBlock extends BaseEntityBlock implements SimpleWaterloggedB
         return CODEC;
     }
 
-    protected ItemInteractionResult pedestalUse(Level level, BlockPos pos, Player player, InteractionHand hand, BlockState state, SoundEvent soundEvent) {
+    protected InteractionResult pedestalUse(Level level, BlockPos pos, Player player, InteractionHand hand, BlockState state, SoundEvent soundEvent) {
         if (state.getValue(AXIS) != Direction.Axis.Y || !state.getValue(TOP)) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return InteractionResult.PASS;
         }
 
         BlockEntity be = level.getBlockEntity(pos);
         if (!(be instanceof PedestalBlockEntity pedestal)) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return InteractionResult.PASS;
         }
 
         ItemStack held = player.getItemInHand(hand);
 
         if (pedestal.getItem().isEmpty() && held.isEmpty()) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return InteractionResult.PASS;
         }
 
-        if (level.isClientSide) {
-            return ItemInteractionResult.SUCCESS;
+        if (level.isClientSide()) {
+            return InteractionResult.SUCCESS;
         }
 
         if (pedestal.getItem().isEmpty()) {
@@ -252,7 +251,7 @@ public class PedestalBlock extends BaseEntityBlock implements SimpleWaterloggedB
                 player.drop(stack, false);
             }
         }
-        return ItemInteractionResult.CONSUME;
+        return InteractionResult.CONSUME;
     }
 
     @Override
@@ -261,22 +260,20 @@ public class PedestalBlock extends BaseEntityBlock implements SimpleWaterloggedB
     }
 
     @Override
-    public void onRemove(BlockState state, @NotNull Level level, @NotNull BlockPos pos, BlockState newState, boolean moved) {
-        if (state.getBlock() != newState.getBlock()) {
-            BlockEntity be = level.getBlockEntity(pos);
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
+		BlockEntity be = level.getBlockEntity(pos);
 
-            if (be instanceof PedestalBlockEntity pedestal) {
-                ItemStack stack = pedestal.getItem();
+		if (be instanceof PedestalBlockEntity pedestal) {
+			ItemStack stack = pedestal.getItem();
 
-                if (!stack.isEmpty()) {
-                    Containers.dropItemStack(level,
-                            pos.getX(),
-                            pos.getY(),
-                            pos.getZ(),
-                            stack);
-                }
-            }
-            super.onRemove(state, level, pos, newState, moved);
-        }
-    }
+			if (!stack.isEmpty()) {
+				Containers.dropItemStack(level,
+						pos.getX(),
+						pos.getY(),
+						pos.getZ(),
+						stack);
+			}
+		}
+		super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
+	}
 }
