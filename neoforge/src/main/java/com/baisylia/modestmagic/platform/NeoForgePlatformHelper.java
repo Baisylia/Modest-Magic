@@ -1,5 +1,6 @@
 package com.baisylia.modestmagic.platform;
 
+import com.baisylia.modestmagic.ModestMagic;
 import com.baisylia.modestmagic.block.ModBlocks;
 import com.baisylia.modestmagic.block.entity.custom.AltarBlockEntity;
 import com.baisylia.modestmagic.block.entity.custom.PedestalBlockEntity;
@@ -42,7 +43,7 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
 
     @Override
     public RecipeMap getSynchronizedRecipeMap() {
-        return null; //FIXME
+        return ModestMagic.MAP;
     }
 
     @Override
