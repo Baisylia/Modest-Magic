@@ -1,27 +1,13 @@
 {
   "type": "modestmagic:infusing",
-  "base": { 
-    "item": "modestmagic:enchantment_tablet" 
-  },
+  "base": "modestmagic:enchantment_tablet",
   "ingredients": [
-    {
-	  "item": "minecraft:slime_ball"
-	},
-    {
-	  "item": "minecraft:slime_ball"
-	},
-    {
-	  "item": "minecraft:slime_ball"
-	},
-    {
-	  "item": "minecraft:slime_ball"
-	},
-    {
-      "item": "minecraft:redstone"
-    },
-    {
-      "item": "minecraft:redstone"
-    }
+    "minecraft:slime_ball",
+    "minecraft:slime_ball",
+    "minecraft:slime_ball",
+    "minecraft:slime_ball",
+    "minecraft:redstone",
+    "minecraft:redstone"
   ],
   "results": [
   {

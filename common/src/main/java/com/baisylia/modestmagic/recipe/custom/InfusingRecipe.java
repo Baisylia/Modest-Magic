@@ -9,6 +9,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
@@ -19,9 +20,9 @@ public class InfusingRecipe implements Recipe<RecipeInput> {
 
     private final Ingredient base;
     private final NonNullList<Ingredient> ingredients;
-    private final List<ItemStack> results;
+    private final List<ItemStackTemplate> results;
 
-    public InfusingRecipe(Ingredient base, NonNullList<Ingredient> ingredients, List<ItemStack> results) {
+    public InfusingRecipe(Ingredient base, NonNullList<Ingredient> ingredients, List<ItemStackTemplate> results) {
         this.base = base;
         this.ingredients = ingredients;
         this.results = results;
@@ -48,7 +49,7 @@ public class InfusingRecipe implements Recipe<RecipeInput> {
     }
 
     public List<ItemStack> getResults() {
-        return results;
+        return results.stream().map(ItemStackTemplate::create).toList();
     }
 
     @Override
@@ -58,7 +59,7 @@ public class InfusingRecipe implements Recipe<RecipeInput> {
 
     @Override
     public @NotNull ItemStack assemble(@NotNull RecipeInput input) {
-        return results.isEmpty() ? ItemStack.EMPTY : results.getFirst().copy();
+        return results.isEmpty() ? ItemStack.EMPTY : results.getFirst().create();
     }
 
     @Override
@@ -110,7 +111,7 @@ public class InfusingRecipe implements Recipe<RecipeInput> {
         public static final MapCodec<InfusingRecipe> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
                 Ingredient.CODEC.fieldOf("base").forGetter(r -> r.base),
                 Ingredient.CODEC.listOf().fieldOf("ingredients").forGetter(r -> r.ingredients),
-                ItemStack.CODEC.listOf().fieldOf("results").forGetter(r -> r.results)
+                ItemStackTemplate.CODEC.listOf().fieldOf("results").forGetter(r -> r.results)
         ).apply(inst, (base, ingredients, results) -> {
             NonNullList<Ingredient> list = NonNullList.create();
             list.addAll(ingredients);
@@ -120,7 +121,7 @@ public class InfusingRecipe implements Recipe<RecipeInput> {
         public static final StreamCodec<RegistryFriendlyByteBuf, InfusingRecipe> STREAM_CODEC = StreamCodec.composite(
                 Ingredient.CONTENTS_STREAM_CODEC, r -> r.base,
                 Ingredient.CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.list()), r -> r.ingredients,
-                ItemStack.STREAM_CODEC.apply(ByteBufCodecs.list()), r -> r.results,
+                ItemStackTemplate.STREAM_CODEC.apply(ByteBufCodecs.list()), r -> r.results,
                 (base, ingredients, results) -> {
                     NonNullList<Ingredient> list = NonNullList.create();
                     list.addAll(ingredients);

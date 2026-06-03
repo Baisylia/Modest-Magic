@@ -21,6 +21,7 @@ import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Optional;
 
 public record TabletSmithingRecipe(Ingredient template, Ingredient base,
@@ -121,7 +122,7 @@ public record TabletSmithingRecipe(Ingredient template, Ingredient base,
 
     @Override
     public PlacementInfo placementInfo() {
-        return null;
+        return PlacementInfo.create(List.of(template, base));
     }
 
     public static class Serializer {

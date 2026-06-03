@@ -1,11 +1,7 @@
 {
   "type": "modestmagic:tablet_smithing",
-  "template": {
-    "item": "modestmagic:enchantment_tablet_swift"
-  },
-  "base": {
-    "tag": "minecraft:enchantable/durability"
-  },
+  "template": "modestmagic:enchantment_tablet_swift",
+  "base": "#minecraft:enchantable/durability",
   "enchantments": [
     "minecraft:efficiency",
     "minecraft:quick_charge",

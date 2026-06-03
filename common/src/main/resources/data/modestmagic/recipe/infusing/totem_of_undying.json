@@ -1,45 +1,19 @@
 {
   "type": "modestmagic:infusing",
-  "base": { 
-    "item": "minecraft:experience_bottle"
-  },
+  "base": "minecraft:experience_bottle",
   "ingredients": [
-    {
-	  "item": "minecraft:gold_ingot"
-	},
-    {
-	  "item": "minecraft:gold_ingot"
-	},
-    {
-	  "item": "minecraft:gold_ingot"
-	},
-    {
-	  "item": "minecraft:gold_ingot"
-	},
-    {
-      "item": "minecraft:echo_shard"
-    },
-    {
-      "item": "minecraft:echo_shard"
-    },
-    {
-      "item": "minecraft:echo_shard"
-    },
-    {
-      "item": "minecraft:echo_shard"
-    },
-    {
-      "item": "modestmagic:stardust"
-    },
-    {
-      "item": "modestmagic:stardust"
-    },
-    {
-      "item": "modestmagic:stardust"
-    },
-    {
-      "item": "modestmagic:stardust"
-    }
+    "minecraft:gold_ingot",
+    "minecraft:gold_ingot",
+    "minecraft:gold_ingot",
+    "minecraft:gold_ingot",
+    "minecraft:echo_shard",
+    "minecraft:echo_shard",
+    "minecraft:echo_shard",
+    "minecraft:echo_shard",
+    "modestmagic:stardust",
+    "modestmagic:stardust",
+    "modestmagic:stardust",
+    "modestmagic:stardust"
   ],
   "results": [
   {

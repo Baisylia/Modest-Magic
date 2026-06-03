@@ -2,8 +2,10 @@ package com.baisylia.modestmagic;
 
 import com.baisylia.modestmagic.block.ModBlocks;
 import com.baisylia.modestmagic.item.ModItems;
+import com.baisylia.modestmagic.recipe.ModRecipes;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
+import net.fabricmc.fabric.api.recipe.v1.sync.RecipeSynchronization;
 import net.fabricmc.fabric.api.registry.FuelValueEvents;
 import net.minecraft.world.item.CreativeModeTabs;
 
@@ -12,6 +14,12 @@ public class ModestMagic implements ModInitializer {
     @Override
     public void onInitialize() {
         CommonClass.init();
+
+        RecipeSynchronization.synchronizeRecipeSerializer(ModRecipes.ENCHANTING_SERIALIZER.get());
+        RecipeSynchronization.synchronizeRecipeSerializer(ModRecipes.INFUSING_SERIALIZER.get());
+        RecipeSynchronization.synchronizeRecipeSerializer(ModRecipes.SUMMONING_SERIALIZER.get());
+        RecipeSynchronization.synchronizeRecipeSerializer(ModRecipes.TABLET_SMITHING_SERIALIZER.get());
+
         FuelValueEvents.BUILD.register((builder, context)->{
             ModBlocks.FUEL_ITEMS.forEach((item, time) -> builder.add(item.get(), time));
         });

@@ -27,7 +27,7 @@ public class ModestMagic {
         NeoForgeRegistryHelper.register(modEventBus);
         modEventBus.addListener(this::addCreative);
 
-        if (FMLEnvironment.dist == Dist.CLIENT) {
+        if (FMLEnvironment.getDist() == Dist.CLIENT) {
             ClientConfigSetup.register(modContainer);
         }
 

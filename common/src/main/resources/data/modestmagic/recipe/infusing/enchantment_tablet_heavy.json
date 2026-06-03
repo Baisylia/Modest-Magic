@@ -1,27 +1,13 @@
 {
   "type": "modestmagic:infusing",
-  "base": { 
-    "item": "modestmagic:enchantment_tablet" 
-  },
+  "base": "modestmagic:enchantment_tablet",
   "ingredients": [
-    {
-	  "item": "minecraft:gunpowder"
-	},
-    {
-	  "item": "minecraft:gunpowder"
-	},
-    {
-	  "item": "minecraft:iron_ingot"
-	},
-    {
-	  "item": "minecraft:iron_ingot"
-	},
-    {
-      "item": "minecraft:iron_ingot"
-    },
-    {
-      "item": "minecraft:iron_ingot"
-    }
+    "minecraft:gunpowder",
+    "minecraft:gunpowder",
+    "minecraft:iron_ingot",
+    "minecraft:iron_ingot",
+    "minecraft:iron_ingot",
+    "minecraft:iron_ingot"
   ],
   "results": [
   {

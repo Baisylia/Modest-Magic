@@ -1,11 +1,7 @@
 {
   "type": "modestmagic:tablet_smithing",
-  "template": {
-    "item": "modestmagic:enchantment_tablet_light"
-  },
-  "base": {
-    "tag": "minecraft:enchantable/durability"
-  },
+  "template": "modestmagic:enchantment_tablet_light",
+  "base": "#minecraft:enchantable/durability",
   "enchantments": [
     "minecraft:silk_touch",
     "minecraft:feather_falling"
