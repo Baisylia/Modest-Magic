@@ -4,7 +4,9 @@ import com.baisylia.modestmagic.ModestMagic;
 import com.baisylia.modestmagic.block.ModBlocks;
 import com.baisylia.modestmagic.block.entity.custom.AltarBlockEntity;
 import com.baisylia.modestmagic.block.entity.custom.PedestalBlockEntity;
+import com.baisylia.modestmagic.events.ModestMagicClientEvents;
 import com.baisylia.modestmagic.platform.services.IPlatformHelper;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.world.item.crafting.RecipeMap;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.api.distmarker.Dist;
@@ -54,5 +56,14 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
     @Override
     public BlockEntityType<PedestalBlockEntity> createPedestal() {
         return new BlockEntityType<>(PedestalBlockEntity::new, ModBlocks.PEDESTAL.get());
+    }
+
+    @Override
+    public HolderGetter.Provider registryAccess() {
+        if (ModestMagic.SERVER != null) {
+            return ModestMagic.SERVER.registryAccess();
+        } else {
+            return ModestMagicClientEvents.getRegistryAccess();
+        }
     }
 }

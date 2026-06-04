@@ -57,7 +57,7 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity, Pede
         poseStack.mulPose(Axis.YP.rotationDegrees(rotation));
         poseStack.scale(0.6f, 0.6f, 0.6f);
 
-        stack.submit(poseStack, submitNodeCollector, enchantingTable.lightCoords, OverlayTexture.NO_OVERLAY, -1);
+        stack.submit(poseStack, submitNodeCollector, enchantingTable.lightCoords, OverlayTexture.NO_OVERLAY, 0);
 
         poseStack.popPose();
     }

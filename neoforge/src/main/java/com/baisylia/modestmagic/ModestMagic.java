@@ -6,6 +6,7 @@ import com.baisylia.modestmagic.item.ModItems;
 import com.baisylia.modestmagic.platform.NeoForgeRegistryHelper;
 import com.baisylia.modestmagic.recipe.ModRecipes;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.RecipeMap;
@@ -22,6 +23,7 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.furnace.FurnaceFuelBurnTimeEvent;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 
 import java.util.Map;
@@ -31,6 +33,7 @@ import java.util.function.Supplier;
 @EventBusSubscriber(modid = Constants.MOD_ID)
 public class ModestMagic {
 
+    public static MinecraftServer SERVER = null;
     public static RecipeMap MAP;
 
     public ModestMagic(IEventBus modEventBus, ModContainer modContainer) {
@@ -39,6 +42,11 @@ public class ModestMagic {
         if (FMLEnvironment.getDist() == Dist.CLIENT) {
             ClientConfigSetup.register(modContainer);
         }
+    }
+
+    @SubscribeEvent
+    private static void register(ServerStartedEvent event) {
+        SERVER = event.getServer();
     }
 
     @SubscribeEvent

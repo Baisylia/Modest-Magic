@@ -5,15 +5,23 @@ import com.baisylia.modestmagic.item.ModItems;
 import com.baisylia.modestmagic.recipe.ModRecipes;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.recipe.v1.sync.RecipeSynchronization;
 import net.fabricmc.fabric.api.registry.FuelValueEvents;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.CreativeModeTabs;
 
 public class ModestMagic implements ModInitializer {
 
+    public static MinecraftServer SERVER = null;
+
     @Override
     public void onInitialize() {
         CommonClass.init();
+
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+            SERVER = server;
+        });
 
         RecipeSynchronization.synchronizeRecipeSerializer(ModRecipes.ENCHANTING_SERIALIZER.get());
         RecipeSynchronization.synchronizeRecipeSerializer(ModRecipes.INFUSING_SERIALIZER.get());

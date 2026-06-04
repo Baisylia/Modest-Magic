@@ -1,5 +1,6 @@
 package com.baisylia.modestmagic.recipe.custom;
 
+import com.baisylia.modestmagic.platform.Services;
 import com.baisylia.modestmagic.recipe.ModRecipes;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -75,8 +76,7 @@ public record TabletSmithingRecipe(Ingredient template, Ingredient base,
         ItemStack itemstack = inv.base().copy();
         if (itemstack.isEmpty()) return ItemStack.EMPTY;
 
-        //FIXME
-        var enchantRegistry = Minecraft.getInstance().level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
+        var enchantRegistry = Services.PLATFORM.registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
         ItemEnchantments existing = itemstack.getOrDefault(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY);
         ItemEnchantments.Mutable mutable = new ItemEnchantments.Mutable(existing);
 

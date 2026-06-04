@@ -2,6 +2,7 @@ package com.baisylia.modestmagic.platform.services;
 
 import com.baisylia.modestmagic.block.entity.custom.AltarBlockEntity;
 import com.baisylia.modestmagic.block.entity.custom.PedestalBlockEntity;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.world.item.crafting.RecipeMap;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
@@ -59,4 +60,6 @@ public interface IPlatformHelper {
     BlockEntityType<AltarBlockEntity> createAltar();
 
     BlockEntityType<PedestalBlockEntity> createPedestal();
+
+	HolderGetter.Provider registryAccess();
 }
