@@ -41,6 +41,9 @@ dependencies {
     // EMI
     implementation "dev.emi:emi-neoforge:${emi_version}"
 
+    // Item Descriptions
+    runtimeOnly "maven.modrinth:item-descriptions:2.7.2+1.21.1-neoforge"
+
     // Cloth Config
     implementation "me.shedaniel.cloth:cloth-config-neoforge:${cloth_config_version}"
 }

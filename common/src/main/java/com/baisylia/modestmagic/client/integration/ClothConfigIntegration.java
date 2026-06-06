@@ -31,6 +31,11 @@ public class ClothConfigIntegration {
                 .setSaveConsumer(newValue -> config.reducedEmiMotion = newValue)
                 .build());
 
+        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.modestmagic.option.showTabletTooltips"), config.showTabletTooltips)
+                .setDefaultValue(true)
+                .setSaveConsumer(newValue -> config.showTabletTooltips = newValue)
+                .build());
+
         return builder.build();
     }
 }

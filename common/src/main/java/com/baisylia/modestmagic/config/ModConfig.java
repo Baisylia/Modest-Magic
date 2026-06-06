@@ -17,6 +17,7 @@ public class ModConfig {
 
     public boolean throwItemsOnPedestals = true;
     public boolean reducedEmiMotion = false;
+    public boolean showTabletTooltips = true;
 
     public static ModConfig get() {
         if (INSTANCE == null) {

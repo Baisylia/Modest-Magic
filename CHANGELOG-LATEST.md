@@ -1,3 +1,3 @@
-### Fixed
+### Added
 
-- Renamed `minecraft:sweeping` to `minecraft:sweeping_edge`.
+- Added custom tooltips for tablets, with Enchantment Descriptions/Item Descriptions integration.
