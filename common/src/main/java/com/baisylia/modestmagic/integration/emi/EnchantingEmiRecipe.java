@@ -2,6 +2,7 @@ package com.baisylia.modestmagic.integration.emi;
 
 import com.baisylia.modestmagic.Constants;
 import com.baisylia.modestmagic.block.ModBlocks;
+import com.baisylia.modestmagic.platform.Services;
 import com.baisylia.modestmagic.recipe.custom.EnchantingRecipe;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
@@ -63,7 +64,7 @@ public class EnchantingEmiRecipe implements EmiRecipe {
             for (List<Holder<Enchantment>> pool : resolvedPools) {
                 boolean poolValid = true;
                 for (Holder<Enchantment> e : pool) {
-                    if (!e.value().canEnchant(testStack) && !testStack.is(Items.BOOK)) {
+                    if (!Services.PLATFORM.isPrimaryEnchantItem(testStack, e) && !testStack.is(Items.BOOK)) {
                         poolValid = false;
                         break;
                     }

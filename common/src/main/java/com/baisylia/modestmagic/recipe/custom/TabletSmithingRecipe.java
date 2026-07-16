@@ -1,5 +1,6 @@
 package com.baisylia.modestmagic.recipe.custom;
 
+import com.baisylia.modestmagic.platform.Services;
 import com.baisylia.modestmagic.recipe.ModRecipes;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -78,7 +79,7 @@ public record TabletSmithingRecipe(Ingredient template, Ingredient base,
             Holder<Enchantment> enchantHolder = opt.get();
             Enchantment enchantment = enchantHolder.value();
 
-            if (enchantment.canEnchant(itemstack) && areEnchantsCompatible(existing, enchantHolder)) {
+            if (Services.PLATFORM.isPrimaryEnchantItem(itemstack, enchantHolder) && areEnchantsCompatible(existing, enchantHolder)) {
                 int currentLevel = mutable.getLevel(enchantHolder);
                 int targetLevel = currentLevel + 1;
                 if (targetLevel <= enchantment.getMaxLevel()) {

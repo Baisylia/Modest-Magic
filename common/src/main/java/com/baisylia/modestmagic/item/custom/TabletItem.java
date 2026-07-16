@@ -102,8 +102,11 @@ public class TabletItem extends Item {
                 for (var recipeHolder : recipes) {
                     if (recipeHolder.value() instanceof TabletSmithingRecipe tabletRecipe) {
                         if (tabletRecipe.template().test(thisStack)) {
-                            cachedEnchantments.addAll(tabletRecipe.enchantments());
-                            break;
+                            for (ResourceKey<Enchantment> key : tabletRecipe.enchantments()) {
+                                if (!cachedEnchantments.contains(key)) {
+                                    cachedEnchantments.add(key);
+                                }
+                            }
                         }
                     }
                 }

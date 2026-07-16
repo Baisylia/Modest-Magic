@@ -1,3 +1,4 @@
-### Added
+### Fixed
 
-- Added custom tooltips for tablets, with Enchantment Descriptions/Item Descriptions integration.
+- Adjusted default enchantment compatibility.
+- Fixed auto-generated tooltip not working for certain enchantments.

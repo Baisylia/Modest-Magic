@@ -2,6 +2,7 @@ package com.baisylia.modestmagic.block.entity.custom;
 
 import com.baisylia.modestmagic.block.entity.ModBlockEntities;
 import com.baisylia.modestmagic.client.ModSounds;
+import com.baisylia.modestmagic.platform.Services;
 import com.baisylia.modestmagic.recipe.ModRecipes;
 import com.baisylia.modestmagic.recipe.custom.EnchantingRecipe;
 import com.baisylia.modestmagic.recipe.custom.InfusingRecipe;
@@ -114,7 +115,7 @@ public class AltarBlockEntity extends PedestalBlockEntity {
                             Holder<Enchantment> enchantHolder = opt.get();
                             Enchantment enchantment = enchantHolder.value();
 
-                            if (!enchantment.canEnchant(this.getItem())) continue;
+                            if (!Services.PLATFORM.isPrimaryEnchantItem(this.getItem(), enchantHolder)) continue;
 
                             boolean incompatible = false;
                             for (Holder<Enchantment> e : existingEnchants.keySet()) {
@@ -148,7 +149,7 @@ public class AltarBlockEntity extends PedestalBlockEntity {
                             Holder<Enchantment> enchantHolder = opt.get();
                             Enchantment enchantment = enchantHolder.value();
 
-                            if (!enchantment.canEnchant(this.getItem())) continue;
+                            if (!Services.PLATFORM.isPrimaryEnchantItem(this.getItem(), enchantHolder)) continue;
 
                             boolean incompatible = false;
                             for (Holder<Enchantment> e : existingEnchants.keySet()) {

@@ -1,5 +1,9 @@
 package com.baisylia.modestmagic.platform.services;
 
+import net.minecraft.core.Holder;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+
 import java.nio.file.Path;
 
 public interface IPlatformHelper {
@@ -48,4 +52,13 @@ public interface IPlatformHelper {
      * @return True if on the client, false if on a dedicated server.
      */
     boolean isPhysicalClient();
+
+    /**
+     * Checks whether an item is a "primary" candidate for an enchantment.
+     *
+     * @param stack       The item stack to check.
+     * @param enchantment The enchantment to check.
+     * @return True if the item should be considered a primary candidate for the enchantment.
+     */
+    boolean isPrimaryEnchantItem(ItemStack stack, Holder<Enchantment> enchantment);
 }

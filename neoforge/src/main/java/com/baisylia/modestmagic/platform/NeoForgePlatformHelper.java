@@ -1,6 +1,9 @@
 package com.baisylia.modestmagic.platform;
 
 import com.baisylia.modestmagic.platform.services.IPlatformHelper;
+import net.minecraft.core.Holder;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
@@ -33,5 +36,10 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
     @Override
     public boolean isPhysicalClient() {
         return FMLLoader.getDist() == Dist.CLIENT;
+    }
+
+    @Override
+    public boolean isPrimaryEnchantItem(ItemStack stack, Holder<Enchantment> enchantment) {
+        return stack.getItem().isPrimaryItemFor(stack, enchantment);
     }
 }

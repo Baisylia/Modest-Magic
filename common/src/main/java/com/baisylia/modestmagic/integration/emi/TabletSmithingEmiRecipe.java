@@ -1,5 +1,6 @@
 package com.baisylia.modestmagic.integration.emi;
 
+import com.baisylia.modestmagic.platform.Services;
 import com.baisylia.modestmagic.recipe.custom.TabletSmithingRecipe;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
@@ -45,7 +46,7 @@ public class TabletSmithingEmiRecipe implements EmiRecipe {
 
         ItemEnchantments.Mutable map = new ItemEnchantments.Mutable(ItemEnchantments.EMPTY);
         for (Holder<Enchantment> e : resolvedEnchants) {
-            if (e.value().canEnchant(baseStack) || baseStack.is(Items.BOOK)) {
+            if (Services.PLATFORM.isPrimaryEnchantItem(baseStack, e) || baseStack.is(Items.BOOK)) {
                 map.set(e, 1);
             }
         }

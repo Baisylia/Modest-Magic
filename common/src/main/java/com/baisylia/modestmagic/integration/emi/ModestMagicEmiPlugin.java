@@ -2,6 +2,7 @@ package com.baisylia.modestmagic.integration.emi;
 
 import com.baisylia.modestmagic.Constants;
 import com.baisylia.modestmagic.block.ModBlocks;
+import com.baisylia.modestmagic.platform.Services;
 import com.baisylia.modestmagic.recipe.ModRecipes;
 import com.baisylia.modestmagic.recipe.custom.EnchantingRecipe;
 import com.baisylia.modestmagic.recipe.custom.InfusingRecipe;
@@ -149,7 +150,7 @@ public class ModestMagicEmiPlugin implements EmiPlugin {
                     boolean isValid = false;
 
                     for (Holder<Enchantment> e : resolvedEnchants) {
-                        if (e.value().canEnchant(baseStack) || baseStack.is(Items.BOOK)) {
+                        if (Services.PLATFORM.isPrimaryEnchantItem(baseStack, e) || baseStack.is(Items.BOOK)) {
                             isValid = true;
                             break;
                         }
