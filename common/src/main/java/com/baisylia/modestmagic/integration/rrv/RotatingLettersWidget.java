@@ -3,6 +3,7 @@ package com.baisylia.modestmagic.integration.rrv;
 import cc.cassian.rrv.api.recipe.ReliableClientRecipe;
 import com.baisylia.modestmagic.config.ModConfig;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 
 public class RotatingLettersWidget extends Widget {
@@ -46,7 +47,7 @@ public class RotatingLettersWidget extends Widget {
             guiGraphics.pose().pushMatrix();
             guiGraphics.pose().translate((float) exactX, (float) exactY);
 
-            guiGraphics.blit(texture, 0, 0, u, v, letterSize, letterSize, letterSize * numLetters, letterSize);
+            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, texture, 0, 0, u, v, letterSize, letterSize, letterSize * numLetters, letterSize);
 
             guiGraphics.pose().popMatrix();
         }

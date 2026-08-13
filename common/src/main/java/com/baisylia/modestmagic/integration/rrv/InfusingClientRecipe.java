@@ -56,7 +56,8 @@ public class InfusingClientRecipe extends AbstractModestMagicClientRecipe {
     @Override
     public void bindSlots(RecipeViewMenu.SlotFillContext slotFillContext) {
         // Pedestal Count slot
-        slotFillContext.bindOptionalSlot(0, SlotContent.of(new ItemStack(ModBlocks.PEDESTAL.get(), inputs.size())), RecipeViewMenu.OptionalSlotRenderer.DEFAULT);
+        List<SlotContent> pedestalItems = inputs.subList(1, inputs.size());
+        slotFillContext.bindOptionalSlot(0, SlotContent.of(new ItemStack(ModBlocks.PEDESTAL.get(), pedestalItems.size())), RecipeViewMenu.OptionalSlotRenderer.DEFAULT);
     }
 
     @Override
