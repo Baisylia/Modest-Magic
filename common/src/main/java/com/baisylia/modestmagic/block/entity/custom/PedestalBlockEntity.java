@@ -14,6 +14,7 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -22,6 +23,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -40,7 +43,7 @@ public class PedestalBlockEntity extends BlockEntity implements WorldlyContainer
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, PedestalBlockEntity blockEntity) {
-        if (level.isClientSide) return;
+        if (level.isClientSide()) return;
         if (!blockEntity.isEmpty()) return;
 
         if (state.hasProperty(PedestalBlock.AXIS) && state.getValue(PedestalBlock.AXIS) != Direction.Axis.Y) return;
@@ -82,7 +85,7 @@ public class PedestalBlockEntity extends BlockEntity implements WorldlyContainer
         this.inventory = stack;
         this.setChanged();
 
-        if (level != null && !level.isClientSide) {
+        if (level != null && !level.isClientSide()) {
             BlockState oldState = getBlockState();
             BlockState newState = oldState.setValue(PedestalBlock.HAS_ITEM, !inventory.isEmpty());
 
@@ -97,19 +100,16 @@ public class PedestalBlockEntity extends BlockEntity implements WorldlyContainer
     }
 
     @Override
-    protected void saveAdditional(@NotNull CompoundTag tag, @NotNull HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        tag.put("Inventory", this.inventory.saveOptional(registries));
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        if (!this.inventory.isEmpty())
+            output.store("Inventory", ItemStack.CODEC, this.inventory);
     }
 
     @Override
-    public void loadAdditional(@NotNull CompoundTag tag, @NotNull HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        if (tag.contains("Inventory")) {
-            this.inventory = ItemStack.parseOptional(registries, tag.getCompound("Inventory"));
-        } else {
-            this.inventory = ItemStack.EMPTY;
-        }
+    public void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        this.inventory = input.read("Inventory", ItemStack.CODEC).orElse(ItemStack.EMPTY);
     }
 
     @Override

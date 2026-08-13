@@ -7,9 +7,13 @@
   "authors": [
     "${mod_author}"
   ],
+  "contributors": [
+    "${credits}"
+  ],
   "contact": {
     "homepage": "https://github.com/Baisylia/Modest-Magic",
-    "sources": "https://github.com/Baisylia/Modest-Magic"
+    "sources": "https://github.com/Baisylia/Modest-Magic",
+    "issues": "https://github.com/Baisylia/Modest-Magic/issues"
   },
   "license": "${license}",
   "icon": "${mod_id}.png",
@@ -24,8 +28,8 @@
     "modmenu": [
       "com.baisylia.modestmagic.compat.ModMenuIntegration"
     ],
-    "emi": [
-      "com.baisylia.modestmagic.integration.emi.ModestMagicEmiPlugin"
+    "rrv_client": [
+      "com.baisylia.modestmagic.integration.rrv.ModestMagicRrvPlugin"
     ]
   },
   "mixins": [
@@ -34,8 +38,8 @@
   ],
   "depends": {
     "fabricloader": ">=0.14",
-    "fabric": "*",
-    "minecraft": "${minecraft_version}",
-    "java": ">=21"
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version_range_fabric}",
+    "java": ">=25"
   }
 }

@@ -1,11 +1,7 @@
 {
   "type": "modestmagic:tablet_smithing",
-  "template": {
-    "item": "modestmagic:enchantment_tablet_fiery"
-  },
-  "base": {
-    "tag": "minecraft:enchantable/durability"
-  },
+  "template": "modestmagic:enchantment_tablet_fiery",
+  "base": "#minecraft:enchantable/durability",
   "enchantments": [
     "minecraft:fire_aspect",
     "minecraft:flame",

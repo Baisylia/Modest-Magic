@@ -1,21 +1,11 @@
 {
   "type": "modestmagic:summoning",
-  "base": {
-    "item": "minecraft:carved_pumpkin"
-  },
+  "base": "minecraft:carved_pumpkin",
   "ingredients": [
-    {
-	  "item": "minecraft:iron_block"
-	},
-    {
-	  "item": "minecraft:iron_block"
-	},
-    {
-      "item": "minecraft:iron_block"
-    },
-    {
-      "item": "minecraft:iron_block"
-    }
+    "minecraft:iron_block",
+	"minecraft:iron_block",
+	"minecraft:iron_block",
+    "minecraft:iron_block"
   ],
   "consume_base": true,
   "outcomes": [

@@ -11,6 +11,7 @@ logoFile = "${mod_id}.png"
 credits = "${credits}"
 authors = "${mod_author}"
 description = '''${description}'''
+rrv_client = "com.baisylia.modestmagic.integration.rrv.ModestMagicRrvPlugin"
 
 [[mixins]]
 config = "${mod_id}.mixins.json"

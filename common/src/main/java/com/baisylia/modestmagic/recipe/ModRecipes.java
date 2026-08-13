@@ -40,7 +40,7 @@ public class ModRecipes {
                 }
             });
     public static final Supplier<RecipeSerializer<EnchantingRecipe>> ENCHANTING_SERIALIZER =
-            SERIALIZERS.register("enchanting", EnchantingRecipe.Serializer::new);
+            SERIALIZERS.register("enchanting", ()-> new RecipeSerializer<>(EnchantingRecipe.Serializer.CODEC, EnchantingRecipe.Serializer.STREAM_CODEC));
 
     public static final Supplier<RecipeType<SummoningRecipe>> SUMMONING_TYPE =
             TYPES.register("summoning", () -> new RecipeType<>() {

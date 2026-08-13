@@ -1,12 +1,11 @@
-package com.baisylia.modestmagic.integration.emi;
+package com.baisylia.modestmagic.integration.rrv;
 
-import dev.emi.emi.api.stack.EmiIngredient;
-import dev.emi.emi.api.stack.EmiStack;
-import dev.emi.emi.api.widget.Bounds;
-import dev.emi.emi.api.widget.Widget;
-import net.minecraft.client.gui.GuiGraphics;
+import cc.cassian.rrv.api.recipe.ReliableClientRecipe;
+import cc.cassian.rrv.common.recipe.inventory.SlotContent;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -14,11 +13,11 @@ import java.util.List;
 
 public class WheelListTooltipWidget extends Widget {
     private final int cx, cy, triggerRadius;
-    private final List<EmiIngredient> allItems;
+    private final List<SlotContent> allItems;
 
-    public WheelListTooltipWidget(int cx, int cy, int triggerRadius, List<EmiIngredient> allItems) {
-        this.cx = cx;
-        this.cy = cy;
+    public WheelListTooltipWidget(int cx, int cy, int triggerRadius, List<SlotContent> allItems, ReliableClientRecipe.RecipePosition recipePosition) {
+        this.cx = recipePosition.left()+ cx;
+        this.cy = recipePosition.top()+ cy;
         this.triggerRadius = triggerRadius;
         this.allItems = allItems;
     }
@@ -29,7 +28,7 @@ public class WheelListTooltipWidget extends Widget {
     }
 
     @Override
-    public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+    public void extractRenderState(@NotNull GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float delta) {
     }
 
     @Override
@@ -40,31 +39,31 @@ public class WheelListTooltipWidget extends Widget {
 
         tooltip.add(ClientTooltipComponent.create(Component.literal("§6Required Items:").getVisualOrderText()));
 
-        List<EmiStack> consolidated = new ArrayList<>();
-        for (EmiIngredient ing : allItems) {
-            if (ing.getEmiStacks().isEmpty()) continue;
+        List<ItemStack> consolidated = new ArrayList<>();
+        for (SlotContent ing : allItems) {
+            if (ing.getValidContents().isEmpty()) continue;
 
-            EmiStack firstStack = ing.getEmiStacks().getFirst();
+            ItemStack firstStack = ing.getValidContents().getFirst();
             boolean found = false;
 
-            for (EmiStack existing : consolidated) {
-                if (existing.isEqual(firstStack)) {
-                    existing.setAmount(existing.getAmount() + 1);
+            for (ItemStack existing : consolidated) {
+                if (ItemStack.isSameItemSameComponents(existing, firstStack)) {
+                    existing.setCount(existing.getCount() + 1);
                     found = true;
                     break;
                 }
             }
 
             if (!found) {
-                EmiStack copy = firstStack.copy();
-                copy.setAmount(1);
+				ItemStack copy = firstStack.copy();
+                copy.setCount(1);
                 consolidated.add(copy);
             }
         }
 
-        for (EmiStack stack : consolidated) {
-            Component name = stack.getItemStack().getHoverName();
-            long amount = stack.getAmount();
+        for (ItemStack stack : consolidated) {
+            Component name = stack.getHoverName();
+            long amount = stack.count();
             Component line = Component.literal("§7- " + amount + "x ").append(name);
             tooltip.add(ClientTooltipComponent.create(line.getVisualOrderText()));
         }

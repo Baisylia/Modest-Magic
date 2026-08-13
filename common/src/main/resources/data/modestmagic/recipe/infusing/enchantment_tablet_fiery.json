@@ -1,27 +1,13 @@
 {
   "type": "modestmagic:infusing",
-  "base": { 
-    "item": "modestmagic:enchantment_tablet" 
-  },
+  "base": "modestmagic:enchantment_tablet",
   "ingredients": [
-    {
-	  "item": "minecraft:blaze_powder"
-	},
-    {
-	  "item": "minecraft:blaze_powder"
-	},
-    {
-	  "item": "minecraft:magma_cream"
-	},
-    {
-	  "item": "minecraft:magma_cream"
-	},
-    {
-      "item": "minecraft:glowstone_dust"
-    },
-    {
-      "item": "minecraft:glowstone_dust"
-    }
+    "minecraft:blaze_powder",
+    "minecraft:blaze_powder",
+    "minecraft:magma_cream",
+    "minecraft:magma_cream",
+    "minecraft:glowstone_dust",
+    "minecraft:glowstone_dust"
   ],
   "results": [
   {

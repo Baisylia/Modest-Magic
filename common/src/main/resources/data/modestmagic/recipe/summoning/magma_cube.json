@@ -1,33 +1,15 @@
 {
   "type": "modestmagic:summoning",
-  "base": {
-    "item": "minecraft:lava_bucket"
-  },
+  "base": "minecraft:lava_bucket",
   "ingredients": [
-    {
-	  "item": "minecraft:magma_cream"
-	},
-    {
-      "item": "minecraft:magma_cream"
-    },
-    {
-      "item": "minecraft:magma_cream"
-    },
-    {
-      "item": "minecraft:magma_cream"
-    },
-    {
-      "item": "minecraft:magma_cream"
-    },
-    {
-      "item": "minecraft:magma_cream"
-    },
-    {
-      "item": "minecraft:magma_cream"
-    },
-    {
-      "item": "minecraft:magma_cream"
-    }
+    "minecraft:magma_cream",
+    "minecraft:magma_cream",
+    "minecraft:magma_cream",
+    "minecraft:magma_cream",
+    "minecraft:magma_cream",
+    "minecraft:magma_cream",
+    "minecraft:magma_cream",
+    "minecraft:magma_cream"
   ],
   "consume_base": true,
   "outcomes": [

@@ -10,11 +10,6 @@ neoForge {
         accessTransformers.from(at.absolutePath)
     }
 
-    parchment {
-        minecraftVersion = parchment_minecraft
-        mappingsVersion = parchment_version
-    }
-
     runs {
         configureEach {
             systemProperty('neoforge.enabledGameTestNamespaces', mod_id)
@@ -38,11 +33,11 @@ neoForge {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
-    // EMI
-    implementation "dev.emi:emi-neoforge:${emi_version}"
+    // RRV
+    implementation "cc.cassian.rrv:reliable-recipe-viewer-neoforge:${rrv_version}"
 
     // Item Descriptions
-    runtimeOnly "maven.modrinth:item-descriptions:2.7.2+1.21.1-neoforge"
+    runtimeOnly "maven.modrinth:item-descriptions:2.8.3+26.1.2-neoforge"
 
     // Cloth Config
     implementation "me.shedaniel.cloth:cloth-config-neoforge:${cloth_config_version}"

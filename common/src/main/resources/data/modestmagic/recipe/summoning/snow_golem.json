@@ -1,15 +1,9 @@
 {
   "type": "modestmagic:summoning",
-  "base": {
-    "item": "minecraft:carved_pumpkin"
-  },
+  "base": "minecraft:carved_pumpkin",
   "ingredients": [
-    {
-	  "item": "minecraft:snow_block"
-	},
-    {
-	  "item": "minecraft:snow_block"
-	}
+    "minecraft:snow_block",
+    "minecraft:snow_block"
   ],
   "consume_base": true,
   "outcomes": [

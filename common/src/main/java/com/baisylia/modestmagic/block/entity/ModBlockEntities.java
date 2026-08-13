@@ -7,8 +7,11 @@ import com.baisylia.modestmagic.block.entity.custom.PedestalBlockEntity;
 import com.baisylia.modestmagic.platform.Services;
 import com.baisylia.modestmagic.platform.services.IRegistryHelper;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
+import java.util.Set;
 import java.util.function.Supplier;
 
 public class ModBlockEntities {
@@ -17,12 +20,14 @@ public class ModBlockEntities {
             Services.REGISTRIES.create(Registries.BLOCK_ENTITY_TYPE, Constants.MOD_ID);
 
     public static final Supplier<BlockEntityType<AltarBlockEntity>> ALTAR_BLOCK_ENTITY =
-            BLOCK_ENTITIES.register("altar_block_entity", () ->
-                    BlockEntityType.Builder.of(AltarBlockEntity::new, ModBlocks.ALTAR.get()).build(null));
+            BLOCK_ENTITIES.register("altar_block_entity", Services.PLATFORM::createAltar);
 
     public static final Supplier<BlockEntityType<PedestalBlockEntity>> PEDESTAL_BLOCK_ENTITY =
-            BLOCK_ENTITIES.register("pedestal_block_entity", () ->
-                    BlockEntityType.Builder.of(PedestalBlockEntity::new, ModBlocks.PEDESTAL.get()).build(null));
+            BLOCK_ENTITIES.register("pedestal_block_entity", Services.PLATFORM::createPedestal);
+
+	private static ResourceKey<BlockEntityType<?>> key(String name) {
+		return ResourceKey.create(Registries.BLOCK_ENTITY_TYPE, Identifier.fromNamespaceAndPath(Constants.MOD_ID, name));
+	}
 
     public static void init() {
     }

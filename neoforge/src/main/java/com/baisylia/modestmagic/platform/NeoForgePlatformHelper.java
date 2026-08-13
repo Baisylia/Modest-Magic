@@ -1,9 +1,20 @@
 package com.baisylia.modestmagic.platform;
 
+import com.baisylia.modestmagic.ModestMagic;
+import com.baisylia.modestmagic.block.ModBlocks;
+import com.baisylia.modestmagic.block.entity.custom.AltarBlockEntity;
+import com.baisylia.modestmagic.block.entity.custom.PedestalBlockEntity;
+import com.baisylia.modestmagic.events.ModestMagicClientEvents;
 import com.baisylia.modestmagic.platform.services.IPlatformHelper;
+import com.google.common.collect.ImmutableMultimap;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
@@ -25,7 +36,7 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
 
     @Override
     public boolean isDevelopmentEnvironment() {
-        return !FMLLoader.isProduction();
+        return !FMLLoader.getCurrent().isProduction();
     }
 
     @Override
@@ -35,11 +46,41 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
 
     @Override
     public boolean isPhysicalClient() {
-        return FMLLoader.getDist() == Dist.CLIENT;
+        return FMLLoader.getCurrent().getDist() == Dist.CLIENT;
+    }
+
+    @Override
+    public ImmutableMultimap<RecipeType<?>, RecipeHolder<?>> getSynchronizedRecipeMap() {
+        ImmutableMultimap.Builder<RecipeType<?>, RecipeHolder<?>> byType = ImmutableMultimap.builder();
+
+        for(RecipeHolder<?> recipe : ModestMagic.MAP.values()) {
+            byType.put(recipe.value().getType(), recipe);
+        }
+
+        return byType.build();
+    }
+
+    @Override
+    public BlockEntityType<AltarBlockEntity> createAltar() {
+        return new BlockEntityType<>(AltarBlockEntity::new, ModBlocks.ALTAR.get());
+    }
+
+    @Override
+    public BlockEntityType<PedestalBlockEntity> createPedestal() {
+        return new BlockEntityType<>(PedestalBlockEntity::new, ModBlocks.PEDESTAL.get());
+    }
+
+    @Override
+    public HolderGetter.Provider registryAccess() {
+        if (ModestMagic.SERVER != null) {
+            return ModestMagic.SERVER.registryAccess();
+        } else {
+            return ModestMagicClientEvents.getRegistryAccess();
+        }
     }
 
     @Override
     public boolean isPrimaryEnchantItem(ItemStack stack, Holder<Enchantment> enchantment) {
-        return stack.getItem().isPrimaryItemFor(stack, enchantment);
+        return stack.isPrimaryItemFor(enchantment);
     }
 }

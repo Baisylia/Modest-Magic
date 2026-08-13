@@ -1,27 +1,13 @@
 {
   "type": "modestmagic:infusing",
-  "base": { 
-    "item": "modestmagic:enchantment_tablet" 
-  },
+  "base": "modestmagic:enchantment_tablet",
   "ingredients": [
-    {
-	  "item": "minecraft:diamond"
-	},
-    {
-	  "item": "minecraft:diamond"
-	},
-    {
-	  "item": "minecraft:flint"
-	},
-    {
-	  "item": "minecraft:flint"
-	},
-    {
-      "item": "minecraft:cactus"
-    },
-    {
-      "item": "minecraft:cactus"
-    }
+    "minecraft:diamond",
+    "minecraft:diamond",
+    "minecraft:flint",
+    "minecraft:flint",
+    "minecraft:cactus",
+    "minecraft:cactus"
   ],
   "results": [
   {

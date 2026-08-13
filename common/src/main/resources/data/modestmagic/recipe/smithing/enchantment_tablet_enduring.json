@@ -1,11 +1,7 @@
 {
   "type": "modestmagic:tablet_smithing",
-  "template": {
-    "item": "modestmagic:enchantment_tablet_enduring"
-  },
-  "base": {
-    "tag": "minecraft:enchantable/durability"
-  },
+  "template": "modestmagic:enchantment_tablet_enduring",
+  "base": "#minecraft:enchantable/durability",
   "enchantments": [
     "minecraft:mending",
     "minecraft:vanishing_curse"

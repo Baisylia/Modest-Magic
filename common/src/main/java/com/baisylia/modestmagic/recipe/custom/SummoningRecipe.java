@@ -73,33 +73,43 @@ public class SummoningRecipe implements Recipe<RecipeInput> {
     }
 
     @Override
+    public boolean showNotification() {
+        return false;
+    }
+
+    @Override
+    public String group() {
+        return "";
+    }
+
+    @Override
     public boolean matches(@NotNull RecipeInput input, @NotNull Level level) {
         return false;
     }
 
     @Override
-    public @NotNull ItemStack assemble(@NotNull RecipeInput input, @NotNull HolderLookup.Provider registries) {
+    public ItemStack assemble(RecipeInput recipeInput) {
         return ItemStack.EMPTY;
     }
 
     @Override
-    public boolean canCraftInDimensions(int w, int h) {
-        return true;
-    }
-
-    @Override
-    public @NotNull ItemStack getResultItem(@NotNull HolderLookup.Provider registries) {
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public @NotNull RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<? extends Recipe<RecipeInput>> getSerializer() {
         return ModRecipes.SUMMONING_SERIALIZER.get();
     }
 
     @Override
-    public @NotNull RecipeType<?> getType() {
+    public RecipeType<? extends Recipe<RecipeInput>> getType() {
         return ModRecipes.SUMMONING_TYPE.get();
+    }
+
+    @Override
+    public PlacementInfo placementInfo() {
+        return PlacementInfo.NOT_PLACEABLE;
+    }
+
+    @Override
+    public RecipeBookCategory recipeBookCategory() {
+        return null;
     }
 
     public @NotNull NonNullList<Ingredient> getIngredients() {
@@ -113,8 +123,7 @@ public class SummoningRecipe implements Recipe<RecipeInput> {
     public record SummonOutcome(EntityType<?> entity, CompoundTag nbt) {
     }
 
-    public static class Serializer implements RecipeSerializer<SummoningRecipe> {
-        public static final Serializer INSTANCE = new Serializer();
+    public static class Serializer {
 
         public static final Codec<SummonOutcome> OUTCOME_CODEC = RecordCodecBuilder.create(inst -> inst.group(
                 BuiltInRegistries.ENTITY_TYPE.byNameCodec().fieldOf("result_entity").forGetter(SummonOutcome::entity),
@@ -152,14 +161,6 @@ public class SummoningRecipe implements Recipe<RecipeInput> {
                 }
         );
 
-        @Override
-        public @NotNull MapCodec<SummoningRecipe> codec() {
-            return CODEC;
-        }
-
-        @Override
-        public @NotNull StreamCodec<RegistryFriendlyByteBuf, SummoningRecipe> streamCodec() {
-            return STREAM_CODEC;
-        }
+        public static final RecipeSerializer<SummoningRecipe> INSTANCE = new RecipeSerializer<>(CODEC, STREAM_CODEC);
     }
 }

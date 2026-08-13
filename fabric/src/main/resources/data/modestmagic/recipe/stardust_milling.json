@@ -9,15 +9,13 @@
   ],
   "type": "create:milling",
   "ingredients": [
-    {
-      "item": "minecraft:nether_star"
-    }
+    "minecraft:nether_star"
   ],
   "results": [
     {
-      "item": "modestmagic:stardust",
+      "id": "modestmagic:stardust",
       "count": 8
     }
   ],
-  "processingTime": 50
+  "processing_time": 50
 }

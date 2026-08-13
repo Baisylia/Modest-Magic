@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "O": {
-      "item": "minecraft:amethyst_shard"
-    },
-    "#": {
-      "item": "minecraft:lapis_block"
-    }
+    "O": "minecraft:amethyst_shard",
+    "#": "minecraft:lapis_block"
   },
   "pattern": [
     "OOO",

@@ -1,27 +1,13 @@
 {
   "type": "modestmagic:infusing",
-  "base": { 
-    "item": "modestmagic:enchantment_tablet" 
-  },
+  "base": "modestmagic:enchantment_tablet",
   "ingredients": [
-    {
-	  "item": "minecraft:ghast_tear"
-	},
-    {
-	  "item": "minecraft:ghast_tear"
-	},
-    {
-	  "item": "minecraft:amethyst_shard"
-	},
-    {
-	  "item": "minecraft:amethyst_shard"
-	},
-    {
-      "item": "minecraft:amethyst_shard"
-    },
-    {
-      "item": "minecraft:amethyst_shard"
-    }
+    "minecraft:ghast_tear",
+    "minecraft:ghast_tear",
+    "minecraft:amethyst_shard",
+    "minecraft:amethyst_shard",
+    "minecraft:amethyst_shard",
+    "minecraft:amethyst_shard"
   ],
   "results": [
   {

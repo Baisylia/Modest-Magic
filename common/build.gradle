@@ -10,16 +10,11 @@ neoForge {
     if (at.exists()) {
         accessTransformers.from(at.absolutePath)
     }
-
-    parchment {
-        minecraftVersion = parchment_minecraft
-        mappingsVersion = parchment_version
-    }
 }
 
 dependencies {
     compileOnly "me.shedaniel.cloth:cloth-config-neoforge:${cloth_config_version}"
-    compileOnly "dev.emi:emi-neoforge:${emi_version}"
+    implementation "cc.cassian.rrv:reliable-recipe-viewer-neoforge:${rrv_version}"
 
     compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
     compileOnly group: 'org.ow2.asm', name: 'asm-tree', version: '9.6'

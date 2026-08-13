@@ -4,6 +4,7 @@ import com.baisylia.modestmagic.platform.Services;
 import com.baisylia.modestmagic.recipe.ModRecipes;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
@@ -14,34 +15,32 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.SmithingRecipe;
-import net.minecraft.world.item.crafting.SmithingRecipeInput;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Optional;
 
 public record TabletSmithingRecipe(Ingredient template, Ingredient base,
                                    NonNullList<ResourceKey<Enchantment>> enchantments) implements SmithingRecipe {
 
     @Override
-    public boolean isTemplateIngredient(@NotNull ItemStack stack) {
-        return this.template.test(stack);
+    public Optional<Ingredient> templateIngredient() {
+        return Optional.ofNullable(this.template);
     }
 
     @Override
-    public boolean isBaseIngredient(@NotNull ItemStack stack) {
-        return this.base.test(stack);
+    public Ingredient baseIngredient() {
+        return this.base;
     }
 
     @Override
-    public boolean isAdditionIngredient(@NotNull ItemStack stack) {
-        return false;
+    public Optional<Ingredient> additionIngredient() {
+        return Optional.empty();
     }
 
     @Override
@@ -59,15 +58,25 @@ public record TabletSmithingRecipe(Ingredient template, Ingredient base,
             return false;
         }
 
-        return !assemble(inv, level.registryAccess()).isEmpty();
+        return !assemble(inv).isEmpty();
     }
 
     @Override
-    public @NotNull ItemStack assemble(SmithingRecipeInput inv, @NotNull HolderLookup.Provider registries) {
+    public boolean showNotification() {
+        return false;
+    }
+
+    @Override
+    public String group() {
+        return "";
+    }
+
+    @Override
+    public @NotNull ItemStack assemble(SmithingRecipeInput inv) {
         ItemStack itemstack = inv.base().copy();
         if (itemstack.isEmpty()) return ItemStack.EMPTY;
 
-        var enchantRegistry = registries.lookupOrThrow(Registries.ENCHANTMENT);
+        var enchantRegistry = Services.PLATFORM.registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
         ItemEnchantments existing = itemstack.getOrDefault(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY);
         ItemEnchantments.Mutable mutable = new ItemEnchantments.Mutable(existing);
 
@@ -107,26 +116,20 @@ public record TabletSmithingRecipe(Ingredient template, Ingredient base,
     }
 
     @Override
-    public boolean canCraftInDimensions(int width, int height) {
-        return width * height >= 2;
-    }
-
-    @Override
-    public @NotNull ItemStack getResultItem(@NotNull HolderLookup.Provider registryAccess) {
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public @NotNull RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<? extends SmithingRecipe> getSerializer() {
         return ModRecipes.TABLET_SMITHING_SERIALIZER.get();
     }
 
-    public static class Serializer implements RecipeSerializer<TabletSmithingRecipe> {
-        public static final Serializer INSTANCE = new Serializer();
+    @Override
+    public PlacementInfo placementInfo() {
+        return PlacementInfo.create(List.of(template, base));
+    }
+
+    public static class Serializer {
 
         public static final MapCodec<TabletSmithingRecipe> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
                 Ingredient.CODEC.fieldOf("template").forGetter(r -> r.template),
-                Ingredient.CODEC.optionalFieldOf("base", Ingredient.EMPTY).forGetter(r -> r.base),
+                Ingredient.CODEC.fieldOf("base").forGetter(r -> r.base),
                 ResourceKey.codec(Registries.ENCHANTMENT).listOf().fieldOf("enchantments").forGetter(r -> r.enchantments)
         ).apply(inst, (template, base, enchantments) -> {
             NonNullList<ResourceKey<Enchantment>> list = NonNullList.create();
@@ -145,14 +148,6 @@ public record TabletSmithingRecipe(Ingredient template, Ingredient base,
                 }
         );
 
-        @Override
-        public @NotNull MapCodec<TabletSmithingRecipe> codec() {
-            return CODEC;
-        }
-
-        @Override
-        public @NotNull StreamCodec<RegistryFriendlyByteBuf, TabletSmithingRecipe> streamCodec() {
-            return STREAM_CODEC;
-        }
+        public static final RecipeSerializer<TabletSmithingRecipe> INSTANCE = new RecipeSerializer<>(CODEC, STREAM_CODEC);
     }
 }
