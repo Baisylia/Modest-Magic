@@ -7,9 +7,13 @@
   "authors": [
     "${mod_author}"
   ],
+  "contributors": [
+    "${credits}"
+  ],
   "contact": {
     "homepage": "https://github.com/Baisylia/Modest-Magic",
-    "sources": "https://github.com/Baisylia/Modest-Magic"
+    "sources": "https://github.com/Baisylia/Modest-Magic",
+    "issues": "https://github.com/Baisylia/Modest-Magic/issues"
   },
   "license": "${license}",
   "icon": "${mod_id}.png",
@@ -35,7 +39,7 @@
   "depends": {
     "fabricloader": ">=0.14",
     "fabric-api": "*",
-    "minecraft": "${minecraft_version}",
+    "minecraft": "${minecraft_version_range_fabric}",
     "java": ">=25"
   }
 }

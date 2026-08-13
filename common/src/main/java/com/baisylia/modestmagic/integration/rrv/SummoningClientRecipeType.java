@@ -10,7 +10,6 @@ import net.minecraft.world.item.ItemStack;
 import org.jspecify.annotations.Nullable;
 
 public class SummoningClientRecipeType extends AbstractModestMagicClientRecipeType {
-	private static final Identifier BACKGROUND = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/rrv_background.png");
 	public static SummoningClientRecipeType INSTANCE = new SummoningClientRecipeType();
 
 	@Override

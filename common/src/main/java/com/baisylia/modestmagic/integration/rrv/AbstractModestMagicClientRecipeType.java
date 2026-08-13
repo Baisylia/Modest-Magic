@@ -15,7 +15,6 @@ import java.util.List;
 public abstract class AbstractModestMagicClientRecipeType implements ReliableClientRecipeType {
 	private static final Identifier BACKGROUND = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/rrv_background.png");
 
-
 	@Override
 	public int getDisplayWidth() {
 		return 140;

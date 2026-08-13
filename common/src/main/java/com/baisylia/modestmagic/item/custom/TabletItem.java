@@ -4,6 +4,7 @@ import com.baisylia.modestmagic.config.ModConfig;
 import com.baisylia.modestmagic.platform.Services;
 import com.baisylia.modestmagic.recipe.custom.TabletSmithingRecipe;
 import net.minecraft.ChatFormatting;
+import net.minecraft.locale.Language;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
@@ -79,8 +80,8 @@ public class TabletItem extends Item {
                 String primaryDescKey = "enchantment." + namespace + "." + path + ".description";
                 String fallbackDescKey = "enchantment." + namespace + "." + path + ".desc";
 
-				if (I18n.exists(primaryDescKey)) tooltip.accept(Component.translatable(primaryDescKey).withStyle(ChatFormatting.DARK_GRAY));
-				else if (I18n.exists(fallbackDescKey)) tooltip.accept(Component.translatable(fallbackDescKey).withStyle(ChatFormatting.DARK_GRAY));
+				if (Language.getInstance().has(primaryDescKey)) tooltip.accept(Component.translatable(primaryDescKey).withStyle(ChatFormatting.DARK_GRAY));
+				else if (Language.getInstance().has(fallbackDescKey)) tooltip.accept(Component.translatable(fallbackDescKey).withStyle(ChatFormatting.DARK_GRAY));
             }
         }
     }
