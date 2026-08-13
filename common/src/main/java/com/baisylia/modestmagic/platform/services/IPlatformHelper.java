@@ -2,8 +2,11 @@ package com.baisylia.modestmagic.platform.services;
 
 import com.baisylia.modestmagic.block.entity.custom.AltarBlockEntity;
 import com.baisylia.modestmagic.block.entity.custom.PedestalBlockEntity;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeMap;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import java.nio.file.Path;

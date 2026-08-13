@@ -1,11 +1,11 @@
 package com.baisylia.modestmagic.item.custom;
 
 import com.baisylia.modestmagic.config.ModConfig;
+import com.baisylia.modestmagic.platform.Services;
 import com.baisylia.modestmagic.recipe.custom.TabletSmithingRecipe;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
@@ -16,7 +16,9 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeMap;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.enchantment.Enchantment;
 import org.jetbrains.annotations.NotNull;
@@ -24,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class TabletItem extends Item {
     private List<ResourceKey<Enchantment>> cachedEnchantments = null;
@@ -41,8 +44,8 @@ public class TabletItem extends Item {
     }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack stack, @NotNull TooltipContext context, @NotNull List<Component> tooltip, @NotNull TooltipFlag flag) {
-        super.appendHoverText(stack, context, tooltip, flag);
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
+        super.appendHoverText(stack, context, display, tooltip, flag);
         if (!ModConfig.get().showTabletTooltips) return;
 
         if (context.registries() == null) return;
@@ -51,33 +54,33 @@ public class TabletItem extends Item {
         if (enchantments == null || enchantments.isEmpty()) return;
 
         var registry = context.registries().lookupOrThrow(Registries.ENCHANTMENT);
-        boolean isShiftDown = Screen.hasShiftDown();
+        boolean isShiftDown = Minecraft.getInstance().hasShiftDown();
 
         for (ResourceKey<Enchantment> key : enchantments) {
             Optional<Holder.Reference<Enchantment>> optEnchant = registry.get(key);
             if (optEnchant.isEmpty()) continue;
 
             Enchantment enchantment = optEnchant.get().value();
-            MutableComponent name = Component.translatable(Util.makeDescriptionId("enchantment", key.location()));
+            MutableComponent name = Component.translatable(Util.makeDescriptionId("enchantment", key.identifier()));
 
             if (!isShiftDown) {
-                tooltip.add(name.withStyle(ChatFormatting.GRAY));
+                tooltip.accept(name.withStyle(ChatFormatting.GRAY));
             } else {
-                tooltip.add(name.withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.UNDERLINE));
+                tooltip.accept(name.withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.UNDERLINE));
 
                 Component maxLevelValue = Component.literal(toRoman(enchantment.getMaxLevel())).withStyle(ChatFormatting.GRAY);
-                tooltip.add(Component.literal("Max. Level: ").withStyle(ChatFormatting.DARK_GRAY).append(maxLevelValue));
+                tooltip.accept(Component.literal("Max. Level: ").withStyle(ChatFormatting.DARK_GRAY).append(maxLevelValue));
 
                 Component appliedToValue = getAppliedTo(enchantment).copy().withStyle(ChatFormatting.GRAY);
-                tooltip.add(Component.literal("Applied to: ").withStyle(ChatFormatting.DARK_GRAY).append(appliedToValue));
+                tooltip.accept(Component.literal("Applied to: ").withStyle(ChatFormatting.DARK_GRAY).append(appliedToValue));
 
-                String namespace = key.location().getNamespace();
-                String path = key.location().getPath();
+                String namespace = key.identifier().getNamespace();
+                String path = key.identifier().getPath();
                 String primaryDescKey = "enchantment." + namespace + "." + path + ".description";
                 String fallbackDescKey = "enchantment." + namespace + "." + path + ".desc";
 
-                String finalDescKey = I18n.exists(primaryDescKey) ? primaryDescKey : fallbackDescKey;
-                tooltip.add(Component.translatable(finalDescKey).withStyle(ChatFormatting.DARK_GRAY));
+				if (I18n.exists(primaryDescKey)) tooltip.accept(Component.translatable(primaryDescKey).withStyle(ChatFormatting.DARK_GRAY));
+				else if (I18n.exists(fallbackDescKey)) tooltip.accept(Component.translatable(fallbackDescKey).withStyle(ChatFormatting.DARK_GRAY));
             }
         }
     }
@@ -94,9 +97,9 @@ public class TabletItem extends Item {
 
         try {
             if (Minecraft.getInstance().level != null) {
-                RecipeManager recipeManager = Minecraft.getInstance().level.getRecipeManager();
+                RecipeMap recipeManager = Services.PLATFORM.getSynchronizedRecipeMap();
 
-                var recipes = recipeManager.getAllRecipesFor(RecipeType.SMITHING);
+                var recipes = recipeManager.byType(RecipeType.SMITHING);
                 ItemStack thisStack = new ItemStack(this);
 
                 for (var recipeHolder : recipes) {

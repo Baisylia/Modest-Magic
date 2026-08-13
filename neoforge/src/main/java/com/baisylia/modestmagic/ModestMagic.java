@@ -3,7 +3,6 @@ package com.baisylia.modestmagic;
 import com.baisylia.modestmagic.block.ModBlocks;
 import com.baisylia.modestmagic.client.ClientConfigSetup;
 import com.baisylia.modestmagic.item.ModItems;
-import com.baisylia.modestmagic.platform.NeoForgeRegistryHelper;
 import com.baisylia.modestmagic.recipe.ModRecipes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.MinecraftServer;
@@ -19,7 +18,6 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.client.event.RecipesReceivedEvent;
-import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.furnace.FurnaceFuelBurnTimeEvent;
@@ -62,7 +60,7 @@ public class ModestMagic {
     }
 
     @SubscribeEvent
-    private static void recieveRecipes(RecipesReceivedEvent event) {
+    private static void receiveRecipes(RecipesReceivedEvent event) {
         MAP = event.getRecipeMap();
     }
 

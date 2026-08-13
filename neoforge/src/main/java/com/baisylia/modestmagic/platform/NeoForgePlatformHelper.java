@@ -6,8 +6,11 @@ import com.baisylia.modestmagic.block.entity.custom.AltarBlockEntity;
 import com.baisylia.modestmagic.block.entity.custom.PedestalBlockEntity;
 import com.baisylia.modestmagic.events.ModestMagicClientEvents;
 import com.baisylia.modestmagic.platform.services.IPlatformHelper;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeMap;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.ModList;
@@ -69,6 +72,6 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
 
     @Override
     public boolean isPrimaryEnchantItem(ItemStack stack, Holder<Enchantment> enchantment) {
-        return stack.getItem().isPrimaryItemFor(stack, enchantment);
+        return stack.isPrimaryItemFor(enchantment);
     }
 }
