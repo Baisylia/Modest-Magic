@@ -33,7 +33,7 @@ neoForge {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
-    // EMI
+    // RRV
     implementation "cc.cassian.rrv:reliable-recipe-viewer-neoforge:${rrv_version}"
 
     // Cloth Config

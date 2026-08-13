@@ -45,7 +45,7 @@ publishMods {
         minecraftVersions.add("${minecraft_version}")
 
         optional("cloth-config")
-        optional("emi")
+        optional("rrv")
     }
 
     modrinth {
@@ -54,6 +54,6 @@ publishMods {
         minecraftVersions.add("${minecraft_version}")
 
         optional("cloth-config")
-        optional("emi")
+        optional("rrv")
     }
 }

@@ -1,4 +1,4 @@
-package com.baisylia.modestmagic.integration.rrv;//package com.baisylia.modestmagic.integration.emi;
+package com.baisylia.modestmagic.integration.rrv;
 
 import cc.cassian.rrv.api.ReliableRecipeViewerClientPlugin;
 import cc.cassian.rrv.api.recipe.ItemView;
@@ -29,24 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ModestMagicRrvPlugin implements ReliableRecipeViewerClientPlugin {
-
-	/*
-    public static final EmiRecipeCategory INFUSING = new EmiRecipeCategory(
-            Identifier.fromNamespaceAndPath(Constants.MOD_ID, "infusing"),
-            EmiStack.of(ModBlocks.ALTAR.get())
-    );
-
-    public static final EmiRecipeCategory ENCHANTING = new EmiRecipeCategory(
-            Identifier.fromNamespaceAndPath(Constants.MOD_ID, "enchanting"),
-            EmiStack.of(ModBlocks.ALTAR.get())
-    );
-
-    public static final EmiRecipeCategory SUMMONING = new EmiRecipeCategory(
-            Identifier.fromNamespaceAndPath(Constants.MOD_ID, "summoning"),
-            EmiStack.of(ModBlocks.ALTAR.get())
-    );
-
-	 */
 
     /**
      * Consolidates a list of SlotContents, combining identical items and summing their amounts.
@@ -93,27 +75,21 @@ public class ModestMagicRrvPlugin implements ReliableRecipeViewerClientPlugin {
 
 	@Override
 	public void onIntegrationInitialize() {
-//		registry.addCategory(INFUSING);
-//		registry.addCategory(ENCHANTING);
-//		registry.addCategory(SUMMONING);
 
-//		registry.addWorkstation(INFUSING, EmiStack.of(ModBlocks.ALTAR.get()));
-//		registry.addWorkstation(ENCHANTING, EmiStack.of(ModBlocks.ALTAR.get()));
-//		registry.addWorkstation(SUMMONING, EmiStack.of(ModBlocks.ALTAR.get()));
+		ItemView.addClientRecipeProvider(recipes->{
 
 		for (RecipeHolder<InfusingRecipe> holder : ClientRecipeManager.INSTANCE.getRecipesForType(ModRecipes.INFUSING_TYPE.get())) {
-//			registry.addRecipe(new InfusingEmiRecipe(holder));
+			recipes.add(new InfusingClientRecipe(holder));
 		}
 
 		for (RecipeHolder<EnchantingRecipe> holder : ClientRecipeManager.INSTANCE.getRecipesForType(ModRecipes.ENCHANTING_TYPE.get())) {
-//			registry.addRecipe(new EnchantingEmiRecipe(holder));
+			recipes.add(new EnchantingClientRecipe(holder));
 		}
 
 		for (RecipeHolder<SummoningRecipe> holder : ClientRecipeManager.INSTANCE.getRecipesForType(ModRecipes.SUMMONING_TYPE.get())) {
-//			registry.addRecipe(new SummoningEmiRecipe(holder));
+			recipes.add(new SummoningClientRecipe(holder));
 		}
 
-		ItemView.addClientRecipeProvider(recipes->{
 		for (RecipeHolder<?> holder : ClientRecipeManager.INSTANCE.getRecipesForType(RecipeType.SMITHING)) {
 			if (holder.value() instanceof TabletSmithingRecipe) {
 

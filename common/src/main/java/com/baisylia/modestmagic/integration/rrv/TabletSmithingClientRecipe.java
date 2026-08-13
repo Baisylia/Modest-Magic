@@ -42,7 +42,7 @@ public class TabletSmithingClientRecipe extends SmithingClientRecipe {
 		EnchantmentHelper.setEnchantments(outStack, map.toImmutable());
 		var output = outStack;
 
-		super(id, SlotContent.of(base), SlotContent.of(), template, SlotContent.of(output), 2);
+		super(id, SlotContent.of(base), SlotContent.of(), template, SlotContent.of(output), null,2);
 
     }
 }

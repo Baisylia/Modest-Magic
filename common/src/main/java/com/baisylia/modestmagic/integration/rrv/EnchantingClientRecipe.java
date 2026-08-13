@@ -1,21 +1,20 @@
-package com.baisylia.modestmagic.integration.emi;
-/*
+package com.baisylia.modestmagic.integration.rrv;
+
+import cc.cassian.rrv.api.recipe.ReliableClientRecipeType;
+import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu;
+import cc.cassian.rrv.common.recipe.inventory.RecipeViewScreen;
+import cc.cassian.rrv.common.recipe.inventory.SlotContent;
 import com.baisylia.modestmagic.Constants;
 import com.baisylia.modestmagic.block.ModBlocks;
 import com.baisylia.modestmagic.recipe.custom.EnchantingRecipe;
-import dev.emi.emi.api.recipe.EmiRecipe;
-import dev.emi.emi.api.recipe.EmiRecipeCategory;
-import dev.emi.emi.api.render.EmiTexture;
-import dev.emi.emi.api.stack.EmiIngredient;
-import dev.emi.emi.api.stack.EmiStack;
-import dev.emi.emi.api.widget.WidgetHolder;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -28,29 +27,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class EnchantingEmiRecipe implements EmiRecipe {
+public class EnchantingClientRecipe extends AbstractModestMagicClientRecipe {
 
-    private static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/emi_background.png");
-    private final ResourceLocation id;
-    private final List<EmiIngredient> inputs;
-    private final EmiIngredient baseIngredient;
-    private final List<EmiStack> outputs;
+    private final Identifier id;
+    private final List<SlotContent> inputs;
+    private final SlotContent baseIngredient;
+    private final List<ItemStack> outputs;
 
-    public EnchantingEmiRecipe(RecipeHolder<EnchantingRecipe> recipeHolder) {
-        this.id = recipeHolder.id();
+    public EnchantingClientRecipe(RecipeHolder<EnchantingRecipe> recipeHolder) {
+        this.id = recipeHolder.id().identifier();
         EnchantingRecipe recipe = recipeHolder.value();
-        this.inputs = recipe.getIngredients().stream().map(EmiIngredient::of).collect(Collectors.toList());
+        this.inputs = recipe.getIngredients().stream().map(SlotContent::of).collect(Collectors.toList());
 
-        List<EmiStack> validBases = new ArrayList<>();
-        List<EmiStack> validOutputs = new ArrayList<>();
+        List<ItemStack> validBases = new ArrayList<>();
+        List<ItemStack> validOutputs = new ArrayList<>();
 
-        Registry<Enchantment> enchantRegistry = Minecraft.getInstance().level.registryAccess().registryOrThrow(Registries.ENCHANTMENT);
+        Registry<Enchantment> enchantRegistry = Minecraft.getInstance().level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
 
         List<List<Holder<Enchantment>>> resolvedPools = new ArrayList<>();
         for (List<ResourceKey<Enchantment>> poolKeys : recipe.getEnchantmentPools()) {
             List<Holder<Enchantment>> pool = new ArrayList<>();
             for (ResourceKey<Enchantment> key : poolKeys) {
-                enchantRegistry.getHolder(key).ifPresent(pool::add);
+                enchantRegistry.get(key).ifPresent(pool::add);
             }
             if (!pool.isEmpty()) resolvedPools.add(pool);
         }
@@ -75,7 +73,7 @@ public class EnchantingEmiRecipe implements EmiRecipe {
             }
 
             if (isValid) {
-                validBases.add(EmiStack.of(testStack));
+                validBases.add(testStack);
 
                 for (List<Holder<Enchantment>> pool : resolvedPools) {
                     ItemStack outStack = testStack.copy();
@@ -89,14 +87,14 @@ public class EnchantingEmiRecipe implements EmiRecipe {
                     }
 
                     EnchantmentHelper.setEnchantments(outStack, enchantments.toImmutable());
-                    validOutputs.add(EmiStack.of(outStack));
+                    validOutputs.add(outStack);
                 }
             }
         }
 
         // fallback
         if (validBases.isEmpty()) {
-            validBases.add(EmiStack.of(Items.BOOK));
+            validBases.add(new ItemStack(Items.BOOK));
             ItemStack out = new ItemStack(Items.ENCHANTED_BOOK);
             ItemEnchantments.Mutable enchantments = new ItemEnchantments.Mutable(ItemEnchantments.EMPTY);
 
@@ -104,84 +102,73 @@ public class EnchantingEmiRecipe implements EmiRecipe {
                 for (Holder<Enchantment> e : resolvedPools.getFirst()) enchantments.set(e, 1);
             }
             EnchantmentHelper.setEnchantments(out, enchantments.toImmutable());
-            validOutputs.add(EmiStack.of(out));
+            validOutputs.add(out);
         }
 
-        this.baseIngredient = EmiIngredient.of(validBases);
+        this.baseIngredient = SlotContent.of(validBases);
         this.outputs = validOutputs;
     }
 
     @Override
-    public EmiRecipeCategory getCategory() {
-        return ModestMagicEmiPlugin.ENCHANTING;
+    public ReliableClientRecipeType getType() {
+        return EnchantingClientRecipeType.INSTANCE;
     }
 
     @Override
-    public ResourceLocation getId() {
-        return id;
+    public void bindSlots(RecipeViewMenu.SlotFillContext slotFillContext) {
+        // Pedestal Count slot
+        slotFillContext.bindOptionalSlot(0, SlotContent.of(new ItemStack(ModBlocks.PEDESTAL.get(), inputs.size())), RecipeViewMenu.OptionalSlotRenderer.DEFAULT);
     }
 
     @Override
-    public List<EmiIngredient> getInputs() {
-        List<EmiIngredient> allInputs = new ArrayList<>();
+    public List<SlotContent> getIngredients() {
+        List<SlotContent> allInputs = new ArrayList<>();
         allInputs.add(baseIngredient);
         allInputs.addAll(inputs);
         return allInputs;
     }
 
     @Override
-    public List<EmiStack> getOutputs() {
-        return outputs;
+    public List<SlotContent> getResults() {
+        return outputs.stream().map(SlotContent::of).toList();
     }
 
     @Override
-    public int getDisplayWidth() {
-        return 140;
+    public Identifier getId() {
+        return id;
     }
 
     @Override
-    public int getDisplayHeight() {
-        return 80;
-    }
-
-    @Override
-    public void addWidgets(WidgetHolder widgets) {
-        widgets.addTexture(BACKGROUND, 0, 0, getDisplayWidth(), getDisplayHeight(), 0, 0);
-
+    public void initRecipe(RecipeViewScreen screen, RecipePosition recipePosition, GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
         int cx = 35;
-        int cy = getDisplayHeight() / 2;
+        int cy = getType().getDisplayHeight() / 2;
         int radius = 24;
 
-        List<EmiIngredient> circleItems;
+        List<SlotContent> circleItems;
 
         if (inputs.size() > 6) {
-            circleItems = ModestMagicEmiPlugin.consolidateItems(inputs);
+            circleItems = ModestMagicRrvPlugin.consolidateItems(inputs);
         } else {
             circleItems = inputs;
         }
 
         RotationState state = new RotationState(cx, cy, radius, circleItems.size());
 
-        widgets.add(new RotatingLettersWidget(
-                ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/enchanted_letters.png"),
+        screen.addRecipeWidget(new RotatingLettersWidget(
+                Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/enchanted_letters.png"),
                 cx, cy, radius + 6
         ));
 
-        widgets.add(new HoveringSlotWidget(baseIngredient, cx - 9, cy - 9, 0));
+        screen.addRecipeWidget(new HoveringSlotWidget(baseIngredient, cx - 9, cy - 9, 0, recipePosition));
 
         for (int i = 0; i < circleItems.size(); i++) {
-            widgets.add(new RotatingSlotWidget(state, circleItems.get(i), i + 1));
+            screen.addRecipeWidget(new RotatingSlotWidget(state, circleItems.get(i), i + 1, recipePosition));
         }
 
-        // Pedestal Count slot
-        widgets.addSlot(EmiStack.of(new ItemStack(ModBlocks.PEDESTAL.get(), inputs.size())), getDisplayWidth() - 18, getDisplayHeight() - 18).drawBack(true);
-
         // Arrow and cycling enchanted item
-        widgets.addTexture(EmiTexture.EMPTY_ARROW, cx + radius + 16, cy - 8);
-        widgets.add(new HoveringSlotWidget(EmiIngredient.of(outputs), cx + radius + 51, cy - 9, 2)).recipeContext(this);
+//        widgets.addTexture(EmiTexture.EMPTY_ARROW, cx + radius + 16, cy - 8);
+        screen.addRecipeWidget(new HoveringSlotWidget(SlotContent.of(outputs), cx + radius + 51, cy - 9, 2, recipePosition));
 
-        widgets.add(new WheelListTooltipWidget(cx, cy, radius, circleItems));
+        screen.addRecipeWidget(new WheelListTooltipWidget(cx, cy, radius, circleItems, recipePosition));
     }
 }
-
- */

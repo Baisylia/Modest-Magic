@@ -26,9 +26,9 @@ public class ClothConfigIntegration {
                 .setSaveConsumer(newValue -> config.throwItemsOnPedestals = newValue)
                 .build());
 
-        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.modestmagic.option.reducedEmiMotion"), config.reducedEmiMotion)
+        general.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.modestmagic.option.reducedEmiMotion"), config.reducedRrvMotion)
                 .setDefaultValue(false)
-                .setSaveConsumer(newValue -> config.reducedEmiMotion = newValue)
+                .setSaveConsumer(newValue -> config.reducedRrvMotion = newValue)
                 .build());
 
         return builder.build();
