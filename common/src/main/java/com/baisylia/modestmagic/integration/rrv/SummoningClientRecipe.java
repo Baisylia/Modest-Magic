@@ -108,7 +108,7 @@ public class SummoningClientRecipe extends AbstractModestMagicClientRecipe {
 
         screen.addRecipeWidget(new RotatingLettersWidget(
                 Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/enchanted_letters.png"),
-                cx, cy, radius + 6
+                cx, cy, radius + 6, recipePosition
         ));
 
         screen.addRecipeWidget(new HoveringSlotWidget(base, cx - 9, cy - 9, 0, recipePosition));
@@ -121,7 +121,7 @@ public class SummoningClientRecipe extends AbstractModestMagicClientRecipe {
 
 
 
-            initEntities();
+        initEntities();
 
         screen.addRecipeWidget(new WheelListTooltipWidget(cx, cy, radius, circleItems, recipePosition));
     }

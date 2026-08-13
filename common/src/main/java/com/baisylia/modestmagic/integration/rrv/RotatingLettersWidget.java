@@ -1,5 +1,6 @@
 package com.baisylia.modestmagic.integration.rrv;
 
+import cc.cassian.rrv.api.recipe.ReliableClientRecipe;
 import com.baisylia.modestmagic.config.ModConfig;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.resources.Identifier;
@@ -10,10 +11,10 @@ public class RotatingLettersWidget extends Widget {
     private final int numLetters = 12;
     private final int letterSize = 8;
 
-    public RotatingLettersWidget(Identifier texture, int cx, int cy, int radius) {
+    public RotatingLettersWidget(Identifier texture, int cx, int cy, int radius, ReliableClientRecipe.RecipePosition recipePosition) {
         this.texture = texture;
-        this.cx = cx;
-        this.cy = cy;
+        this.cx = recipePosition.left()+ cx;
+        this.cy = recipePosition.top()+ cy;
         this.radius = radius;
     }
 

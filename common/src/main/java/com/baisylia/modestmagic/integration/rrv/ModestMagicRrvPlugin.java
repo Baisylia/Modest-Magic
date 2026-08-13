@@ -44,7 +44,7 @@ public class ModestMagicRrvPlugin implements ReliableRecipeViewerClientPlugin {
             for (int i = 0; i < uniqueIngredients.size(); i++) {
                 SlotContent existing = uniqueIngredients.get(i);
                 // compare the first stack to see if they are the same ingredient requirement
-                if (!existing.getValidContents().isEmpty() && existing.getValidContents().getFirst() == (ing.getValidContents().getFirst())) {
+                if (!existing.getValidContents().isEmpty() && ItemStack.isSameItem(existing.getValidContents().getFirst(), (ing.getValidContents().getFirst()))) {
                     amounts.set(i, amounts.get(i) + 1);
                     found = true;
                     break;

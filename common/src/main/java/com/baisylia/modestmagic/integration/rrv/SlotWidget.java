@@ -20,9 +20,6 @@ public class SlotWidget extends Widget {
 	private final int y;
 	private ItemStack stack;
 
-	private static final Identifier SLOT_HIGHLIGHT_BACK_SPRITE = Identifier.withDefaultNamespace("container/slot_highlight_back");
-	private static final Identifier SLOT_HIGHLIGHT_FRONT_SPRITE = Identifier.withDefaultNamespace("container/slot_highlight_front");
-
 	public SlotWidget(SlotContent ingredient, int x, int y, ReliableClientRecipe.RecipePosition recipePosition) {
 		this.ingredient = ingredient;
 		this.x = recipePosition.left() + x;
@@ -49,21 +46,13 @@ public class SlotWidget extends Widget {
 		return super.mouseClicked(event, doubleClick);
 	}
 
-	@Override
-	public boolean isMouseOver(double mouseX, double mouseY) {
-		return mouseX > x && mouseX < x + 16 && mouseY > y && mouseY < y + 16;
-	}
-
 	void renderItem(GuiGraphicsExtractor graphics, int mouseX, int mouseY, ItemStack current, int x, int y) {
 		if (isMouseOver(mouseX, mouseY)) {
 			Minecraft mc = Minecraft.getInstance();
-			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SLOT_HIGHLIGHT_BACK_SPRITE, x - 4, y - 4, 24, 24);
 			graphics.setComponentTooltipForNextFrame(mc.font, Screen.getTooltipFromItem(mc, current), mouseX, mouseY);
 		}
 		graphics.fakeItem(current, x, y);
-		if (isMouseOver(mouseX, mouseY)) {
-			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SLOT_HIGHLIGHT_FRONT_SPRITE, x - 4, y - 4, 24, 24);
-		}
+		graphics.itemDecorations(Minecraft.getInstance().font, current, x, y);
 	}
 
 	@Override
@@ -73,6 +62,6 @@ public class SlotWidget extends Widget {
 
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor draw, int mouseX, int mouseY, float delta) {
-		draw.fakeItem(stack, x, y);
+		renderItem(draw, mouseX, mouseY, stack, x, y);
 	}
 }

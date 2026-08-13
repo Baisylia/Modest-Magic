@@ -14,18 +14,15 @@ public abstract class Widget implements Renderable, GuiEventListener, Narratable
 
 	public abstract Bounds getBounds();
 
+	@Override
+	public boolean isMouseOver(double mouseX, double mouseY) {
+		return getBounds().contains((int) mouseX, (int) mouseY);
+	}
+
 	public abstract void extractRenderState(GuiGraphicsExtractor draw, int mouseX, int mouseY, float delta);
 
 	public List<ClientTooltipComponent> getTooltip(int mouseX, int mouseY) {
 		return List.of();
-	}
-
-	public boolean mouseClicked(int mouseX, int mouseY, int button) {
-		return false;
-	}
-
-	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		return false;
 	}
 
 	@Override

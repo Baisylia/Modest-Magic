@@ -8,13 +8,15 @@ public class RotatingSlotWidget extends SlotWidget {
     private final RotationState state;
     private final SlotContent ingredient;
     private final int index;
+	private final ReliableClientRecipe.RecipePosition recipePosition;
 
 	public RotatingSlotWidget(RotationState state, SlotContent ingredient, int index, ReliableClientRecipe.RecipePosition recipePosition) {
         super(ingredient, 0, 0, recipePosition);
         this.state = state;
         this.ingredient = ingredient;
         this.index = index;
-    }
+		this.recipePosition = recipePosition;
+	}
 
     private double getExactAngle() {
         return (360.0 / state.total) * index + state.getAngle() - 90.0;
@@ -30,7 +32,7 @@ public class RotatingSlotWidget extends SlotWidget {
 
     @Override
     public Bounds getBounds() {
-        return new Bounds((int) getExactDoubleX(), (int) getExactDoubleY(), 18, 18);
+        return new Bounds((int) getExactDoubleX() + recipePosition.left(), (int) getExactDoubleY() + recipePosition.top(), 18, 18);
     }
 
     @Override
