@@ -42,7 +42,11 @@ publishMods {
     curseforge {
         accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
         projectId = "534359"
+        minecraftVersions.add("26.1")
+        minecraftVersions.add("26.1.1")
         minecraftVersions.add("${minecraft_version}")
+        minecraftVersions.add("26.2")
+        minecraftVersions.add("26.3")
         client = true
         server = true
 
@@ -53,7 +57,11 @@ publishMods {
     modrinth {
         accessToken = providers.environmentVariable("MODRINTH_TOKEN")
         projectId = "sWRvoDiO"
+        minecraftVersions.add("26.1")
+        minecraftVersions.add("26.1.1")
         minecraftVersions.add("${minecraft_version}")
+        minecraftVersions.add("26.2")
+        minecraftVersions.add("26.3")
 
         optional("cloth-config")
         optional("rrv")
