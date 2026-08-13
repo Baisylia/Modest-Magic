@@ -4,6 +4,7 @@ import cc.cassian.rrv.api.recipe.ReliableClientRecipe;
 import cc.cassian.rrv.common.recipe.inventory.SlotContent;
 import com.baisylia.modestmagic.config.ModConfig;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 public class HoveringSlotWidget extends SlotWidget {
@@ -26,7 +27,7 @@ public class HoveringSlotWidget extends SlotWidget {
 
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(0, hover);
-        guiGraphics.fakeItem(this.ingredient.current(), this.getBounds().x(), this.getBounds().y());
+        renderItem(guiGraphics, mouseX, mouseY, this.ingredient.current(), this.getBounds().x(), this.getBounds().y());
         guiGraphics.pose().popMatrix();
     }
 }
