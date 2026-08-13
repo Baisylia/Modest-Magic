@@ -14,7 +14,6 @@ public class HoveringSlotWidget extends SlotWidget {
         super(ingredient, x, y, recipePosition);
         this.ingredient = ingredient;
         this.indexOffset = indexOffset;
-        this.drawBack(false);
     }
 
     @Override

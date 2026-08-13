@@ -14,7 +14,6 @@ public class RotatingSlotWidget extends SlotWidget {
         this.state = state;
         this.ingredient = ingredient;
         this.index = index;
-		this.drawBack(false);
     }
 
     private double getExactAngle() {

@@ -152,7 +152,7 @@ public class EnchantingClientRecipe extends AbstractModestMagicClientRecipe {
             circleItems = inputs;
         }
 
-        RotationState state = new RotationState(cx, cy, radius, circleItems.size());
+        RotationState state = new RotationState(cx, cy, radius, circleItems.size(), recipePosition);
 
         screen.addRecipeWidget(new RotatingLettersWidget(
                 Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/enchanted_letters.png"),

@@ -10,8 +10,6 @@ import com.baisylia.modestmagic.block.ModBlocks;
 import com.baisylia.modestmagic.recipe.custom.SummoningRecipe;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.screens.inventory.InventoryScreen;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.ProblemReporter;
@@ -106,7 +104,7 @@ public class SummoningClientRecipe extends AbstractModestMagicClientRecipe {
             circleItems = pedestalItems;
         }
 
-        RotationState state = new RotationState(cx, cy, radius, circleItems.size());
+        RotationState state = new RotationState(cx, cy, radius, circleItems.size(), recipePosition);
 
         screen.addRecipeWidget(new RotatingLettersWidget(
                 Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/enchanted_letters.png"),
