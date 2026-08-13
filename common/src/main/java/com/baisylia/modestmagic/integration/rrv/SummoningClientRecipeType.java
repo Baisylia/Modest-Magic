@@ -15,7 +15,7 @@ public class SummoningClientRecipeType extends AbstractModestMagicClientRecipeTy
 
 	@Override
 	public Component getDisplayName() {
-		return Component.translatable("recipe.modestmagic.enchanting");
+		return Component.translatable("recipe.modestmagic.summoning");
 	}
 
 

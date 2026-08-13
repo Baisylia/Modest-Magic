@@ -17,7 +17,6 @@ import java.util.List;
 
 public class InfusingClientRecipe extends AbstractModestMagicClientRecipe {
 
-    private static final Identifier BACKGROUND = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/rrv_background.png");
     private final Identifier id;
     private final SlotContent base;
     private final List<SlotContent> inputs;

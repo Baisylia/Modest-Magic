@@ -1,5 +1,6 @@
 package com.baisylia.modestmagic.integration.rrv;
 
+import cc.cassian.rrv.api.client.RecipeScreenContext;
 import cc.cassian.rrv.api.recipe.ReliableClientRecipeType;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewScreen;
@@ -27,7 +28,6 @@ import java.util.List;
 
 public class SummoningClientRecipe extends AbstractModestMagicClientRecipe {
 
-    private static final Identifier BACKGROUND = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/rrv_background.png");
     private final Identifier id;
     private final SlotContent base;
     private final List<SlotContent> inputs;
@@ -119,11 +119,21 @@ public class SummoningClientRecipe extends AbstractModestMagicClientRecipe {
 
 //        widgets.addTexture(EmiTexture.EMPTY_ARROW, cx + radius + 16, cy - 8);
 
-        int slotX = cx + radius - 4;
-        int slotY = cy - 24;
+
 
             initEntities();
 
+        screen.addRecipeWidget(new WheelListTooltipWidget(cx, cy, radius, circleItems, recipePosition));
+    }
+
+    @Override
+    public void renderRecipe(RecipeScreenContext context) {
+        super.renderRecipe(context);
+        int cx = 35;
+        int cy = getType().getDisplayHeight() / 2;
+        int radius = 24;
+        int slotX = cx + radius - 4;
+        int slotY = cy - 24;
         if (cachedEntities != null && !cachedEntities.isEmpty()) {
             int index = (int) ((System.currentTimeMillis() / 1500L) % cachedEntities.size());
             Entity currentEntity = cachedEntities.get(index);
@@ -134,8 +144,8 @@ public class SummoningClientRecipe extends AbstractModestMagicClientRecipe {
 
                 float centerX = slotX + 9;
                 float centerY = slotY + 18;
-                float lookX = centerX - mouseX;
-                float lookY = centerY - 10 - mouseY;
+                float lookX = centerX - context.mouseX();
+                float lookY = centerY - 10 - context.mouseY();
                 float f2 = (float) Math.atan(lookX / 40.0F);
                 float f3 = (float) Math.atan(lookY / 40.0F);
 
@@ -155,8 +165,13 @@ public class SummoningClientRecipe extends AbstractModestMagicClientRecipe {
                 living.yHeadRot = living.getYRot();
                 living.yHeadRotO = living.getYRot();
 
-                RrvGuiRenderHelper.renderEntityOnScreen(guiGraphics, living, recipePosition.left() + 67, recipePosition.top() + 2, recipePosition.left() + 67 + 28, recipePosition.top() + 2 + 28, scale, new Vector3f(0.0F, (28.0F / scale / 2.0F), 0.0F), new Quaternionf().rotationXYZ((float) Math.toRadians(180.0F), (partialTicks) / 180.0F * Mth.PI, 0.0F), null);
-
+                RrvGuiRenderHelper.renderEntityOnScreen(context.guiGraphics(), living,
+                        context.recipePosition().left() + 105, context.recipePosition().top() + 20,
+                        context.recipePosition().left() + 105 + 28, context.recipePosition().top() + 20 + 28,
+                        scale,
+                        new Vector3f(0.0F, (28.0F / scale / 2.0F), 0.0F),  // translation
+                        pose, // rotation
+                        null);
 
                 living.yBodyRot = yBodyRot;
                 living.setYRot(yRot);
@@ -165,7 +180,5 @@ public class SummoningClientRecipe extends AbstractModestMagicClientRecipe {
                 living.yHeadRot = yHeadRot;
             }
         }
-
-        screen.addRecipeWidget(new WheelListTooltipWidget(cx, cy, radius, circleItems, recipePosition));
     }
 }
