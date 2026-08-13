@@ -27,7 +27,6 @@ import org.jetbrains.annotations.Nullable;
 
 public class AltarBlock extends PedestalBlock {
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
-    public static final MapCodec<AltarBlock> CODEC = simpleCodec(AltarBlock::new);
 
     public AltarBlock(Properties properties) {
         super(properties);
@@ -89,9 +88,8 @@ public class AltarBlock extends PedestalBlock {
         return pedestalUse(level, pos, player, InteractionHand.MAIN_HAND, state, ModSounds.ADD_ITEM_ALTAR.get());
     }
 
-    @Override
-    protected @NotNull MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return null;
     }
 
     @Override

@@ -6,6 +6,7 @@ import com.baisylia.modestmagic.block.entity.custom.AltarBlockEntity;
 import com.baisylia.modestmagic.block.entity.custom.PedestalBlockEntity;
 import com.baisylia.modestmagic.client.ModestMagicClient;
 import com.baisylia.modestmagic.platform.services.IPlatformHelper;
+import com.google.common.collect.ImmutableMultimap;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.item.v1.EnchantingContext;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
@@ -14,13 +15,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeMap;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import java.nio.file.Path;
-import java.util.Set;
 
 public class FabricPlatformHelper implements IPlatformHelper {
     @Override
@@ -49,8 +49,14 @@ public class FabricPlatformHelper implements IPlatformHelper {
     }
 
     @Override
-    public RecipeMap getSynchronizedRecipeMap() {
-        return RecipeMap.create(Minecraft.getInstance().level.recipeAccess().getSynchronizedRecipes().recipes());
+    public ImmutableMultimap<RecipeType<?>, RecipeHolder<?>> getSynchronizedRecipeMap() {
+        ImmutableMultimap.Builder<RecipeType<?>, RecipeHolder<?>> byType = ImmutableMultimap.builder();
+
+        for(RecipeHolder<?> recipe : Minecraft.getInstance().level.recipeAccess().getSynchronizedRecipes().recipes()) {
+            byType.put(recipe.value().getType(), recipe);
+        }
+
+        return byType.build();
     }
 
     @Override

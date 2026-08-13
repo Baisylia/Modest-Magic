@@ -3,6 +3,7 @@ package com.baisylia.modestmagic.item.custom;
 import com.baisylia.modestmagic.config.ModConfig;
 import com.baisylia.modestmagic.platform.Services;
 import com.baisylia.modestmagic.recipe.custom.TabletSmithingRecipe;
+import com.google.common.collect.ImmutableMultimap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.locale.Language;
 import net.minecraft.util.Util;
@@ -18,6 +19,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeMap;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -98,9 +100,9 @@ public class TabletItem extends Item {
 
         try {
             if (Minecraft.getInstance().level != null) {
-                RecipeMap recipeManager = Services.PLATFORM.getSynchronizedRecipeMap();
+                ImmutableMultimap<RecipeType<?>, RecipeHolder<?>> recipeManager = Services.PLATFORM.getSynchronizedRecipeMap();
 
-                var recipes = recipeManager.byType(RecipeType.SMITHING);
+                var recipes = recipeManager.get(RecipeType.SMITHING);
                 ItemStack thisStack = new ItemStack(this);
 
                 for (var recipeHolder : recipes) {

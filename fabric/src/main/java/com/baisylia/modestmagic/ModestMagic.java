@@ -28,10 +28,6 @@ public class ModestMagic implements ModInitializer {
         RecipeSynchronization.synchronizeRecipeSerializer(ModRecipes.SUMMONING_SERIALIZER.get());
         RecipeSynchronization.synchronizeRecipeSerializer(ModRecipes.TABLET_SMITHING_SERIALIZER.get());
 
-        FuelValueEvents.BUILD.register((builder, context)->{
-            ModBlocks.FUEL_ITEMS.forEach((item, time) -> builder.add(item.get(), time));
-        });
-
         CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(entries -> {
             entries.accept(ModBlocks.ALTAR.get());
             entries.accept(ModBlocks.PEDESTAL.get());

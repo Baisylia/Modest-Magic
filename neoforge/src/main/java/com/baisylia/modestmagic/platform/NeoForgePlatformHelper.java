@@ -6,10 +6,13 @@ import com.baisylia.modestmagic.block.entity.custom.AltarBlockEntity;
 import com.baisylia.modestmagic.block.entity.custom.PedestalBlockEntity;
 import com.baisylia.modestmagic.events.ModestMagicClientEvents;
 import com.baisylia.modestmagic.platform.services.IPlatformHelper;
+import com.google.common.collect.ImmutableMultimap;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeMap;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.api.distmarker.Dist;
@@ -47,8 +50,14 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
     }
 
     @Override
-    public RecipeMap getSynchronizedRecipeMap() {
-        return ModestMagic.MAP;
+    public ImmutableMultimap<RecipeType<?>, RecipeHolder<?>> getSynchronizedRecipeMap() {
+        ImmutableMultimap.Builder<RecipeType<?>, RecipeHolder<?>> byType = ImmutableMultimap.builder();
+
+        for(RecipeHolder<?> recipe : ModestMagic.MAP.values()) {
+            byType.put(recipe.value().getType(), recipe);
+        }
+
+        return byType.build();
     }
 
     @Override

@@ -7,6 +7,8 @@ import com.baisylia.modestmagic.recipe.ModRecipes;
 import com.baisylia.modestmagic.recipe.custom.EnchantingRecipe;
 import com.baisylia.modestmagic.recipe.custom.InfusingRecipe;
 import com.baisylia.modestmagic.recipe.custom.SummoningRecipe;
+import com.google.common.collect.ImmutableMultimap;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
@@ -24,6 +26,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeMap;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
@@ -81,8 +84,8 @@ public class AltarBlockEntity extends PedestalBlockEntity {
             return false;
 
         // Infusing Recipe
-        for (RecipeHolder<InfusingRecipe> recipeHolder : getRecipeManager().byType(ModRecipes.INFUSING_TYPE.get())) {
-            InfusingRecipe recipe = recipeHolder.value();
+        for (RecipeHolder<?> recipeHolder : getRecipeManager().get(ModRecipes.INFUSING_TYPE.get())) {
+            InfusingRecipe recipe = (InfusingRecipe) recipeHolder.value();
             if (recipe.matches(this.getItem(), items)) {
                 if (!recipe.getResults().isEmpty()) {
                     if (!level.isClientSide()) {
@@ -102,8 +105,8 @@ public class AltarBlockEntity extends PedestalBlockEntity {
         }
 
         // Enchanting Recipe
-        for (RecipeHolder<EnchantingRecipe> recipeHolder : getRecipeManager().byType(ModRecipes.ENCHANTING_TYPE.get())) {
-            EnchantingRecipe recipe = recipeHolder.value();
+        for (RecipeHolder<?> recipeHolder : getRecipeManager().get(ModRecipes.ENCHANTING_TYPE.get())) {
+            EnchantingRecipe recipe = (EnchantingRecipe) recipeHolder.value();
             if (recipe.matches(items)) {
                 if (!recipe.getEnchantmentPools().isEmpty()) {
                     ItemEnchantments existingEnchants = this.getItem().getOrDefault(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY);
@@ -182,8 +185,8 @@ public class AltarBlockEntity extends PedestalBlockEntity {
         }
 
         // Summoning Recipe
-        for (RecipeHolder<SummoningRecipe> recipeHolder : getRecipeManager().byType(ModRecipes.SUMMONING_TYPE.get())) {
-            SummoningRecipe recipe = recipeHolder.value();
+        for (RecipeHolder<?> recipeHolder : getRecipeManager().get(ModRecipes.SUMMONING_TYPE.get())) {
+            SummoningRecipe recipe = (SummoningRecipe) recipeHolder.value();
             if (recipe.matches(this.getItem(), items)) {
                 if (!recipe.getOutcomes().isEmpty()) {
                     if (!level.isClientSide()) {
@@ -237,14 +240,20 @@ public class AltarBlockEntity extends PedestalBlockEntity {
         return false;
     }
 
-    static RecipeMap RECIPE_MAP;
+    static ImmutableMultimap<RecipeType<?>, RecipeHolder<?>> RECIPE_MAP;
 
-    private RecipeMap getRecipeManager() {
+    private ImmutableMultimap<RecipeType<?>, RecipeHolder<?>> getRecipeManager() {
         if (RECIPE_MAP != null) {
             return RECIPE_MAP;
         }
         if (level instanceof ServerLevel server) {
-            RECIPE_MAP = RecipeMap.create(server.recipeAccess().getRecipes());
+            ImmutableMultimap.Builder<RecipeType<?>, RecipeHolder<?>> byType = ImmutableMultimap.builder();
+
+            for(RecipeHolder<?> recipe : server.recipeAccess().getRecipes()) {
+                byType.put(recipe.value().getType(), recipe);
+            }
+
+            return byType.build();
         } else RECIPE_MAP = Services.PLATFORM.getSynchronizedRecipeMap();
         return RECIPE_MAP;
     }

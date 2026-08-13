@@ -27,8 +27,6 @@ public class ModBlocks {
     public static final IRegistryHelper.IRegistryProvider<Block> BLOCKS =
             Services.REGISTRIES.create(Registries.BLOCK, Constants.MOD_ID);
 
-    public static final Map<Supplier<Item>, Integer> FUEL_ITEMS = new HashMap<>();
-
     public static final Supplier<Block> ALTAR = registerBlock("altar",
             AltarBlock::new, (BlockBehaviour.Properties.ofFullCopy(Blocks.OBSIDIAN).noOcclusion()));
 

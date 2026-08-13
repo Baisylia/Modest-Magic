@@ -65,16 +65,6 @@ public class ModestMagic {
     }
 
     @SubscribeEvent
-    private static void onFuelBurnTime(FurnaceFuelBurnTimeEvent event) {
-        for (Map.Entry<Supplier<Item>, Integer> entry : ModBlocks.FUEL_ITEMS.entrySet()) {
-            if (event.getItemStack().is(entry.getKey().get())) {
-                event.setBurnTime(entry.getValue());
-                return;
-            }
-        }
-    }
-
-    @SubscribeEvent
     private static void addCreative(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
             event.accept(ModItems.STARDUST.get());

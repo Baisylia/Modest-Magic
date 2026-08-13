@@ -44,7 +44,6 @@ public class PedestalBlock extends BaseEntityBlock implements SimpleWaterloggedB
     public static final BooleanProperty TOP = BooleanProperty.create("top");
     public static final BooleanProperty BOTTOM = BooleanProperty.create("bottom");
     public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.AXIS;
-    public static final MapCodec<PedestalBlock> CODEC = simpleCodec(PedestalBlock::new);
 
     public PedestalBlock(Properties properties) {
         super(properties);
@@ -213,9 +212,8 @@ public class PedestalBlock extends BaseEntityBlock implements SimpleWaterloggedB
         return pedestalUse(level, pos, player, player.getUsedItemHand(), state, ModSounds.ADD_ITEM_PEDESTAL.get());
     }
 
-    @Override
     protected @NotNull MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
+        return null;
     }
 
     protected InteractionResult pedestalUse(Level level, BlockPos pos, Player player, InteractionHand hand, BlockState state, SoundEvent soundEvent) {
