@@ -4,17 +4,18 @@ import cc.cassian.rrv.api.recipe.ReliableClientRecipe;
 import cc.cassian.rrv.common.recipe.inventory.SlotContent;
 import com.baisylia.modestmagic.config.ModConfig;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 public class HoveringSlotWidget extends SlotWidget {
-    private final int indexOffset;
+	private final HoveringSlotWidget base;
+	private final int indexOffset;
     private final SlotContent ingredient;
 
-    public HoveringSlotWidget(SlotContent ingredient, int x, int y, int indexOffset, ReliableClientRecipe.RecipePosition recipePosition) {
+    public HoveringSlotWidget(SlotContent ingredient, HoveringSlotWidget base, int x, int y, int indexOffset, ReliableClientRecipe.RecipePosition recipePosition) {
         super(ingredient, x, y, recipePosition);
         this.ingredient = ingredient;
-        this.indexOffset = indexOffset;
+		this.base = base;
+		this.indexOffset = indexOffset;
     }
 
     @Override
@@ -27,7 +28,7 @@ public class HoveringSlotWidget extends SlotWidget {
 
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(0, hover);
-        renderItem(guiGraphics, mouseX, mouseY, this.ingredient.current(), this.getBounds().x(), this.getBounds().y());
+		renderItem(guiGraphics, mouseX, mouseY, this.ingredient, base != null ? base.ingredient : null, this.getBounds().x(), this.getBounds().y());
         guiGraphics.pose().popMatrix();
     }
 }

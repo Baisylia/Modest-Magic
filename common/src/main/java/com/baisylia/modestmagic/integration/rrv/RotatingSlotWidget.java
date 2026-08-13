@@ -44,7 +44,7 @@ public class RotatingSlotWidget extends SlotWidget {
 
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate((float) (exactX + 1), (float) (exactY + 1));
-        renderItem(guiGraphics, mouseX, mouseY, ingredient.current(), super.getBounds().x(), super.getBounds().y());
+        renderItem(guiGraphics, mouseX, mouseY, ingredient, null, super.getBounds().x(), super.getBounds().y());
         guiGraphics.pose().popMatrix();
     }
 }

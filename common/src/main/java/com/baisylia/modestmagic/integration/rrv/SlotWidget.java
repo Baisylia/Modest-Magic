@@ -9,15 +9,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.resources.Identifier;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.Nullable;
 
 public class SlotWidget extends Widget {
 	private final SlotContent ingredient;
 	private final int x;
 	private final int y;
+	private boolean initialized;
 	private ItemStack stack;
 
 	public SlotWidget(SlotContent ingredient, int x, int y, ReliableClientRecipe.RecipePosition recipePosition) {
@@ -25,6 +25,7 @@ public class SlotWidget extends Widget {
 		this.x = recipePosition.left() + x;
 		this.y = recipePosition.top() + y;
 		this.stack = ingredient.getValidContents().getFirst();
+		this.initialized = false;
 	}
 
 	@Override
@@ -46,13 +47,30 @@ public class SlotWidget extends Widget {
 		return super.mouseClicked(event, doubleClick);
 	}
 
-	void renderItem(GuiGraphicsExtractor graphics, int mouseX, int mouseY, ItemStack current, int x, int y) {
+	void renderItem(GuiGraphicsExtractor graphics, int mouseX, int mouseY, SlotContent current, @Nullable SlotContent base, int x, int y) {
+		ClientLevel level = Minecraft.getInstance().level;
+		if (level != null) {
+			long gameTime = level.getGameTime();
+			int i = 20; // change every second
+			long l = gameTime % i;
+
+			if (!initialized || (l == 0 && (gameTime-lastChanged > i))) {
+				lastChanged = gameTime;
+				if (base != null) {
+					this.stack = current.getByIndex(current.getNextMatching(base.current()));
+				} else {
+					this.stack = current.next();
+				}
+				initialized = true;
+			}
+		}
+
 		if (isMouseOver(mouseX, mouseY)) {
 			Minecraft mc = Minecraft.getInstance();
-			graphics.setComponentTooltipForNextFrame(mc.font, Screen.getTooltipFromItem(mc, current), mouseX, mouseY);
+			graphics.setComponentTooltipForNextFrame(mc.font, Screen.getTooltipFromItem(mc, stack), mouseX, mouseY);
 		}
-		graphics.fakeItem(current, x, y);
-		graphics.itemDecorations(Minecraft.getInstance().font, current, x, y);
+		graphics.fakeItem(stack, x, y);
+		graphics.itemDecorations(Minecraft.getInstance().font, stack, x, y);
 	}
 
 	@Override
@@ -60,8 +78,11 @@ public class SlotWidget extends Widget {
 		return new Bounds(x,y,18,18);
 	}
 
+	int index = 0;
+	long lastChanged = 0;
+
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor draw, int mouseX, int mouseY, float delta) {
-		renderItem(draw, mouseX, mouseY, stack, x, y);
+		renderItem(draw, mouseX, mouseY, ingredient, null, x, y);
 	}
 }

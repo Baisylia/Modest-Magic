@@ -12,7 +12,6 @@ import com.baisylia.modestmagic.recipe.custom.SummoningRecipe;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.Mth;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
@@ -111,7 +110,7 @@ public class SummoningClientRecipe extends AbstractModestMagicClientRecipe {
                 cx, cy, radius + 6, recipePosition
         ));
 
-        screen.addRecipeWidget(new HoveringSlotWidget(base, cx - 9, cy - 9, 0, recipePosition));
+        screen.addRecipeWidget(new HoveringSlotWidget(base, null, cx - 9, cy - 9, 0, recipePosition));
 
         for (int i = 0; i < circleItems.size(); i++) {
             screen.addRecipeWidget(new RotatingSlotWidget(state, circleItems.get(i), i + 1, recipePosition));

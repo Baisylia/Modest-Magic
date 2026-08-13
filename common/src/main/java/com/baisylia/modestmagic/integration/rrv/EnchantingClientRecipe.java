@@ -160,7 +160,8 @@ public class EnchantingClientRecipe extends AbstractModestMagicClientRecipe {
                 cx, cy, radius + 6,
                 recipePosition));
 
-        screen.addRecipeWidget(new HoveringSlotWidget(baseIngredient, cx - 9, cy - 9, 0, recipePosition));
+        HoveringSlotWidget base = new HoveringSlotWidget(baseIngredient, null, cx - 9, cy - 9, 0, recipePosition);
+        screen.addRecipeWidget(base);
 
         for (int i = 0; i < circleItems.size(); i++) {
             screen.addRecipeWidget(new RotatingSlotWidget(state, circleItems.get(i), i + 1, recipePosition));
@@ -168,7 +169,7 @@ public class EnchantingClientRecipe extends AbstractModestMagicClientRecipe {
 
         // Arrow and cycling enchanted item
 //        widgets.addTexture(EmiTexture.EMPTY_ARROW, cx + radius + 16, cy - 8);
-        screen.addRecipeWidget(new HoveringSlotWidget(SlotContent.of(outputs), cx + radius + 51, cy - 9, 2, recipePosition));
+        screen.addRecipeWidget(new HoveringSlotWidget(SlotContent.of(outputs), base, cx + radius + 51, cy - 9, 2, recipePosition));
 
         screen.addRecipeWidget(new WheelListTooltipWidget(cx, cy, radius, circleItems, recipePosition));
     }
