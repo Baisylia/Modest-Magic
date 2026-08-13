@@ -120,7 +120,7 @@ public class AltarBlockEntity extends PedestalBlockEntity {
                             Holder<Enchantment> enchantHolder = opt.get();
                             Enchantment enchantment = enchantHolder.value();
 
-                            if (!enchantment.canEnchant(this.getItem())) continue;
+                            if (!Services.PLATFORM.isPrimaryEnchantItem(this.getItem(), enchantHolder)) continue;
 
                             boolean incompatible = false;
                             for (Holder<Enchantment> e : existingEnchants.keySet()) {
@@ -154,7 +154,7 @@ public class AltarBlockEntity extends PedestalBlockEntity {
                             Holder<Enchantment> enchantHolder = opt.get();
                             Enchantment enchantment = enchantHolder.value();
 
-                            if (!enchantment.canEnchant(this.getItem())) continue;
+                            if (!Services.PLATFORM.isPrimaryEnchantItem(this.getItem(), enchantHolder)) continue;
 
                             boolean incompatible = false;
                             for (Holder<Enchantment> e : existingEnchants.keySet()) {

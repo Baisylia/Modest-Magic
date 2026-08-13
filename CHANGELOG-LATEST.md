@@ -1,3 +1,4 @@
 ### Fixed
 
-- Renamed `minecraft:sweeping` to `minecraft:sweeping_edge`.
+- Adjusted default enchantment compatibility.
+- Fixed auto-generated tooltip not working for certain enchantments.

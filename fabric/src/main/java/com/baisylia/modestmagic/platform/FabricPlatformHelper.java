@@ -68,4 +68,7 @@ public class FabricPlatformHelper implements IPlatformHelper {
         }
     }
 
+    public boolean isPrimaryEnchantItem(ItemStack stack, Holder<Enchantment> enchantment) {
+        return stack.getItem().canBeEnchantedWith(stack, enchantment, EnchantingContext.PRIMARY);
+    }
 }

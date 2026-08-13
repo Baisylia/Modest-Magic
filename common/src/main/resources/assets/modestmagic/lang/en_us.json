@@ -40,5 +40,6 @@
   "config.modestmagic.title": "Modest Magic Config",
   "config.modestmagic.category.general": "General",
   "config.modestmagic.option.throwItemsOnPedestals": "Throw Items on Pedestals",
-  "config.modestmagic.option.reducedEmiMotion": "Reduced EMI Motion"
+  "config.modestmagic.option.reducedEmiMotion": "Reduced EMI Motion",
+  "config.modestmagic.option.showTabletTooltips": "Show Tablet Tooltips"
 }

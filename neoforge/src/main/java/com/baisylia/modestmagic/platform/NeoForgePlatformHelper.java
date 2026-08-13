@@ -66,4 +66,9 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
             return ModestMagicClientEvents.getRegistryAccess();
         }
     }
+
+    @Override
+    public boolean isPrimaryEnchantItem(ItemStack stack, Holder<Enchantment> enchantment) {
+        return stack.getItem().isPrimaryItemFor(stack, enchantment);
+    }
 }

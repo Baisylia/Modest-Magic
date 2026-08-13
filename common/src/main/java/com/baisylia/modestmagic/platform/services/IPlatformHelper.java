@@ -62,4 +62,12 @@ public interface IPlatformHelper {
     BlockEntityType<PedestalBlockEntity> createPedestal();
 
 	HolderGetter.Provider registryAccess();
+    /**
+     * Checks whether an item is a "primary" candidate for an enchantment.
+     *
+     * @param stack       The item stack to check.
+     * @param enchantment The enchantment to check.
+     * @return True if the item should be considered a primary candidate for the enchantment.
+     */
+    boolean isPrimaryEnchantItem(ItemStack stack, Holder<Enchantment> enchantment);
 }

@@ -1,6 +1,7 @@
 package com.baisylia.modestmagic.item;
 
 import com.baisylia.modestmagic.Constants;
+import com.baisylia.modestmagic.item.custom.TabletItem;
 import com.baisylia.modestmagic.platform.Services;
 import com.baisylia.modestmagic.platform.services.IRegistryHelper;
 import net.minecraft.core.Registry;
@@ -24,42 +25,42 @@ public class ModItems {
             Item::new, (new Item.Properties()));
 
     public static final Supplier<Item> ENCHANTMENT_TABLET_AQUATIC = registerItem("enchantment_tablet_aquatic",
-            Item::new, (foiledProps()));
+            TabletItem::new, (foiledProps()));
     public static final Supplier<Item> ENCHANTMENT_TABLET_CYCLIC = registerItem("enchantment_tablet_cyclic",
-            Item::new, (foiledProps()));
+            TabletItem::new, (foiledProps()));
     public static final Supplier<Item> ENCHANTMENT_TABLET_EVERLASTING = registerItem("enchantment_tablet_everlasting",
-            Item::new, (foiledProps()));
+            TabletItem::new, (foiledProps()));
 
     public static final Supplier<Item> ENCHANTMENT_TABLET_FLINGING = registerItem("enchantment_tablet_flinging",
-            Item::new, (foiledProps()));
+            TabletItem::new, (foiledProps()));
     public static final Supplier<Item> ENCHANTMENT_TABLET_GLACIAL = registerItem("enchantment_tablet_glacial",
-            Item::new, (foiledProps()));
+            TabletItem::new, (foiledProps()));
     public static final Supplier<Item> ENCHANTMENT_TABLET_HALLOWED = registerItem("enchantment_tablet_hallowed",
-            Item::new, (foiledProps()));
+            TabletItem::new, (foiledProps()));
     public static final Supplier<Item> ENCHANTMENT_TABLET_HAUNTED = registerItem("enchantment_tablet_haunted",
-            Item::new, (foiledProps()));
+            TabletItem::new, (foiledProps()));
     public static final Supplier<Item> ENCHANTMENT_TABLET_HEAVY = registerItem("enchantment_tablet_heavy",
-            Item::new, (foiledProps()));
+            TabletItem::new, (foiledProps()));
     public static final Supplier<Item> ENCHANTMENT_TABLET_INFESTED = registerItem("enchantment_tablet_infested",
-            Item::new, (foiledProps()));
+            TabletItem::new, (foiledProps()));
     public static final Supplier<Item> ENCHANTMENT_TABLET_RECOLLECTION = registerItem("enchantment_tablet_recollection",
-            Item::new, (foiledProps()));
+            TabletItem::new, (foiledProps()));
     public static final Supplier<Item> ENCHANTMENT_TABLET_SWIFT = registerItem("enchantment_tablet_swift",
-            Item::new, (foiledProps()));
+            TabletItem::new, (foiledProps()));
     public static final Supplier<Item> ENCHANTMENT_TABLET_FIERY = registerItem("enchantment_tablet_fiery",
-            Item::new, (foiledProps()));
+            TabletItem::new, (foiledProps()));
     public static final Supplier<Item> ENCHANTMENT_TABLET_LIGHT = registerItem("enchantment_tablet_light",
-            Item::new, (foiledProps()));
+            TabletItem::new, (foiledProps()));
     public static final Supplier<Item> ENCHANTMENT_TABLET_LUCKY = registerItem("enchantment_tablet_lucky",
-            Item::new, (foiledProps()));
+            TabletItem::new, (foiledProps()));
     public static final Supplier<Item> ENCHANTMENT_TABLET_SERRATED = registerItem("enchantment_tablet_serrated",
-            Item::new, (foiledProps()));
+            TabletItem::new, (foiledProps()));
     public static final Supplier<Item> ENCHANTMENT_TABLET_PUNCTURING = registerItem("enchantment_tablet_puncturing",
-            Item::new, (foiledProps()));
+            TabletItem::new, (foiledProps()));
     public static final Supplier<Item> ENCHANTMENT_TABLET_ENDURING = registerItem("enchantment_tablet_enduring",
-            Item::new, (foiledProps()));
+            TabletItem::new, (foiledProps()));
     public static final Supplier<Item> ENCHANTMENT_TABLET_SECURE = registerItem("enchantment_tablet_secure",
-            Item::new, (foiledProps()));
+            TabletItem::new, (foiledProps()));
 
     private static Item.Properties foiledProps() {
         return new Item.Properties().component(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
