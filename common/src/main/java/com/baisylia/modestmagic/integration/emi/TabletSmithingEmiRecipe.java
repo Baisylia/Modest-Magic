@@ -26,12 +26,14 @@ public class TabletSmithingEmiRecipe implements EmiRecipe {
     private final ResourceLocation id;
     private final EmiIngredient template;
     private final EmiStack base;
+    private final EmiIngredient addition;
     private final EmiStack output;
 
     public TabletSmithingEmiRecipe(RecipeHolder<TabletSmithingRecipe> recipeHolder, ItemStack baseStack, List<Holder<Enchantment>> resolvedEnchants) {
         TabletSmithingRecipe recipe = recipeHolder.value();
         this.template = EmiIngredient.of(recipe.template());
         this.base = EmiStack.of(baseStack);
+        this.addition = EmiIngredient.of(recipe.addition());
 
         ResourceLocation baseId = BuiltInRegistries.ITEM.getKey(baseStack.getItem());
         this.id = ResourceLocation.fromNamespaceAndPath(
@@ -66,7 +68,7 @@ public class TabletSmithingEmiRecipe implements EmiRecipe {
 
     @Override
     public List<EmiIngredient> getInputs() {
-        return List.of(template, base, EmiStack.EMPTY);
+        return List.of(template, base, addition);
     }
 
     @Override
@@ -93,7 +95,7 @@ public class TabletSmithingEmiRecipe implements EmiRecipe {
     public void addWidgets(WidgetHolder widgets) {
         widgets.addSlot(template, 0, 0);
         widgets.addSlot(base, 18, 0);
-        widgets.addSlot(EmiStack.EMPTY, 36, 0);
+        widgets.addSlot(addition, 36, 0);
         widgets.addTexture(EmiTexture.EMPTY_ARROW, 62, 1);
         widgets.addSlot(output, 94, 0).recipeContext(this);
     }
