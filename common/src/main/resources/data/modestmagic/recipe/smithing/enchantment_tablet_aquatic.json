@@ -1,10 +1,10 @@
-{
+﻿{
   "type": "modestmagic:tablet_smithing",
   "template": {
     "item": "modestmagic:enchantment_tablet_aquatic"
   },
   "base": {
-    "tag": "minecraft:enchantable/durability"
+    "tag": "modestmagic:enchantable/tablets"
   },
   "enchantments": [
     "minecraft:aqua_affinity",

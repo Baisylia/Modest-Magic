@@ -1,4 +1,4 @@
-### Fixed
+### Changed
 
-- Adjusted default enchantment compatibility.
-- Fixed auto-generated tooltip not working for certain enchantments.
+- Added `#modestmagic:enchantable/tablet` for items that can be enchanted with tablets in the smithing table (fixes
+  issues with Enderscape mirrors).
