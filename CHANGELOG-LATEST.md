@@ -1,4 +1,3 @@
-### Changed
+### Added
 
-- Added `#modestmagic:enchantable/tablet` for items that can be enchanted with tablets in the smithing table (fixes
-  issues with Enderscape mirrors).
+- Added optional "addition" field for tablet smithing (@Xaidee).
