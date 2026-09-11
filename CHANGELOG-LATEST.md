@@ -1,3 +1,3 @@
-### Added
+### Changed
 
-- Added optional "addition" field for tablet smithing (@Xaidee).
+- Tablet tooltips are now controlled by `#modestmagic:tablets` (should make adding custom tablet items simpler).

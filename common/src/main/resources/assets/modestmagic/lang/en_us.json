@@ -43,5 +43,6 @@
   "config.modestmagic.option.reducedEmiMotion": "Reduced EMI Motion",
   "config.modestmagic.option.showTabletTooltips": "Show Tablet Tooltips",
 
-  "tag.modestmagic.enchantable.tablets": "Tablet Enchantable"
+  "tag.modestmagic.enchantable.tablets": "Tablet Enchantable",
+  "tag.modestmagic.tablets": "Tablets"
 }
