@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.item.v1.EnchantingContext;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Holder;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 
 import java.nio.file.Path;
@@ -38,6 +39,6 @@ public class FabricPlatformHelper implements IPlatformHelper {
 
     @Override
     public boolean isPrimaryEnchantItem(ItemStack stack, Holder<Enchantment> enchantment) {
-        return stack.getItem().canBeEnchantedWith(stack, enchantment, EnchantingContext.PRIMARY);
+        return stack.is(Items.BOOK) || stack.getItem().canBeEnchantedWith(stack, enchantment, EnchantingContext.PRIMARY);
     }
 }

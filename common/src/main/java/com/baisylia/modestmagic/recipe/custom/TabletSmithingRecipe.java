@@ -7,13 +7,13 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.SmithingRecipe;
@@ -70,9 +70,12 @@ public record TabletSmithingRecipe(Ingredient template, Ingredient base, Ingredi
     public @NotNull ItemStack assemble(SmithingRecipeInput inv, @NotNull HolderLookup.Provider registries) {
         ItemStack itemstack = inv.base().copy();
         if (itemstack.isEmpty()) return ItemStack.EMPTY;
+        if (itemstack.is(Items.BOOK)) {
+            itemstack = new ItemStack(Items.ENCHANTED_BOOK, itemstack.getCount());
+        }
 
         var enchantRegistry = registries.lookupOrThrow(Registries.ENCHANTMENT);
-        ItemEnchantments existing = itemstack.getOrDefault(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY);
+        ItemEnchantments existing = EnchantmentHelper.getEnchantmentsForCrafting(itemstack);
         ItemEnchantments.Mutable mutable = new ItemEnchantments.Mutable(existing);
 
         boolean itemEnchanted = false;
@@ -83,7 +86,7 @@ public record TabletSmithingRecipe(Ingredient template, Ingredient base, Ingredi
             Holder<Enchantment> enchantHolder = opt.get();
             Enchantment enchantment = enchantHolder.value();
 
-            if (Services.PLATFORM.isPrimaryEnchantItem(itemstack, enchantHolder) && areEnchantsCompatible(existing, enchantHolder)) {
+            if ((Services.PLATFORM.isPrimaryEnchantItem(itemstack, enchantHolder) || itemstack.is(Items.ENCHANTED_BOOK)) && areEnchantsCompatible(existing, enchantHolder)) {
                 int currentLevel = mutable.getLevel(enchantHolder);
                 int targetLevel = currentLevel + 1;
                 if (targetLevel <= enchantment.getMaxLevel()) {

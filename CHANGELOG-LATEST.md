@@ -1,3 +1,3 @@
-### Changed
+### Fixed
 
-- Tablet tooltips are now controlled by `#modestmagic:tablets` (should make adding custom tablet items simpler).
+- Fixed `modestmagic:enchanting` outputting books instead of enchanted books.
