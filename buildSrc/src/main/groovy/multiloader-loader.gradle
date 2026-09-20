@@ -46,6 +46,7 @@ publishMods {
         minecraftVersions.add("26.1.1")
         minecraftVersions.add("${minecraft_version}")
         minecraftVersions.add("26.2")
+        minecraftVersions.add("26.3")
         client = true
         server = true
 
@@ -60,8 +61,7 @@ publishMods {
         minecraftVersions.add("26.1.1")
         minecraftVersions.add("${minecraft_version}")
         minecraftVersions.add("26.2")
-        minecraftVersions.add("26.3-snapshot-7")
-        minecraftVersions.add("26.3-snapshot-8")
+        minecraftVersions.add("26.3")
 
         optional("cloth-config")
         optional("rrv")

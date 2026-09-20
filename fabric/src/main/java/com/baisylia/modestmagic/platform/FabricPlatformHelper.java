@@ -15,6 +15,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -52,7 +53,7 @@ public class FabricPlatformHelper implements IPlatformHelper {
     public ImmutableMultimap<RecipeType<?>, RecipeHolder<?>> getSynchronizedRecipeMap() {
         ImmutableMultimap.Builder<RecipeType<?>, RecipeHolder<?>> byType = ImmutableMultimap.builder();
 
-        for(RecipeHolder<?> recipe : Minecraft.getInstance().level.recipeAccess().getSynchronizedRecipes().recipes()) {
+        for (RecipeHolder<?> recipe : Minecraft.getInstance().level.recipeAccess().getSynchronizedRecipes().recipes()) {
             byType.put(recipe.value().getType(), recipe);
         }
 
@@ -78,7 +79,8 @@ public class FabricPlatformHelper implements IPlatformHelper {
         }
     }
 
+    @Override
     public boolean isPrimaryEnchantItem(ItemStack stack, Holder<Enchantment> enchantment) {
-        return stack.getItem().canBeEnchantedWith(stack, enchantment, EnchantingContext.PRIMARY);
+        return stack.is(Items.BOOK) || stack.getItem().canBeEnchantedWith(stack, enchantment, EnchantingContext.PRIMARY);
     }
 }

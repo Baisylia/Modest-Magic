@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "#minecraft:enchantable/durability",
+    {
+      "id": "#enderscape:enchantable/mirror",
+      "required": false
+    }
+  ]
+}

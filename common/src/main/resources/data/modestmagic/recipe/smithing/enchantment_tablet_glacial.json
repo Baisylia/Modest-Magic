@@ -1,7 +1,7 @@
 {
   "type": "modestmagic:tablet_smithing",
   "template": "modestmagic:enchantment_tablet_glacial",
-  "base": "#minecraft:enchantable/durability",
+  "base": "#modestmagic:enchantable/tablets",
   "enchantments": [
     "minecraft:respiration",
     "minecraft:frost_walker"

@@ -1,7 +1,7 @@
 {
   "type": "modestmagic:tablet_smithing",
   "template": "modestmagic:enchantment_tablet_heavy",
-  "base": "#minecraft:enchantable/durability",
+  "base": "#modestmagic:enchantable/tablets",
   "enchantments": [
     "minecraft:blast_protection",
     "minecraft:density"

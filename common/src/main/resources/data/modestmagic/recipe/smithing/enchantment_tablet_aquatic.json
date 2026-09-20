@@ -1,7 +1,7 @@
 {
   "type": "modestmagic:tablet_smithing",
   "template": "modestmagic:enchantment_tablet_aquatic",
-  "base": "#minecraft:enchantable/durability",
+  "base": "#modestmagic:enchantable/tablets",
   "enchantments": [
     "minecraft:aqua_affinity",
     "minecraft:depth_strider",

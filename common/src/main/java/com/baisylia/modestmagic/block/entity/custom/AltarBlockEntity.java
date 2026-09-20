@@ -24,6 +24,7 @@ import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeMap;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -109,7 +110,7 @@ public class AltarBlockEntity extends PedestalBlockEntity {
             EnchantingRecipe recipe = (EnchantingRecipe) recipeHolder.value();
             if (recipe.matches(items)) {
                 if (!recipe.getEnchantmentPools().isEmpty()) {
-                    ItemEnchantments existingEnchants = this.getItem().getOrDefault(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY);
+                    ItemEnchantments existingEnchants = EnchantmentHelper.getEnchantmentsForCrafting(this.getItem());
                     ItemEnchantments.Mutable mutable = new ItemEnchantments.Mutable(existingEnchants);
                     boolean appliedAny = false;
 
@@ -123,7 +124,8 @@ public class AltarBlockEntity extends PedestalBlockEntity {
                             Holder<Enchantment> enchantHolder = opt.get();
                             Enchantment enchantment = enchantHolder.value();
 
-                            if (!Services.PLATFORM.isPrimaryEnchantItem(this.getItem(), enchantHolder)) continue;
+                            if (!Services.PLATFORM.isPrimaryEnchantItem(this.getItem(), enchantHolder) && !this.getItem().is(Items.BOOK) && !this.getItem().is(Items.ENCHANTED_BOOK))
+                                continue;
 
                             boolean incompatible = false;
                             for (Holder<Enchantment> e : existingEnchants.keySet()) {
@@ -157,7 +159,8 @@ public class AltarBlockEntity extends PedestalBlockEntity {
                             Holder<Enchantment> enchantHolder = opt.get();
                             Enchantment enchantment = enchantHolder.value();
 
-                            if (!Services.PLATFORM.isPrimaryEnchantItem(this.getItem(), enchantHolder)) continue;
+                            if (!Services.PLATFORM.isPrimaryEnchantItem(this.getItem(), enchantHolder) && !this.getItem().is(Items.BOOK) && !this.getItem().is(Items.ENCHANTED_BOOK))
+                                continue;
 
                             boolean incompatible = false;
                             for (Holder<Enchantment> e : existingEnchants.keySet()) {
@@ -176,7 +179,12 @@ public class AltarBlockEntity extends PedestalBlockEntity {
                             }
                         }
 
-                        EnchantmentHelper.setEnchantments(this.getItem(), mutable.toImmutable());
+                        ItemStack result = this.getItem().copy();
+                        if (result.is(Items.BOOK)) {
+                            result = new ItemStack(Items.ENCHANTED_BOOK, result.getCount());
+                        }
+                        EnchantmentHelper.setEnchantments(result, mutable.toImmutable());
+                        this.setItem(result);
                         enchantEffects(pedestals, ParticleTypes.SOUL_FIRE_FLAME, ModSounds.ALTAR_ENCHANT.get());
                     }
                     return true;

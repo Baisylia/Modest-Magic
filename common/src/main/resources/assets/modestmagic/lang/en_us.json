@@ -63,5 +63,8 @@
   "tag.minecraft.enchantable.sword": "Enchantable Swords",
   "tag.minecraft.enchantable.trident": "Enchantable Tridents",
   "tag.minecraft.enchantable.vanishing": "Vanishing Enchantable",
-  "tag.minecraft.enchantable.weapon": "Enchantable Weapons"
+  "tag.minecraft.enchantable.weapon": "Enchantable Weapons",
+
+  "tag.modestmagic.enchantable.tablets": "Tablet Enchantable",
+  "tag.modestmagic.tablets": "Tablets"
 }

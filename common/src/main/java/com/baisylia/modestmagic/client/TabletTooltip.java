@@ -1,60 +1,49 @@
-package com.baisylia.modestmagic.item.custom;
+package com.baisylia.modestmagic.client;
 
 import com.baisylia.modestmagic.config.ModConfig;
 import com.baisylia.modestmagic.platform.Services;
 import com.baisylia.modestmagic.recipe.custom.TabletSmithingRecipe;
-import com.google.common.collect.ImmutableMultimap;
+import com.baisylia.modestmagic.tag.ModTags;
 import net.minecraft.ChatFormatting;
-import net.minecraft.locale.Language;
-import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.Util;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.RecipeManager;
-import net.minecraft.world.item.crafting.RecipeMap;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.enchantment.Enchantment;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.*;
 
-public class TabletItem extends Item {
-    private List<ResourceKey<Enchantment>> cachedEnchantments = null;
+public class TabletTooltip {
 
-    public TabletItem(Properties properties) {
-        super(properties);
+    private static final Map<Item, List<ResourceKey<Enchantment>>> CACHED_ENCHANTMENTS = new HashMap<>();
+
+    public static boolean isTablet(@NotNull ItemStack stack) {
+        return stack.is(ModTags.Items.TABLETS);
     }
 
-    /**
-     * Helper to convert integer levels into Roman Numerals.
-     */
     private static String toRoman(int number) {
         String[] numerals = {"", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"};
         return (number >= 0 && number <= 10) ? numerals[number] : String.valueOf(number);
     }
 
-    @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
-        super.appendHoverText(stack, context, display, tooltip, flag);
+    public static void appendHoverText(@NotNull ItemStack stack, @NotNull Item.TooltipContext context, @NotNull List<Component> tooltip, @NotNull TooltipFlag flag) {
         if (!ModConfig.get().showTabletTooltips) return;
-
+        if (!isTablet(stack)) return;
         if (context.registries() == null) return;
 
-        List<ResourceKey<Enchantment>> enchantments = getEnchantments();
-        if (enchantments == null || enchantments.isEmpty()) return;
+        List<ResourceKey<Enchantment>> enchantments = getEnchantments(stack);
+        if (enchantments.isEmpty()) return;
 
         var registry = context.registries().lookupOrThrow(Registries.ENCHANTMENT);
         boolean isShiftDown = Minecraft.getInstance().hasShiftDown();
@@ -67,66 +56,59 @@ public class TabletItem extends Item {
             MutableComponent name = Component.translatable(Util.makeDescriptionId("enchantment", key.identifier()));
 
             if (!isShiftDown) {
-                tooltip.accept(name.withStyle(ChatFormatting.GRAY));
+                tooltip.add(name.withStyle(ChatFormatting.GRAY));
             } else {
-                tooltip.accept(name.withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.UNDERLINE));
+                tooltip.add(name.withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.UNDERLINE));
 
                 Component maxLevelValue = Component.literal(toRoman(enchantment.getMaxLevel())).withStyle(ChatFormatting.GRAY);
-                tooltip.accept(Component.literal("Max. Level: ").withStyle(ChatFormatting.DARK_GRAY).append(maxLevelValue));
+                tooltip.add(Component.literal("Max. Level: ").withStyle(ChatFormatting.DARK_GRAY).append(maxLevelValue));
 
                 Component appliedToValue = getAppliedTo(enchantment).copy().withStyle(ChatFormatting.GRAY);
-                tooltip.accept(Component.literal("Applied to: ").withStyle(ChatFormatting.DARK_GRAY).append(appliedToValue));
+                tooltip.add(Component.literal("Applied to: ").withStyle(ChatFormatting.DARK_GRAY).append(appliedToValue));
 
                 String namespace = key.identifier().getNamespace();
                 String path = key.identifier().getPath();
                 String primaryDescKey = "enchantment." + namespace + "." + path + ".description";
                 String fallbackDescKey = "enchantment." + namespace + "." + path + ".desc";
 
-				if (Language.getInstance().has(primaryDescKey)) tooltip.accept(Component.translatable(primaryDescKey).withStyle(ChatFormatting.DARK_GRAY));
-				else if (Language.getInstance().has(fallbackDescKey)) tooltip.accept(Component.translatable(fallbackDescKey).withStyle(ChatFormatting.DARK_GRAY));
+                if (Language.getInstance().has(primaryDescKey)) {
+                    tooltip.add(Component.translatable(primaryDescKey).withStyle(ChatFormatting.DARK_GRAY));
+                } else if (Language.getInstance().has(fallbackDescKey)) {
+                    tooltip.add(Component.translatable(fallbackDescKey).withStyle(ChatFormatting.DARK_GRAY));
+                }
             }
         }
     }
 
-    /**
-     * Fetches the enchantments from the RecipeManager based on this specific Tablet item.
-     */
-    private List<ResourceKey<Enchantment>> getEnchantments() {
-        if (cachedEnchantments != null) {
-            return cachedEnchantments;
+    public static List<ResourceKey<Enchantment>> getEnchantments(@NotNull ItemStack stack) {
+        if (Minecraft.getInstance().level == null) {
+            return Collections.emptyList();
         }
 
-        cachedEnchantments = new ArrayList<>();
+        return CACHED_ENCHANTMENTS.computeIfAbsent(stack.getItem(), item -> {
+            List<ResourceKey<Enchantment>> enchantments = new ArrayList<>();
+            try {
+                var recipes = Services.PLATFORM.getSynchronizedRecipeMap().get(RecipeType.SMITHING);
+                ItemStack testStack = new ItemStack(item);
 
-        try {
-            if (Minecraft.getInstance().level != null) {
-                ImmutableMultimap<RecipeType<?>, RecipeHolder<?>> recipeManager = Services.PLATFORM.getSynchronizedRecipeMap();
-
-                var recipes = recipeManager.get(RecipeType.SMITHING);
-                ItemStack thisStack = new ItemStack(this);
-
-                for (var recipeHolder : recipes) {
+                for (RecipeHolder<?> recipeHolder : recipes) {
                     if (recipeHolder.value() instanceof TabletSmithingRecipe tabletRecipe) {
-                        if (tabletRecipe.template().test(thisStack)) {
+                        if (tabletRecipe.template().test(testStack)) {
                             for (ResourceKey<Enchantment> key : tabletRecipe.enchantments()) {
-                                if (!cachedEnchantments.contains(key)) {
-                                    cachedEnchantments.add(key);
+                                if (!enchantments.contains(key)) {
+                                    enchantments.add(key);
                                 }
                             }
                         }
                     }
                 }
+            } catch (Exception ignored) {
             }
-        } catch (Exception ignored) {
-        }
-
-        return cachedEnchantments;
+            return enchantments;
+        });
     }
 
-    /**
-     * Converts the item tag into its localized component.
-     */
-    private Component getAppliedTo(Enchantment enchantment) {
+    private static Component getAppliedTo(Enchantment enchantment) {
         Optional<TagKey<Item>> tagOpt = enchantment.getSupportedItems().unwrapKey();
         if (tagOpt.isPresent()) {
             String translationKey = Util.makeDescriptionId("tag", tagOpt.get().location());
