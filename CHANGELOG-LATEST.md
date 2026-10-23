@@ -1,3 +1,3 @@
-### Changed
-
-- Ported data-driven fixes and changes from 1.21.
+- Utilize newer RRV 8.8 features (@cassiancc).
+- Remove use of deprecated Fabric API methods (@cassiancc).
+- Add iconFile NeoForge metadata for new mod list currently being backported (@cassiancc).
