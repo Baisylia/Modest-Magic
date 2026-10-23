@@ -9,6 +9,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Prediction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
@@ -246,7 +247,7 @@ public class PedestalBlock extends BaseEntityBlock implements SimpleWaterloggedB
             level.playSound(null, pos, ModSounds.REMOVE_ITEM_PEDESTAL.get(), SoundSource.BLOCKS, 1.0f, 1.0f);
 
             if (!player.getInventory().add(stack)) {
-                player.drop(stack, false);
+                player.drop(stack, false, Prediction.PREDICTED);
             }
         }
         return InteractionResult.CONSUME;

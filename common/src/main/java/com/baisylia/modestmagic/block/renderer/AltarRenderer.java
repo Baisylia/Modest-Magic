@@ -48,7 +48,7 @@ public class AltarRenderer implements BlockEntityRenderer<AltarBlockEntity, Pede
 
         float rotation = enchantingTable.rotation;
 
-        poseStack.mulPose(Axis.YP.rotationDegrees(rotation));
+        poseStack.rotateDegrees(Axis.YP, (rotation));
         poseStack.scale(0.6f, 0.6f, 0.6f);
 
         stack.submit(poseStack, submitNodeCollector, enchantingTable.lightCoords, OverlayTexture.NO_OVERLAY, 0);
