@@ -1,3 +1,1 @@
-- Utilize newer RRV 8.8 features (@cassiancc).
-- Remove use of deprecated Fabric API methods (@cassiancc).
-- Add iconFile NeoForge metadata for new mod list currently being backported (@cassiancc).
+- Ported to 26.3 (@cassiancc).
