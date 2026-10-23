@@ -32,7 +32,6 @@ public class SlotWidget extends Widget {
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
 		if (this.stack != null) {
 
-
 			if (RRVInputUtil.isLeftClick(event)) {
 				ItemViewOverlay.INSTANCE.openRecipeView(this.stack, ActionType.RESULT);
 				return true;

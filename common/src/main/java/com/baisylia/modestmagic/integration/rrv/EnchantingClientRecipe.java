@@ -1,5 +1,7 @@
 package com.baisylia.modestmagic.integration.rrv;
 
+import cc.cassian.rrv.api.client.RecipeScreenContext;
+import cc.cassian.rrv.api.recipe.ReliableClientRecipe;
 import cc.cassian.rrv.api.recipe.ReliableClientRecipeType;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewMenu;
 import cc.cassian.rrv.common.recipe.inventory.RecipeViewScreen;
@@ -28,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class EnchantingClientRecipe extends AbstractModestMagicClientRecipe {
+public class EnchantingClientRecipe implements ReliableClientRecipe {
 
     private final Identifier id;
     private final List<SlotContent> inputs;
@@ -140,7 +142,7 @@ public class EnchantingClientRecipe extends AbstractModestMagicClientRecipe {
     }
 
     @Override
-    public void initRecipe(RecipeViewScreen screen, RecipePosition recipePosition, GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    public void addRecipeWidgets(RecipeScreenContext context) {
         int cx = 35;
         int cy = getType().getDisplayHeight() / 2;
         int radius = 24;
@@ -153,24 +155,24 @@ public class EnchantingClientRecipe extends AbstractModestMagicClientRecipe {
             circleItems = inputs;
         }
 
-        RotationState state = new RotationState(cx, cy, radius, circleItems.size(), recipePosition);
+        RotationState state = new RotationState(cx, cy, radius, circleItems.size(), context.recipePosition());
 
-        screen.addRecipeWidget(new RotatingLettersWidget(
+        context.widgets().addRecipeWidget(new RotatingLettersWidget(
                 Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/enchanted_letters.png"),
                 cx, cy, radius + 6,
-                recipePosition));
+                context.recipePosition()));
 
-        HoveringSlotWidget base = new HoveringSlotWidget(baseIngredient, null, cx - 9, cy - 9, 0, recipePosition);
-        screen.addRecipeWidget(base);
+        HoveringSlotWidget base = new HoveringSlotWidget(baseIngredient, null, cx - 9, cy - 9, 0, context.recipePosition());
+        context.widgets().addRecipeWidget(base);
 
         for (int i = 0; i < circleItems.size(); i++) {
-            screen.addRecipeWidget(new RotatingSlotWidget(state, circleItems.get(i), i + 1, recipePosition));
+            context.widgets().addRecipeWidget(new RotatingSlotWidget(state, circleItems.get(i), i + 1, context.recipePosition()));
         }
 
         // Arrow and cycling enchanted item
 //        widgets.addTexture(EmiTexture.EMPTY_ARROW, cx + radius + 16, cy - 8);
-        screen.addRecipeWidget(new HoveringSlotWidget(SlotContent.of(outputs), base, cx + radius + 51, cy - 9, 2, recipePosition));
+        context.widgets().addRecipeWidget(new HoveringSlotWidget(SlotContent.of(outputs), base, cx + radius + 51, cy - 9, 2, context.recipePosition()));
 
-        screen.addRecipeWidget(new WheelListTooltipWidget(cx, cy, radius, circleItems, recipePosition));
+        context.widgets().addRecipeWidget(new WheelListTooltipWidget(cx, cy, radius, circleItems, context.recipePosition()));
     }
 }
