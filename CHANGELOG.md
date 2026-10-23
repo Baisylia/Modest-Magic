@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.2] - 2026-10-22
+
+- Utilize newer RRV 8.8 features (@cassiancc).
+- Remove use of deprecated Fabric API methods (@cassiancc).
+- Add iconFile NeoForge metadata for new mod list currently being backported (@cassiancc).
+
 ## [1.4.1] - 2026-09-12
 
 ### Fixed
